@@ -1,8 +1,13 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { Key, Users, CheckSquare, XSquare, AlertCircle } from "lucide-react";
+import { UserCheck, SlidersHorizontal, KeyRound } from "lucide-react";
+
+import { AccessCampaignsWidget } from "@/components/widgets/access_reviews/AccessCampaignsWidget";
+import { RevokedAccessWidget } from "@/components/widgets/access_reviews/RevokedAccessWidget";
+import { OverPermissionedWidget } from "@/components/widgets/access_reviews/OverPermissionedWidget";
+import { PrivilegedAccessWidget } from "@/components/widgets/access_reviews/PrivilegedAccessWidget";
+import { AccessRequestQueueWidget } from "@/components/widgets/access_reviews/AccessRequestQueueWidget";
 
 export default function AccessReviewsPage() {
     return (
@@ -11,45 +16,43 @@ export default function AccessReviewsPage() {
             <div className="flex items-center justify-between">
                 <div>
                     <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
-                        <Key className="w-8 h-8 mr-3 text-cyan-500" />
-                        User Access Reviews (UAR)
+                        <KeyRound className="w-8 h-8 mr-3 text-red-500" />
+                        Identity & Access Management
                     </h1>
-                    <p className="text-sm text-slate-400 mt-2">Quarterly recertification campaigns and identity governance.</p>
+                    <p className="text-sm text-slate-400 mt-2">Enforce least-privilege policies, orchestrate user access reviews, and govern privileged vaulting.</p>
                 </div>
-                <button className="bg-slate-100 hover:bg-white text-slate-900 px-5 py-2.5 rounded-xl text-sm font-medium shadow-glow transition-all">
-                    Start Campaign
-                </button>
+                <div className="flex space-x-3">
+                    <button className="px-5 py-2.5 border border-slate-700 hover:bg-slate-800 rounded-xl text-sm font-medium text-slate-300 transition-all flex items-center">
+                        <SlidersHorizontal className="w-4 h-4 mr-2" />
+                        Configure Rules
+                    </button>
+                    <button className="bg-red-600 hover:bg-red-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(239,68,68,0.3)] transition-all flex items-center">
+                        <UserCheck className="w-4 h-4 mr-2" />
+                        New Campaign
+                    </button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {[
-                    { label: "Total Identities", value: "3,104", icon: Users, color: "text-slate-300" },
-                    { label: "Approved Access", value: "2,840", icon: CheckSquare, color: "text-emerald-400" },
-                    { label: "Revoked", value: "112", icon: XSquare, color: "text-red-400" },
-                    { label: "Pending Review", value: "152", icon: AlertCircle, color: "text-amber-400" },
-                ].map((s, i) => (
-                    <motion.div
-                        key={i}
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{ delay: i * 0.1, duration: 0.4 }}
-                        className="glass-panel p-5 rounded-2xl flex flex-col justify-between border border-slate-800/50"
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest">{s.label}</span>
-                            <s.icon className={`w-5 h-5 ${s.color}`} />
-                        </div>
-                        <span className="text-3xl font-bold text-slate-100 tracking-tighter">{s.value}</span>
-                    </motion.div>
-                ))}
+            {/* Top Row: UAR Campaigns, Revoked, Over-Permissioned */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 h-[320px]">
+                    <AccessCampaignsWidget />
+                </div>
+                <div className="md:col-span-1 lg:col-span-1 h-[320px]">
+                    <RevokedAccessWidget />
+                </div>
+                <div className="md:col-span-2 lg:col-span-1 h-[320px]">
+                    <OverPermissionedWidget />
+                </div>
             </div>
 
-            <div className="glass-panel flex-1 rounded-2xl border border-slate-800/50 min-h-[400px] flex items-center justify-center p-8 text-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 to-transparent z-10" />
-                <div className="z-20">
-                    <Key className="w-16 h-16 text-slate-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-bold text-slate-200 mb-2">Campaign Initializing</h3>
-                    <p className="text-slate-400 text-sm max-w-sm mx-auto">Syncing with Okta, Google Workspace, and Azure AD to compile current entitlement assignments.</p>
+            {/* Bottom Row: Privileged Access, Request Queue */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 min-h-[380px]">
+                <div className="xl:col-span-2">
+                    <PrivilegedAccessWidget />
+                </div>
+                <div className="xl:col-span-1">
+                    <AccessRequestQueueWidget />
                 </div>
             </div>
         </div>

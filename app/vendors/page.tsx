@@ -5,6 +5,12 @@ import { motion } from "framer-motion";
 import { Building2, MailWarning, Clock, Filter, Plus } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 
+import { VendorRiskDistributionWidget } from "@/components/widgets/vendors/VendorRiskDistributionWidget";
+import { TopVendorRisksWidget } from "@/components/widgets/vendors/TopVendorRisksWidget";
+import { VendorQuestionnairesWidget } from "@/components/widgets/vendors/VendorQuestionnairesWidget";
+import { VendorMapWidget } from "@/components/widgets/vendors/VendorMapWidget";
+import { VendorActionListWidget } from "@/components/widgets/vendors/VendorActionListWidget";
+
 export default function VendorsPage() {
     return (
         <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-700">
@@ -53,32 +59,26 @@ export default function VendorsPage() {
                 ))}
             </div>
 
-            {/* Placeholder Table */}
-            <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col flex-1 min-h-[500px]">
-                <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm text-slate-400">
-                        <thead className="text-xs text-slate-500 font-mono uppercase bg-slate-900/40 border-b border-slate-800/50">
-                            <tr>
-                                <th className="px-6 py-4 font-medium rounded-tl-xl">Vendor Name</th>
-                                <th className="px-6 py-4 font-medium">Risk Tier</th>
-                                <th className="px-6 py-4 font-medium">Assessment Status</th>
-                                <th className="px-6 py-4 font-medium text-right rounded-tr-xl">Last Review</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-slate-800/50">
-                            {[1, 2, 3, 4, 5].map((_, idx) => (
-                                <tr key={idx} className="hover:bg-slate-800/30 transition-colors">
-                                    <td className="px-6 py-4 flex items-center">
-                                        <div className="w-8 h-8 rounded-lg bg-slate-800 mr-3 animate-pulse" />
-                                        <div className="h-4 w-24 bg-slate-800 rounded animate-pulse" />
-                                    </td>
-                                    <td className="px-6 py-4"><div className="h-4 w-16 bg-slate-800/50 rounded animate-pulse" /></td>
-                                    <td className="px-6 py-4"><div className="h-5 w-24 bg-slate-800/50 rounded-full animate-pulse" /></td>
-                                    <td className="px-6 py-4 flex justify-end"><div className="h-4 w-20 bg-slate-800/50 rounded animate-pulse" /></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+            {/* Top Widget Row */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 h-[300px]">
+                    <VendorRiskDistributionWidget />
+                </div>
+                <div className="lg:col-span-2 h-[300px]">
+                    <VendorQuestionnairesWidget />
+                </div>
+            </div>
+
+            {/* Bottom Widget Row */}
+            <div className="grid grid-cols-1 xl:grid-cols-4 gap-6 min-h-[400px]">
+                <div className="xl:col-span-1">
+                    <TopVendorRisksWidget />
+                </div>
+                <div className="xl:col-span-2">
+                    <VendorMapWidget />
+                </div>
+                <div className="xl:col-span-1">
+                    <VendorActionListWidget />
                 </div>
             </div>
         </div>

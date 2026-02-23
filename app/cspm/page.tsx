@@ -5,6 +5,12 @@ import { motion } from "framer-motion";
 import { CloudCog, Globe, Server, Database, AlertCircle } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 
+import { MultiCloudPostureWidget } from "@/components/widgets/cspm/MultiCloudPostureWidget";
+import { DriftDetectionWidget } from "@/components/widgets/cspm/DriftDetectionWidget";
+import { MisconfigurationFeedWidget } from "@/components/widgets/cspm/MisconfigurationFeedWidget";
+import { ResourceInventoryWidget } from "@/components/widgets/cspm/ResourceInventoryWidget";
+import { TopCloudAccountsWidget } from "@/components/widgets/cspm/TopCloudAccountsWidget";
+
 export default function CSPMPage() {
     return (
         <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-700">
@@ -52,11 +58,26 @@ export default function CSPMPage() {
                 ))}
             </div>
 
-            <div className="glass-panel rounded-2xl border border-slate-800/50 flex-1 min-h-[500px] flex items-center justify-center p-8">
-                <div className="text-center">
-                    <CloudCog className="w-16 h-16 text-sky-500/30 mx-auto mb-6 animate-pulse" />
-                    <h3 className="text-xl font-bold text-slate-300 mb-2">Aggregating Cloud Logs</h3>
-                    <p className="text-sm text-slate-500 max-w-sm mx-auto">Connecting to AWS Config and Azure Resource Graph APIs. The visualization map will compile shortly.</p>
+            {/* Top Row: Multi-Cloud Posture & Drift Detection */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="h-[350px]">
+                    <MultiCloudPostureWidget />
+                </div>
+                <div className="h-[350px]">
+                    <DriftDetectionWidget />
+                </div>
+            </div>
+
+            {/* Bottom Row: Misconfigurations, Inventory, Top Accounts */}
+            <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 min-h-[400px]">
+                <div className="xl:col-span-1">
+                    <MisconfigurationFeedWidget />
+                </div>
+                <div className="xl:col-span-1">
+                    <ResourceInventoryWidget />
+                </div>
+                <div className="xl:col-span-1">
+                    <TopCloudAccountsWidget />
                 </div>
             </div>
         </div>

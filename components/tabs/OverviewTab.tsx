@@ -7,6 +7,13 @@ import { cn } from "@/components/ui/Card";
 import { CircularProgress } from "@/components/ui/CircularProgress";
 import { HeatmapWidget } from "@/components/widgets/HeatmapWidget";
 
+// Import Kickass Overview Widgets
+import { CostEstimatorWidget } from "@/components/widgets/overview/CostEstimatorWidget";
+import { ExecutiveSummaryWidget } from "@/components/widgets/overview/ExecutiveSummaryWidget";
+import { RealtimeAnomalyFeed } from "@/components/widgets/overview/RealtimeAnomalyFeed";
+import { GeographicThreatMap } from "@/components/widgets/overview/GeographicThreatMap";
+import { BurnRateChart } from "@/components/widgets/overview/BurnRateChart";
+
 interface OverviewProps {
     activeFramework: string;
     setActiveFramework: React.Dispatch<React.SetStateAction<string>>;
@@ -62,28 +69,29 @@ export function OverviewTab({ activeFramework, setActiveFramework, frameworks, s
                 ))}
             </div>
 
-            {/* Middle Row: Master Score & Critical Risks */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Master Score */}
-                <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden group col-span-1 lg:col-span-2">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+            {/* Middle Row A: Executive AI, Global Posture, Quick Risks */}
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                <div className="lg:col-span-2">
+                    <ExecutiveSummaryWidget />
+                </div>
 
+                {/* Master Score */}
+                <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between relative overflow-hidden group lg:col-span-1">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
                     <div className="z-10 flex flex-col h-full justify-between">
                         <div>
-                            <h3 className="text-sm font-semibold text-slate-400 tracking-wide uppercase">Global Posture Score</h3>
+                            <h3 className="text-sm font-semibold text-slate-400 tracking-wide uppercase">Global Posture</h3>
                             <div className="mt-2 flex items-baseline space-x-3">
-                                <span className="text-6xl font-bold text-slate-100 tracking-tighter">{score}</span>
+                                <span className="text-5xl font-bold text-slate-100 tracking-tighter">{score}</span>
                                 <span className="text-xl text-slate-500 font-medium">/ 100</span>
                             </div>
                         </div>
-
-                        <div className="mt-8 flex items-center space-x-6">
+                        <div className="mt-6 flex flex-col space-y-2">
                             <div className="flex items-center space-x-2">
                                 <TrendingUp className="w-5 h-5 text-emerald-400" />
-                                <span className="text-sm font-medium text-emerald-400">{trend} vs last month</span>
+                                <span className="text-sm font-medium text-emerald-400">{trend} vs month</span>
                             </div>
-                            <div className="h-4 w-px bg-slate-800" />
-                            <div className="flex items-center space-x-2 text-sm text-slate-400">
+                            <div className="flex items-center text-sm text-slate-400">
                                 <span>Target: <span className="text-slate-200">90</span></span>
                             </div>
                         </div>
@@ -91,7 +99,7 @@ export function OverviewTab({ activeFramework, setActiveFramework, frameworks, s
                 </div>
 
                 {/* Quick Risk Stat */}
-                <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
+                <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between lg:col-span-1">
                     <div>
                         <div className="flex flex-row items-center justify-between mb-2">
                             <h3 className="text-sm font-semibold text-slate-400 tracking-wide uppercase">Critical Risks</h3>
@@ -100,19 +108,36 @@ export function OverviewTab({ activeFramework, setActiveFramework, frameworks, s
                         <span className="text-5xl font-bold text-slate-100 tracking-tighter">{riskCount}</span>
                     </div>
                     <button className="mt-6 w-full flex items-center justify-center space-x-2 bg-slate-800/50 hover:bg-slate-800 text-sm text-slate-200 py-2.5 rounded-lg border border-slate-700/50 transition-colors">
-                        <span>View Vulnerabilities</span>
+                        <span>Details</span>
                         <ArrowRight className="w-4 h-4" />
                     </button>
                 </div>
             </div>
 
-            {/* Bottom Row: Heatmap & Actionable Steps */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2">
+            {/* Middle Row B: Heatmap & Burn Rate */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div className="h-[300px]">
                     <HeatmapWidget frameworkId={activeFramework} />
                 </div>
+                <div className="h-[300px]">
+                    <BurnRateChart />
+                </div>
+            </div>
 
-                <div className="glass-panel p-6 rounded-2xl border border-slate-800/50 lg:col-span-1">
+            {/* Bottom Row A: Geo-Threat Map, Anomaly Feed, Actionable Steps */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                {/* Geographic Threat Map */}
+                <div className="lg:col-span-1 min-h-[300px]">
+                    <GeographicThreatMap />
+                </div>
+
+                {/* Anomaly Feed */}
+                <div className="lg:col-span-1 min-h-[300px]">
+                    <RealtimeAnomalyFeed />
+                </div>
+
+                {/* Action steps */}
+                <div className="glass-panel p-6 rounded-2xl border border-slate-800/50 lg:col-span-1 min-h-[300px]">
                     <div className="flex items-center justify-between border-b border-slate-800/50 pb-4 mb-4">
                         <h3 className="text-lg font-semibold text-slate-100">Next Actionable Steps</h3>
                         <span className="text-xs font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded">3 Pending</span>
@@ -138,6 +163,11 @@ export function OverviewTab({ activeFramework, setActiveFramework, frameworks, s
                         ))}
                     </div>
                 </div>
+            </div>
+
+            {/* Bottom Row B: Cost Estimator */}
+            <div className="grid grid-cols-1">
+                <CostEstimatorWidget />
             </div>
         </motion.div>
     );

@@ -1,9 +1,13 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
-import { GraduationCap, Users, Shield, TrendingUp, Mail } from "lucide-react";
-import { cn } from "@/components/ui/Card";
+import { GraduationCap, PlayCircle, Library } from "lucide-react";
+
+import { TrainingCompletionWidget } from "@/components/widgets/training/TrainingCompletionWidget";
+import { PhishingSimulationWidget } from "@/components/widgets/training/PhishingSimulationWidget";
+import { OverdueTrainingWidget } from "@/components/widgets/training/OverdueTrainingWidget";
+import { DepartmentMetricsWidget } from "@/components/widgets/training/DepartmentMetricsWidget";
+import { RecentCampaignsWidget } from "@/components/widgets/training/RecentCampaignsWidget";
 
 export default function TrainingPage() {
     return (
@@ -13,50 +17,42 @@ export default function TrainingPage() {
                 <div>
                     <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
                         <GraduationCap className="w-8 h-8 mr-3 text-emerald-500" />
-                        Awareness Training
+                        Security Awareness
                     </h1>
-                    <p className="text-sm text-slate-400 mt-2">Employee security modules, phishing simulations, and performance tracking.</p>
+                    <p className="text-sm text-slate-400 mt-2">Manage employee compliance modules, phishing simulations, and human-risk metrics.</p>
                 </div>
-                <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all">
-                    Launch Campaign
-                </button>
+                <div className="flex space-x-3">
+                    <button className="px-5 py-2.5 border border-slate-700 hover:bg-slate-800 rounded-xl text-sm font-medium text-slate-300 transition-all flex items-center">
+                        <Library className="w-4 h-4 mr-2" />
+                        Course Library
+                    </button>
+                    <button className="bg-emerald-600 hover:bg-emerald-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(16,185,129,0.3)] transition-all flex items-center">
+                        <PlayCircle className="w-4 h-4 mr-2" />
+                        Launch Campaign
+                    </button>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {[
-                    { label: "Completion Rate", value: "94%", detail: "↑ 2% this month", icon: Users, color: "text-emerald-400" },
-                    { label: "Phish Resilient", value: "88%", detail: "Last campaign: Q3", icon: Shield, color: "text-blue-400" },
-                    { label: "Active Modules", value: "3", detail: "Due in 14 days", icon: Mail, color: "text-amber-400" },
-                ].map((s, i) => (
-                    <motion.div
-                        key={i}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.1, duration: 0.5 }}
-                        className="glass-panel p-6 rounded-2xl flex flex-col border border-slate-800/50"
-                    >
-                        <div className="flex justify-between items-start mb-4">
-                            <span className="text-sm font-semibold text-slate-400 uppercase tracking-widest">{s.label}</span>
-                            <s.icon className={cn("w-5 h-5", s.color)} />
-                        </div>
-                        <span className="text-4xl font-bold text-slate-100 tracking-tighter mb-2">{s.value}</span>
-                        <span className="text-xs text-slate-500 font-medium flex items-center">
-                            <TrendingUp className="w-3 h-3 mr-1" />
-                            {s.detail}
-                        </span>
-                    </motion.div>
-                ))}
+            {/* Top Row: Completion, Phishing, Overdue */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="lg:col-span-1 h-[320px]">
+                    <TrainingCompletionWidget />
+                </div>
+                <div className="md:col-span-1 lg:col-span-1 h-[320px]">
+                    <PhishingSimulationWidget />
+                </div>
+                <div className="md:col-span-2 lg:col-span-1 h-[320px]">
+                    <OverdueTrainingWidget />
+                </div>
             </div>
 
-            {/* Campaign Grid Placeholder */}
-            <div className="glass-panel rounded-2xl border border-slate-800/50 flex-1 min-h-[400px] flex items-center justify-center p-8 text-center relative overflow-hidden group">
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-900/80 z-10" />
-                <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5" />
-
-                <div className="z-20 flex flex-col items-center">
-                    <GraduationCap className="w-20 h-20 text-emerald-500/20 mb-6" />
-                    <h3 className="text-2xl font-bold text-slate-200 mb-2">Campaign Intelligence Hub</h3>
-                    <p className="text-slate-400 max-w-md">Syncing HRIS directories and pulling historic completion logs for dynamic table generation.</p>
+            {/* Bottom Row: Dept Leaderboard, Recent Campaigns */}
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[380px]">
+                <div className="xl:col-span-1">
+                    <DepartmentMetricsWidget />
+                </div>
+                <div className="xl:col-span-1">
+                    <RecentCampaignsWidget />
                 </div>
             </div>
         </div>
