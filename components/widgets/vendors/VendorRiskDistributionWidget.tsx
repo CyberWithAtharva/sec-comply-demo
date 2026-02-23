@@ -21,13 +21,13 @@ export function VendorRiskDistributionWidget() {
                 </div>
             </div>
 
-            <div className="flex-1 w-full min-h-[200px] relative">
+            <div className="flex-1 min-h-0 w-full relative">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                         <Pie
                             data={data}
-                            innerRadius={65}
-                            outerRadius={85}
+                            innerRadius={50}
+                            outerRadius={70}
                             paddingAngle={5}
                             dataKey="value"
                             stroke="none"
@@ -44,16 +44,16 @@ export function VendorRiskDistributionWidget() {
                 </ResponsiveContainer>
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-3xl font-bold text-slate-100 pb-1">142</span>
+                    <span className="text-2xl font-bold text-slate-100 pb-0.5">142</span>
                     <span className="text-[10px] uppercase tracking-widest text-slate-500 font-medium">Vendors</span>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mt-4 pt-4 border-t border-slate-800/50">
+            <div className="grid grid-cols-2 gap-1.5 mt-2 pt-3 shrink-0 border-t border-slate-800/50">
                 {data.map((item, i) => (
-                    <div key={i} className="flex items-center space-x-2">
-                        <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                        <span className="text-[10px] text-slate-400">{item.name}</span>
+                    <div key={i} className="flex items-center space-x-1.5">
+                        <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
+                        <span className="text-[10px] text-slate-400 truncate">{item.name}</span>
                     </div>
                 ))}
             </div>

@@ -20,22 +20,24 @@ export function SubdomainTakeoverWidget() {
                 <span className="text-xs font-mono text-red-500 bg-red-500/10 px-2 py-1 rounded">Action Required</span>
             </div>
 
-            <div className="flex flex-col space-y-3 flex-1 justify-center">
-                <p className="text-xs text-slate-400 mb-2">Vulnerable CNAMEs pointing to unclaimed external resources.</p>
-                {risks.map((risk, idx) => (
-                    <div key={idx} className="p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 flex flex-col group hover:bg-slate-800/40 transition-colors cursor-pointer">
-                        <div className="flex justify-between items-start mb-1">
-                            <span className="text-sm font-medium text-slate-200 group-hover:text-red-400 transition-colors">{risk.target}</span>
-                            <span className="text-[10px] font-bold uppercase tracking-wider text-red-500">{risk.severity}</span>
+            <div className="flex-1 min-h-0 flex flex-col overflow-y-auto pr-1 scrollbar-thin">
+                <p className="text-xs text-slate-400 mb-2 shrink-0">Vulnerable CNAMEs pointing to unclaimed external resources.</p>
+                <div className="flex flex-col space-y-3">
+                    {risks.map((risk, idx) => (
+                        <div key={idx} className="p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 flex flex-col group hover:bg-slate-800/40 transition-colors cursor-pointer">
+                            <div className="flex justify-between items-start mb-1">
+                                <span className="text-sm font-medium text-slate-200 group-hover:text-red-400 transition-colors">{risk.target}</span>
+                                <span className="text-[10px] font-bold uppercase tracking-wider text-red-500">{risk.severity}</span>
+                            </div>
+                            <div className="flex items-center text-[10px] text-slate-500 bg-slate-900/50 p-1.5 rounded-lg border border-slate-800/50">
+                                <span className="text-slate-400 mr-1">CNAME:</span> {risk.cname}
+                            </div>
                         </div>
-                        <div className="flex items-center text-[10px] text-slate-500 bg-slate-900/50 p-1.5 rounded-lg border border-slate-800/50">
-                            <span className="text-slate-400 mr-1">CNAME:</span> {risk.cname}
-                        </div>
-                    </div>
-                ))}
+                    ))}
+                </div>
             </div>
 
-            <button className="w-full mt-4 flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-sm font-medium text-red-400 py-2.5 rounded-lg border border-red-500/20 transition-colors">
+            <button className="w-full mt-3 shrink-0 flex items-center justify-center bg-red-500/10 hover:bg-red-500/20 text-sm font-medium text-red-400 py-2.5 rounded-lg border border-red-500/20 transition-colors">
                 Remediate DNS Records
             </button>
         </div>

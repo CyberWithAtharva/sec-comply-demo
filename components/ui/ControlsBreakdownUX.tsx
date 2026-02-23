@@ -2,10 +2,10 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Server, Lock, Fingerprint, Eye, ChevronRight, CheckCircle2, AlertTriangle, AlertCircle, Maximize2, ChevronDown, FileText, FileJson, FileBadge } from "lucide-react";
+import { ShieldCheck, Server, Lock, Fingerprint, Eye, ChevronRight, CheckCircle2, AlertTriangle, AlertCircle, Maximize2, ChevronDown, FileText, FileJson, FileBadge, ArrowRight } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 
-// Mock Data for 3-Level Vertical
+// ─── Mock Data ────────────────────────────────────────────────────
 const tscDomains = [
     { id: "security", name: "Security", icon: ShieldCheck, status: "Good", progress: 85 },
     { id: "availability", name: "Availability", icon: Server, status: "Warning", progress: 62 },
@@ -51,6 +51,25 @@ const controlsData: Record<string, any[]> = {
         { id: "CC2.2", desc: "Entity internally communicates information, including objectives and responsibilities for internal control.", status: "failed", type: "Manual" },
         { id: "CC2.3", desc: "Entity communicates with external parties regarding matters affecting functioning of internal control.", status: "passed", type: "Manual" },
     ],
+    cc3: [
+        { id: "CC3.1", desc: "Entity specifies objectives with sufficient clarity to enable identification of risks.", status: "passed", type: "Manual" },
+        { id: "CC3.2", desc: "Entity identifies risks to the achievement of its objectives.", status: "passed", type: "Automated" },
+        { id: "CC3.3", desc: "Entity considers the potential for fraud in assessing risks.", status: "failed", type: "Manual" },
+        { id: "CC3.4", desc: "Entity identifies and assesses changes that could significantly impact internal control.", status: "passed", type: "Automated" },
+    ],
+    cc4: [
+        { id: "CC4.1", desc: "Entity selects, develops, and performs ongoing and/or separate evaluations.", status: "passed", type: "Automated" },
+        { id: "CC4.2", desc: "Entity evaluates and communicates internal control deficiencies in a timely manner.", status: "passed", type: "Manual" },
+    ],
+    cc5: [
+        { id: "CC5.1", desc: "Entity selects and develops control activities that contribute to the mitigation of risks.", status: "passed", type: "Automated" },
+        { id: "CC5.2", desc: "Entity also selects and develops general control activities over technology.", status: "failed", type: "Automated" },
+        { id: "CC5.3", desc: "Entity deploys control activities through policies and procedures.", status: "passed", type: "Manual" },
+        { id: "CC5.4", desc: "SDLC change management controls are documented and followed.", status: "failed", type: "Automated" },
+        { id: "CC5.5", desc: "Entity implements segregation of duties or compensating controls.", status: "passed", type: "Manual" },
+        { id: "CC5.6", desc: "Entity implements logical access security over infrastructure management.", status: "passed", type: "Automated" },
+        { id: "CC5.7", desc: "Entity restricts registration and issuance of IT credentials.", status: "failed", type: "Automated" },
+    ],
     cc6: [
         { id: "CC6.1", desc: "Entity implements logical access security software, infrastructure, and architectures.", status: "passed", type: "Automated" },
         { id: "CC6.2", desc: "Entity registers and authorizes new internal and external users.", status: "passed", type: "Automated" },
@@ -60,10 +79,41 @@ const controlsData: Record<string, any[]> = {
         { id: "CC6.6", desc: "Entity implements logical access security measures to protect against threats from outside boundaries.", status: "passed", type: "Automated" },
         { id: "CC6.7", desc: "Entity restricts the transmission, movement, and removal of information.", status: "passed", type: "Automated" },
         { id: "CC6.8", desc: "Entity implements controls to prevent or detect and act upon the introduction of unauthorized software.", status: "passed", type: "Automated" },
+    ],
+    a1: [
+        { id: "A1.1", desc: "Entity maintains, monitors, and evaluates current processing capacity and use of system components.", status: "passed", type: "Automated" },
+        { id: "A1.2", desc: "Entity authorizes, designs, develops or acquires, implements, operates, and maintains environmental protections.", status: "failed", type: "Manual" },
+        { id: "A1.3", desc: "Entity tests recovery plan procedures supporting system recovery to meet its objectives.", status: "passed", type: "Automated" },
+    ],
+    c1: [
+        { id: "C1.1", desc: "Entity identifies and maintains confidential information to meet confidentiality commitments.", status: "passed", type: "Automated" },
+        { id: "C1.2", desc: "Entity disposes of confidential information to meet confidentiality commitments.", status: "passed", type: "Manual" },
+    ],
+    pi1: [
+        { id: "PI1.1", desc: "Entity obtains or generates, uses and communicates relevant, quality info regarding processing objectives.", status: "failed", type: "Automated" },
+        { id: "PI1.2", desc: "System processing is complete, valid, accurate, timely, and authorized.", status: "failed", type: "Automated" },
+        { id: "PI1.3", desc: "System output is complete, valid, accurate, timely, and authorized.", status: "pending", type: "Manual" },
+        { id: "PI1.4", desc: "Entity implements policies and procedures to make info available for downstream processing.", status: "failed", type: "Automated" },
+        { id: "PI1.5", desc: "Entity implements quality assurance process for system processing.", status: "failed", type: "Manual" },
+    ],
+    p1: [
+        { id: "P1.1", desc: "Entity provides notice to data subjects about its privacy practices to meet its objectives.", status: "passed", type: "Manual" },
+        { id: "P1.2", desc: "Entity communicates data subjects' personal info to identified third parties.", status: "passed", type: "Manual" },
+        { id: "P1.3", desc: "Entity collects personal info consistent with privacy notice.", status: "failed", type: "Automated" },
+        { id: "P1.4", desc: "Entity limits the use of personal information to the purposes identified in notice.", status: "passed", type: "Automated" },
+        { id: "P1.5", desc: "Entity retains personal info consistent with its objectives.", status: "passed", type: "Automated" },
+        { id: "P1.6", desc: "Entity disposes personal info in accordance with data retention policies.", status: "failed", type: "Manual" },
+        { id: "P1.7", desc: "Entity discloses personal info to authorized third parties.", status: "passed", type: "Manual" },
+        { id: "P1.8", desc: "Entity informs data subjects of corrections or modifications.", status: "failed", type: "Manual" },
+    ],
+    p2: [
+        { id: "P2.1", desc: "Entity communicates choices available regarding the collection, use, retention, and disposal of personal info.", status: "passed", type: "Manual" },
+        { id: "P2.2", desc: "Entity obtains and documents consent from data subjects for processing personal info.", status: "failed", type: "Automated" },
+        { id: "P2.3", desc: "Entity provides mechanisms for data subjects to update or delete their personal information.", status: "passed", type: "Automated" },
     ]
 };
 
-// Evidence coverage data per control
+// Per-control evidence file mapping
 const evidenceData: Record<string, { files: { name: string; type: string; icon: any }[] }> = {
     "CC1.1": { files: [{ name: "Code of Ethics Policy.pdf", type: "PDF", icon: FileBadge }, { name: "Annual Ethics Training Log", type: "XLSX", icon: FileText }] },
     "CC1.2": { files: [{ name: "Board Meeting Minutes Q3.pdf", type: "PDF", icon: FileBadge }] },
@@ -73,6 +123,19 @@ const evidenceData: Record<string, { files: { name: string; type: string; icon: 
     "CC2.1": { files: [{ name: "Data Quality Framework.pdf", type: "PDF", icon: FileBadge }] },
     "CC2.2": { files: [{ name: "Internal Communication Policy.pdf", type: "PDF", icon: FileBadge }] },
     "CC2.3": { files: [{ name: "External Communication Log.xlsx", type: "XLSX", icon: FileText }] },
+    "CC3.1": { files: [{ name: "Strategic Objectives Doc.pdf", type: "PDF", icon: FileBadge }] },
+    "CC3.2": { files: [{ name: "Enterprise Risk Register.xlsx", type: "XLSX", icon: FileText }, { name: "Risk Assessment Report.pdf", type: "PDF", icon: FileBadge }] },
+    "CC3.3": { files: [{ name: "Fraud Risk Assessment.pdf", type: "PDF", icon: FileBadge }] },
+    "CC3.4": { files: [{ name: "Change Impact Analysis.xlsx", type: "XLSX", icon: FileText }] },
+    "CC4.1": { files: [{ name: "Continuous Monitoring Config.json", type: "JSON", icon: FileJson }] },
+    "CC4.2": { files: [{ name: "Deficiency Tracker.xlsx", type: "XLSX", icon: FileText }] },
+    "CC5.1": { files: [{ name: "Control Matrix.xlsx", type: "XLSX", icon: FileText }] },
+    "CC5.2": { files: [{ name: "IT General Controls Audit.pdf", type: "PDF", icon: FileBadge }] },
+    "CC5.3": { files: [{ name: "Policy & Procedure Manual.pdf", type: "PDF", icon: FileBadge }] },
+    "CC5.4": { files: [{ name: "SDLC Change Log.json", type: "JSON", icon: FileJson }] },
+    "CC5.5": { files: [{ name: "SoD Matrix.xlsx", type: "XLSX", icon: FileText }] },
+    "CC5.6": { files: [{ name: "Infrastructure Access Report.json", type: "JSON", icon: FileJson }] },
+    "CC5.7": { files: [{ name: "Credential Issuance Policy.pdf", type: "PDF", icon: FileBadge }] },
     "CC6.1": { files: [{ name: "AWS IAM Policy Export.json", type: "JSON", icon: FileJson }, { name: "Azure AD Config.json", type: "JSON", icon: FileJson }] },
     "CC6.2": { files: [{ name: "User Provisioning Workflow.pdf", type: "PDF", icon: FileBadge }] },
     "CC6.3": { files: [{ name: "Access Review Report Q3.xlsx", type: "XLSX", icon: FileText }] },
@@ -81,12 +144,188 @@ const evidenceData: Record<string, { files: { name: string; type: string; icon: 
     "CC6.6": { files: [{ name: "Firewall Rules Export.json", type: "JSON", icon: FileJson }, { name: "WAF Config.json", type: "JSON", icon: FileJson }] },
     "CC6.7": { files: [{ name: "DLP Policy Config.json", type: "JSON", icon: FileJson }] },
     "CC6.8": { files: [{ name: "Endpoint Security Report.pdf", type: "PDF", icon: FileBadge }] },
+    "A1.1": { files: [{ name: "Capacity Monitor Dashboard.json", type: "JSON", icon: FileJson }] },
+    "A1.2": { files: [{ name: "Environmental Controls Audit.pdf", type: "PDF", icon: FileBadge }] },
+    "A1.3": { files: [{ name: "DR Test Results Q3.pdf", type: "PDF", icon: FileBadge }, { name: "Recovery Playbook.pdf", type: "PDF", icon: FileBadge }] },
+    "C1.1": { files: [{ name: "Data Classification Policy.pdf", type: "PDF", icon: FileBadge }, { name: "DLP Config.json", type: "JSON", icon: FileJson }] },
+    "C1.2": { files: [{ name: "Data Disposal Certificate.pdf", type: "PDF", icon: FileBadge }] },
+    "PI1.1": { files: [{ name: "Data Quality Rules.json", type: "JSON", icon: FileJson }] },
+    "PI1.2": { files: [{ name: "Processing Validation Report.xlsx", type: "XLSX", icon: FileText }] },
+    "PI1.3": { files: [{ name: "Output Verification Log.xlsx", type: "XLSX", icon: FileText }] },
+    "PI1.4": { files: [{ name: "Data Pipeline Config.json", type: "JSON", icon: FileJson }] },
+    "PI1.5": { files: [{ name: "QA Process Document.pdf", type: "PDF", icon: FileBadge }] },
+    "P1.1": { files: [{ name: "Privacy Notice v3.pdf", type: "PDF", icon: FileBadge }] },
+    "P1.2": { files: [{ name: "Third-Party Disclosure Log.xlsx", type: "XLSX", icon: FileText }] },
+    "P1.3": { files: [{ name: "Collection Consent Records.json", type: "JSON", icon: FileJson }] },
+    "P1.4": { files: [{ name: "Purpose Limitation Policy.pdf", type: "PDF", icon: FileBadge }] },
+    "P1.5": { files: [{ name: "Retention Schedule.xlsx", type: "XLSX", icon: FileText }] },
+    "P1.6": { files: [{ name: "Data Disposal Procedure.pdf", type: "PDF", icon: FileBadge }] },
+    "P1.7": { files: [{ name: "Third-Party Agreements.pdf", type: "PDF", icon: FileBadge }] },
+    "P1.8": { files: [{ name: "Data Correction Log.xlsx", type: "XLSX", icon: FileText }] },
+    "P2.1": { files: [{ name: "Consent Management Platform Config.json", type: "JSON", icon: FileJson }] },
+    "P2.2": { files: [{ name: "Consent Forms Archive.pdf", type: "PDF", icon: FileBadge }] },
+    "P2.3": { files: [{ name: "Data Subject Portal Audit.pdf", type: "PDF", icon: FileBadge }] },
 };
 
-// Heatmap data
-const INFRA_CATEGORIES = ["AWS", "Azure", "GCP", "On-Premise"];
-const SECURITY_SUBCATEGORIES = ["IAM", "Network Security", "Data Protection", "Encryption", "Logging & Monitoring", "Incident Response"];
+// ─── Per-Control Heatmap Configuration ────────────────────────────
+// Categories (rows) and subcategories (columns) vary based on the control ID prefix
+interface HeatmapConfig {
+    rows: string[];
+    cols: string[];
+}
 
+function getHeatmapConfig(controlId: string): HeatmapConfig {
+    const prefix = controlId.split(".")[0].toUpperCase();
+
+    switch (prefix) {
+        case "CC1":
+            return {
+                rows: ["HR", "Legal", "Operations", "Executive"],
+                cols: ["Ethics Training", "Code Review", "Policy Updates", "Reporting", "Governance"],
+            };
+        case "CC2":
+            return {
+                rows: ["Internal", "External", "Board", "Stakeholders"],
+                cols: ["Channels", "Data Quality", "Timeliness", "Accuracy", "Completeness"],
+            };
+        case "CC3":
+            return {
+                rows: ["Strategic", "Operational", "Financial", "Compliance"],
+                cols: ["Identification", "Analysis", "Response", "Monitoring", "Fraud Assessment"],
+            };
+        case "CC4":
+            return {
+                rows: ["Automated", "Manual", "Continuous", "Periodic"],
+                cols: ["Detection", "Evaluation", "Reporting", "Remediation"],
+            };
+        case "CC5":
+            return {
+                rows: ["Applications", "Infrastructure", "Databases", "CI/CD"],
+                cols: ["SoD", "Change Mgmt", "IT Controls", "Access Review", "Deployment"],
+            };
+        case "CC6":
+            return {
+                rows: ["AWS", "Azure", "GCP", "On-Premise"],
+                cols: ["IAM", "Network Security", "Data Protection", "Encryption", "Logging & Monitoring", "Incident Response"],
+            };
+        case "A1":
+            return {
+                rows: ["Primary DC", "DR Site", "CDN / Edge", "Cloud Regions"],
+                cols: ["Uptime", "Failover", "RTO", "RPO", "Scaling"],
+            };
+        case "C1":
+            return {
+                rows: ["SaaS", "IaaS", "PaaS", "On-Premise"],
+                cols: ["Classification", "Access Control", "DLP", "Key Mgmt", "Monitoring"],
+            };
+        case "PI1":
+            return {
+                rows: ["APIs", "Databases", "Pipelines", "Reports"],
+                cols: ["Validation", "Processing", "Completeness", "Accuracy", "Timeliness"],
+            };
+        case "P1":
+            return {
+                rows: ["Web App", "Mobile App", "APIs", "Third-Party"],
+                cols: ["Notice", "Collection", "Consent", "Retention", "Subject Rights"],
+            };
+        case "P2":
+            return {
+                rows: ["Web App", "Mobile App", "Email", "Third-Party"],
+                cols: ["Opt-In", "Opt-Out", "Data Sharing", "Cookies", "Preferences"],
+            };
+        default:
+            return {
+                rows: ["AWS", "Azure", "GCP", "On-Premise"],
+                cols: ["IAM", "Network Security", "Data Protection", "Encryption", "Logging & Monitoring"],
+            };
+    }
+}
+
+// ─── Category → Subcategory Tree Data ─────────────────────────────
+interface TreeNode {
+    name: string;
+    children: string[];
+}
+
+function getCategoryTree(controlId: string): TreeNode[] {
+    const prefix = controlId.split(".")[0].toUpperCase();
+
+    switch (prefix) {
+        case "CC1":
+            return [
+                { name: "Governance", children: ["Board Oversight", "Ethics Program", "Code of Conduct"] },
+                { name: "Human Resources", children: ["Recruitment Standards", "Competency Framework", "Performance Accountability"] },
+                { name: "Organizational Structure", children: ["Reporting Lines", "Authority Delegation", "Role Segregation"] },
+            ];
+        case "CC2":
+            return [
+                { name: "Internal Communication", children: ["Policy Distribution", "Training Notices", "Control Objectives"] },
+                { name: "External Communication", children: ["Regulatory Reporting", "Vendor Communication", "Stakeholder Updates"] },
+                { name: "Information Quality", children: ["Data Accuracy", "Completeness Checks", "Timeliness Standards"] },
+            ];
+        case "CC3":
+            return [
+                { name: "Risk Identification", children: ["Threat Modeling", "Vulnerability Scanning", "Business Impact"] },
+                { name: "Risk Analysis", children: ["Likelihood Assessment", "Impact Rating", "Inherent vs. Residual"] },
+                { name: "Risk Response", children: ["Mitigation Plans", "Risk Acceptance", "Transfer / Avoidance"] },
+            ];
+        case "CC4":
+            return [
+                { name: "Ongoing Monitoring", children: ["Automated Alerts", "SIEM Integration", "Health Dashboards"] },
+                { name: "Separate Evaluations", children: ["Internal Audit", "External Audit", "Penetration Testing"] },
+                { name: "Deficiency Mgmt", children: ["Root Cause Analysis", "Remediation Tracking", "Escalation Procedures"] },
+            ];
+        case "CC5":
+            return [
+                { name: "IT General Controls", children: ["Change Management", "Patch Management", "Configuration Mgmt"] },
+                { name: "Control Activities", children: ["Separation of Duties", "Reconciliation", "Authorization Controls"] },
+                { name: "Technology Controls", children: ["SDLC Lifecycle", "Code Review", "Deployment Gates"] },
+            ];
+        case "CC6":
+            return [
+                { name: "Logical Access", children: ["IAM Policies", "MFA Enforcement", "RBAC / ABAC", "SSO Integration"] },
+                { name: "Physical Access", children: ["Badge Systems", "Biometric Controls", "Visitor Management"] },
+                { name: "Network Security", children: ["Firewall Rules", "WAF", "Micro-Segmentation", "VPN / Zero Trust"] },
+                { name: "Data Security", children: ["Encryption at Rest", "Encryption in Transit", "DLP Policies"] },
+            ];
+        case "A1":
+            return [
+                { name: "Capacity Management", children: ["Auto-Scaling", "Load Balancing", "Resource Monitoring"] },
+                { name: "Disaster Recovery", children: ["DR Plans", "RTO/RPO Targets", "Geo-Redundancy"] },
+                { name: "Backup & Restore", children: ["Automated Backups", "Point-in-Time Recovery", "Backup Validation"] },
+            ];
+        case "C1":
+            return [
+                { name: "Data Classification", children: ["Public", "Internal", "Confidential", "Restricted"] },
+                { name: "Data Protection", children: ["Access Restrictions", "Encryption", "Tokenization"] },
+                { name: "Data Lifecycle", children: ["Retention Policy", "Secure Disposal", "Archival"] },
+            ];
+        case "PI1":
+            return [
+                { name: "Input Controls", children: ["Schema Validation", "Data Type Checks", "Range Validation"] },
+                { name: "Processing Controls", children: ["Batch Integrity", "Error Handling", "Transaction Logging"] },
+                { name: "Output Controls", children: ["Completeness Checks", "Reconciliation", "Distribution Controls"] },
+            ];
+        case "P1":
+            return [
+                { name: "Privacy Notice", children: ["Purpose Statement", "Data Types Collected", "Third-Party Sharing"] },
+                { name: "Data Collection", children: ["Consent Capture", "Minimal Data Principle", "Lawful Basis"] },
+                { name: "Subject Rights", children: ["Access Requests", "Rectification", "Erasure (RTBF)", "Portability"] },
+            ];
+        case "P2":
+            return [
+                { name: "Consent Management", children: ["Granular Opt-In", "Easy Opt-Out", "Consent Versioning"] },
+                { name: "Data Sharing", children: ["Third-Party Agreements", "Cross-Border Transfers", "Sub-Processors"] },
+                { name: "Cookie Management", children: ["Cookie Banner", "Category Controls", "Preference Center"] },
+            ];
+        default:
+            return [
+                { name: "General", children: ["Category A", "Category B", "Category C"] },
+            ];
+    }
+}
+
+// ─── Seeded random for deterministic heatmap ──────────────────────
 const seededRandom = (seed: number) => {
     const x = Math.sin(seed++) * 10000;
     return x - Math.floor(x);
@@ -115,16 +354,110 @@ function getIntensityLabel(value: number): string {
     return "Gap";
 }
 
+// ─── Category → Subcategory Tree Component ────────────────────────
+function CategoryTree({ controlId }: { controlId: string }) {
+    const treeData = getCategoryTree(controlId);
+    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(treeData.map(n => n.name)));
+
+    const toggleNode = (name: string) => {
+        setExpandedNodes(prev => {
+            const next = new Set(prev);
+            if (next.has(name)) next.delete(name);
+            else next.add(name);
+            return next;
+        });
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: 0.1 }}
+            className="mt-5"
+        >
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 block">
+                Category → Subcategories
+            </span>
+            <div className="flex flex-col space-y-2.5">
+                {treeData.map((node, nodeIdx) => {
+                    const isOpen = expandedNodes.has(node.name);
+                    return (
+                        <motion.div
+                            key={node.name}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: nodeIdx * 0.06 }}
+                            className="flex items-start gap-3"
+                        >
+                            {/* Parent Node */}
+                            <button
+                                onClick={() => toggleNode(node.name)}
+                                className={cn(
+                                    "flex-shrink-0 w-40 flex items-center space-x-2 px-3 py-2.5 rounded-xl border transition-all text-left",
+                                    isOpen
+                                        ? "bg-blue-500/10 border-blue-500/25 shadow-[0_0_12px_rgba(59,130,246,0.08)]"
+                                        : "bg-slate-800/60 border-slate-700/50 hover:border-slate-600"
+                                )}
+                            >
+                                <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
+                                    <ChevronRight className={cn("w-3 h-3 flex-shrink-0", isOpen ? "text-blue-400" : "text-slate-500")} />
+                                </motion.div>
+                                <span className={cn("text-xs font-semibold truncate", isOpen ? "text-blue-300" : "text-slate-300")}>
+                                    {node.name}
+                                </span>
+                            </button>
+
+                            {/* Arrow connector */}
+                            <div className="flex items-center pt-2.5 flex-shrink-0">
+                                <div className={cn("w-6 h-px transition-colors", isOpen ? "bg-blue-500/40" : "bg-slate-700")} />
+                                <ArrowRight className={cn("w-3 h-3 -ml-1 transition-colors", isOpen ? "text-blue-500/60" : "text-slate-700")} />
+                            </div>
+
+                            {/* Children */}
+                            <AnimatePresence>
+                                {isOpen && (
+                                    <motion.div
+                                        initial={{ opacity: 0, width: 0 }}
+                                        animate={{ opacity: 1, width: "auto" }}
+                                        exit={{ opacity: 0, width: 0 }}
+                                        transition={{ duration: 0.25 }}
+                                        className="flex flex-wrap gap-1.5 overflow-hidden"
+                                    >
+                                        {node.children.map((child, childIdx) => (
+                                            <motion.div
+                                                key={child}
+                                                initial={{ opacity: 0, scale: 0.8 }}
+                                                animate={{ opacity: 1, scale: 1 }}
+                                                exit={{ opacity: 0, scale: 0.8 }}
+                                                transition={{ delay: childIdx * 0.04, duration: 0.2 }}
+                                                className="text-[10px] font-medium text-slate-300 bg-slate-800/80 border border-slate-700/50 px-2.5 py-1.5 rounded-lg hover:border-blue-500/30 hover:bg-slate-800 transition-all cursor-default whitespace-nowrap"
+                                            >
+                                                {child}
+                                            </motion.div>
+                                        ))}
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    );
+                })}
+            </div>
+        </motion.div>
+    );
+}
+
+// ─── Evidence Heatmap Inline (Per-Control) ────────────────────────
 function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
+    const config = getHeatmapConfig(controlId);
     const baseSeed = stringToSeed(controlId);
 
     const heatmapData = React.useMemo(() => {
-        return INFRA_CATEGORIES.map((_, catIdx) =>
-            SECURITY_SUBCATEGORIES.map((_, subIdx) => {
+        return config.rows.map((_, catIdx) =>
+            config.cols.map((_, subIdx) => {
                 return seededRandom(baseSeed + catIdx * 100 + subIdx * 17);
             })
         );
-    }, [baseSeed]);
+    }, [baseSeed, config.rows.length, config.cols.length]);
 
     const files = evidenceData[controlId]?.files || [
         { name: "Evidence Artifact.pdf", type: "PDF", icon: FileBadge },
@@ -172,10 +505,10 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                     </div>
                 </div>
 
-                <div className="grid gap-1" style={{ gridTemplateColumns: "80px repeat(6, 1fr)" }}>
+                <div className="grid gap-1" style={{ gridTemplateColumns: `80px repeat(${config.cols.length}, 1fr)` }}>
                     {/* Column Headers */}
                     <div />
-                    {SECURITY_SUBCATEGORIES.map((sub) => (
+                    {config.cols.map((sub) => (
                         <div
                             key={sub}
                             className="text-[9px] font-medium text-slate-500 text-center px-0.5 truncate"
@@ -185,8 +518,8 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                         </div>
                     ))}
 
-                    {/* Rows */}
-                    {INFRA_CATEGORIES.map((cat, catIdx) => (
+                    {/* Data Rows */}
+                    {config.rows.map((cat, catIdx) => (
                         <React.Fragment key={cat}>
                             <div className="text-[11px] font-semibold text-slate-300 flex items-center truncate" title={cat}>
                                 {cat}
@@ -205,7 +538,7 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                                         "rounded-md h-8 flex items-center justify-center cursor-pointer transition-all duration-200 hover:scale-110 hover:ring-1 hover:ring-white/20 hover:shadow-lg hover:z-10",
                                         getIntensityClass(value)
                                     )}
-                                    title={`${cat} → ${SECURITY_SUBCATEGORIES[subIdx]}: ${Math.round(value * 100)}%`}
+                                    title={`${cat} → ${config.cols[subIdx]}: ${Math.round(value * 100)}%`}
                                 >
                                     <span className="text-[9px] font-bold opacity-90">
                                         {getIntensityLabel(value)}
@@ -216,10 +549,14 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                     ))}
                 </div>
             </div>
+
+            {/* Category → Subcategory Tree */}
+            <CategoryTree controlId={controlId} />
         </motion.div>
     );
 }
 
+// ─── Main Component ───────────────────────────────────────────────
 export function ControlsBreakdownUX() {
     const [selectedDomain, setSelectedDomain] = useState(tscDomains[0].id);
     const [selectedCategory, setSelectedCategory] = useState("cc6");
@@ -342,6 +679,7 @@ export function ControlsBreakdownUX() {
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0, transition: { delay: idx * 0.05 } }}
                                     exit={{ opacity: 0, scale: 0.95 }}
+                                    onClick={() => setExpandedControlId(isExpanded ? null : control.id)}
                                     className={cn(
                                         "glass-panel p-4 rounded-xl border flex flex-col transition-all group cursor-pointer",
                                         isExpanded
@@ -380,32 +718,38 @@ export function ControlsBreakdownUX() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setExpandedControlId(isExpanded ? null : control.id);
-                                            }}
-                                            className={cn(
-                                                "text-xs font-semibold transition-all whitespace-nowrap px-3 py-1.5 rounded border flex items-center space-x-1.5",
-                                                isExpanded
-                                                    ? "text-blue-400 bg-blue-500/10 border-blue-500/20 opacity-100"
-                                                    : "text-indigo-400 bg-indigo-500/10 border-indigo-500/20 opacity-0 group-hover:opacity-100 hover:bg-indigo-500/20"
-                                            )}
-                                        >
-                                            <span>{isExpanded ? "Collapse" : "View Evidence"}</span>
+                                        {/* Expand indicator — always visible, entire row is clickable */}
+                                        <div className={cn(
+                                            "flex items-center space-x-1.5 text-xs font-semibold whitespace-nowrap px-3 py-1.5 rounded border transition-all flex-shrink-0 ml-3",
+                                            isExpanded
+                                                ? "text-blue-400 bg-blue-500/10 border-blue-500/20"
+                                                : "text-slate-500 bg-slate-800/40 border-slate-700/50 group-hover:text-indigo-400 group-hover:border-indigo-500/20 group-hover:bg-indigo-500/10"
+                                        )}>
+                                            <span>{isExpanded ? "Collapse" : "Expand"}</span>
                                             <motion.div
                                                 animate={{ rotate: isExpanded ? 180 : 0 }}
                                                 transition={{ duration: 0.2 }}
                                             >
                                                 <ChevronDown className="w-3 h-3" />
                                             </motion.div>
-                                        </button>
+                                        </div>
                                     </div>
 
-                                    {/* Expanded Evidence Heatmap */}
-                                    {isExpanded && (
-                                        <EvidenceHeatmapInline controlId={control.id} />
-                                    )}
+                                    {/* Expanded Evidence + Heatmap + Tree */}
+                                    <AnimatePresence>
+                                        {isExpanded && (
+                                            <motion.div
+                                                initial={{ opacity: 0, height: 0 }}
+                                                animate={{ opacity: 1, height: "auto" }}
+                                                exit={{ opacity: 0, height: 0 }}
+                                                transition={{ duration: 0.3 }}
+                                                className="overflow-hidden"
+                                                onClick={(e) => e.stopPropagation()}
+                                            >
+                                                <EvidenceHeatmapInline controlId={control.id} />
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
                                 </motion.div>
                             );
                         })}
