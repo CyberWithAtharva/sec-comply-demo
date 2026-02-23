@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Sidebar } from "@/components/layout/Sidebar";
 
 export const metadata: Metadata = {
   title: "SecComply | AI-Driven Security Compliance",
@@ -22,15 +21,7 @@ export default function RootLayout({
           <div className="absolute -bottom-[20%] left-[20%] w-[60%] h-[40%] rounded-full bg-blue-800/10 blur-[100px] mix-blend-screen" />
         </div>
 
-        {/* Main Application Container */}
-        <main className="relative z-10 w-full min-h-screen flex">
-          <Sidebar />
-          <div className="flex-1 w-full flex flex-col items-center">
-            <div className="w-full max-w-[1600px] flex-1 h-full mx-auto px-4 md:px-8 py-6">
-              {children}
-            </div>
-          </div>
-        </main>
+        {children}
       </body>
     </html>
   );

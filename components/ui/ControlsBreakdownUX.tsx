@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ShieldCheck, Server, Lock, Fingerprint, Eye, ChevronRight, CheckCircle2, AlertTriangle, AlertCircle, Maximize2, ChevronDown, FileText, FileJson, FileBadge, ArrowRight } from "lucide-react";
+import { ShieldCheck, Server, Lock, Fingerprint, Eye, ChevronRight, CheckCircle2, AlertTriangle, AlertCircle, Maximize2, ChevronDown, FileText, FileJson, FileBadge, ArrowRight, Layers } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 
 // ─── Mock Data ────────────────────────────────────────────────────
@@ -372,13 +372,14 @@ function CategoryTree({ controlId }: { controlId: string }) {
         <motion.div
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: 0.1 }}
-            className="mt-5"
+            transition={{ duration: 0.3, delay: 0.05 }}
+            className="mb-5 bg-slate-900/30 rounded-xl border border-slate-800/40 p-4"
         >
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 block">
-                Category → Subcategories
+            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 flex items-center space-x-2">
+                <Layers className="w-3 h-3" />
+                <span>Category → Subcategories</span>
             </span>
-            <div className="flex flex-col space-y-2.5">
+            <div className="flex flex-col space-y-2">
                 {treeData.map((node, nodeIdx) => {
                     const isOpen = expandedNodes.has(node.name);
                     return (
@@ -386,58 +387,50 @@ function CategoryTree({ controlId }: { controlId: string }) {
                             key={node.name}
                             initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: nodeIdx * 0.06 }}
-                            className="flex items-start gap-3"
+                            transition={{ delay: nodeIdx * 0.05 }}
+                            className="flex items-center gap-2.5"
                         >
                             {/* Parent Node */}
                             <button
                                 onClick={() => toggleNode(node.name)}
                                 className={cn(
-                                    "flex-shrink-0 w-40 flex items-center space-x-2 px-3 py-2.5 rounded-xl border transition-all text-left",
+                                    "flex-shrink-0 w-44 flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all text-left",
                                     isOpen
-                                        ? "bg-blue-500/10 border-blue-500/25 shadow-[0_0_12px_rgba(59,130,246,0.08)]"
-                                        : "bg-slate-800/60 border-slate-700/50 hover:border-slate-600"
+                                        ? "bg-blue-500/8 border-blue-500/25 shadow-[0_0_16px_rgba(59,130,246,0.06)]"
+                                        : "bg-slate-800/50 border-slate-700/40 hover:border-slate-600"
                                 )}
                             >
                                 <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
                                     <ChevronRight className={cn("w-3 h-3 flex-shrink-0", isOpen ? "text-blue-400" : "text-slate-500")} />
                                 </motion.div>
-                                <span className={cn("text-xs font-semibold truncate", isOpen ? "text-blue-300" : "text-slate-300")}>
+                                <span className={cn("text-[11px] font-semibold truncate", isOpen ? "text-blue-300" : "text-slate-300")}>
                                     {node.name}
                                 </span>
                             </button>
 
                             {/* Arrow connector */}
-                            <div className="flex items-center pt-2.5 flex-shrink-0">
-                                <div className={cn("w-6 h-px transition-colors", isOpen ? "bg-blue-500/40" : "bg-slate-700")} />
-                                <ArrowRight className={cn("w-3 h-3 -ml-1 transition-colors", isOpen ? "text-blue-500/60" : "text-slate-700")} />
+                            <div className="flex items-center flex-shrink-0">
+                                <div className={cn("w-5 h-[1.5px] transition-colors rounded-full", isOpen ? "bg-blue-500/40" : "bg-slate-700/60")} />
+                                <ArrowRight className={cn("w-3 h-3 -ml-0.5 transition-colors", isOpen ? "text-blue-400/60" : "text-slate-700")} />
                             </div>
 
                             {/* Children */}
-                            <AnimatePresence>
-                                {isOpen && (
-                                    <motion.div
-                                        initial={{ opacity: 0, width: 0 }}
-                                        animate={{ opacity: 1, width: "auto" }}
-                                        exit={{ opacity: 0, width: 0 }}
-                                        transition={{ duration: 0.25 }}
-                                        className="flex flex-wrap gap-1.5 overflow-hidden"
-                                    >
-                                        {node.children.map((child, childIdx) => (
-                                            <motion.div
-                                                key={child}
-                                                initial={{ opacity: 0, scale: 0.8 }}
-                                                animate={{ opacity: 1, scale: 1 }}
-                                                exit={{ opacity: 0, scale: 0.8 }}
-                                                transition={{ delay: childIdx * 0.04, duration: 0.2 }}
-                                                className="text-[10px] font-medium text-slate-300 bg-slate-800/80 border border-slate-700/50 px-2.5 py-1.5 rounded-lg hover:border-blue-500/30 hover:bg-slate-800 transition-all cursor-default whitespace-nowrap"
-                                            >
-                                                {child}
-                                            </motion.div>
-                                        ))}
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            <div className="flex flex-wrap gap-1.5 min-h-[28px] items-center">
+                                <AnimatePresence>
+                                    {isOpen && node.children.map((child, childIdx) => (
+                                        <motion.div
+                                            key={child}
+                                            initial={{ opacity: 0, scale: 0.85, y: 4 }}
+                                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.85, y: 4 }}
+                                            transition={{ delay: childIdx * 0.03, duration: 0.2 }}
+                                            className="text-[10px] font-medium text-slate-300 bg-slate-800/70 border border-slate-700/40 px-2.5 py-1.5 rounded-lg hover:border-blue-500/30 hover:bg-blue-500/5 hover:text-blue-300 transition-all cursor-default whitespace-nowrap"
+                                        >
+                                            {child}
+                                        </motion.div>
+                                    ))}
+                                </AnimatePresence>
+                            </div>
                         </motion.div>
                     );
                 })}
@@ -486,6 +479,9 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                     ))}
                 </div>
             </div>
+
+            {/* Category → Subcategory Tree (ABOVE heatmap) */}
+            <CategoryTree controlId={controlId} />
 
             {/* Heatmap Grid */}
             <div>
@@ -549,9 +545,6 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                     ))}
                 </div>
             </div>
-
-            {/* Category → Subcategory Tree */}
-            <CategoryTree controlId={controlId} />
         </motion.div>
     );
 }

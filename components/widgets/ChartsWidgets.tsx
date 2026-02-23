@@ -2,7 +2,7 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { ResponsiveContainer, AreaChart, Area, XAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ScatterChart, Scatter, ZAxis, RadialBarChart, RadialBar, Cell, BarChart, Bar, CartesianGrid, Treemap } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ScatterChart, Scatter, ZAxis, RadialBarChart, RadialBar, Cell, BarChart, Bar, CartesianGrid, Treemap } from "recharts";
 
 const getMult = (f?: string) => f === 'iso27001' ? 1.2 : f === 'dpd' ? 0.8 : 1;
 
@@ -101,11 +101,16 @@ export function ScatterWidget({ frameworkId = "soc2" }: { frameworkId?: string }
                 <ResponsiveContainer width="100%" height="100%">
                     <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
                         <XAxis type="number" dataKey="x" name="Probability" hide />
-                        <ZAxis type="number" dataKey="z" range={[60, 400]} name="Impact" />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }} />
+                        <YAxis type="number" dataKey="y" name="Impact" hide />
+                        <ZAxis type="number" dataKey="z" range={[60, 400]} name="Density" />
+                        <Tooltip
+                            cursor={{ strokeDasharray: '3 3', stroke: '#334155' }}
+                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', color: '#f8fafc', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                            itemStyle={{ color: '#94a3b8' }}
+                        />
                         <Scatter name="Controls" data={data} fill="#f59e0b" shape="circle">
                             {SCATTER_DATA.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#f97316" : "#eab308"} className="drop-shadow-lg" />
+                                <Cell key={`cell-${index}`} fill={index % 2 === 0 ? "#f97316" : "#eab308"} className="drop-shadow-lg opacity-80 hover:opacity-100 transition-opacity" />
                             ))}
                         </Scatter>
                     </ScatterChart>
