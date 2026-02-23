@@ -1,65 +1,107 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { ChevronRight } from "lucide-react";
+
+import { OverviewTab } from "@/components/tabs/OverviewTab";
+import { ControlsTab } from "@/components/tabs/ControlsTab";
+import { DomainsTab } from "@/components/tabs/DomainsTab";
+import { PoliciesTab } from "@/components/tabs/PoliciesTab";
+import { EvidenceTab } from "@/components/tabs/EvidenceTab";
+import { ProgramDetailsModal } from "@/components/ui/ProgramDetailsModal";
+
+export default function ProgramsPage() {
+  const [activeFramework, setActiveFramework] = useState("soc2");
+  const [activeTab, setActiveTab] = useState("Overview");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const frameworks = [
+    {
+      id: "soc2",
+      title: "SOC 2 Type II",
+      subtitle: "2017 · AICPA · 0 of 51 controls verified",
+      value: 0,
+      status: "Critical" as const,
+      colorClass: "text-red-500",
+    },
+    {
+      id: "iso27001",
+      title: "ISO 27001",
+      subtitle: "2022 · 15 of 93 controls verified",
+      value: 16,
+      status: "Warning" as const,
+      colorClass: "text-amber-500",
+    },
+    {
+      id: "dpd",
+      title: "DPD Framework",
+      subtitle: "Data Protection · 45 of 60 controls verified",
+      value: 75,
+      status: "Good" as const,
+      colorClass: "text-emerald-500",
+    }
+  ];
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-700">
+
+      {/* Header Breadcrumb */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center text-sm font-mono text-slate-400 tracking-wide">
+          <span className="hover:text-slate-200 cursor-pointer transition-colors">Home</span>
+          <ChevronRight className="w-4 h-4 mx-2 opacity-50" />
+          <span className="text-slate-100">Programs</span>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Navigate to Questionnaire */}
+        <a href="/questionnaire" className="text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg shadow-glow transition-all">
+          Go to Assessment &rarr;
+        </a>
+      </div>
+
+      {/* Replaced by CircularProgress rendering inside OverviewTab */}
+
+      {/* Layout Tabs for the selected framework */}
+      <div className="pt-8 mb-4">
+        <div className="flex space-x-8 border-b border-slate-800 pb-px relative overflow-x-auto no-scrollbar">
+          {["Overview", "Controls", "Domains", "Policies", "Evidence"].map((tab) => (
+            <button
+              key={tab}
+              onClick={() => setActiveTab(tab)}
+              className={`pb-4 text-sm font-medium tracking-wide whitespace-nowrap transition-colors relative ${activeTab === tab
+                ? "text-blue-400"
+                : "text-slate-400 hover:text-slate-200"
+                }`}
+            >
+              {tab}
+              {activeTab === tab && (
+                <motion.div
+                  layoutId="activeTab"
+                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"
+                />
+              )}
+            </button>
+          ))}
         </div>
-      </main>
+      </div>
+
+      {/* Dynamic Tab Area */}
+      <div className="pb-20">
+        <AnimatePresence mode="wait">
+          {activeTab === "Overview" && <OverviewTab key="overview" activeFramework={activeFramework} setActiveFramework={setActiveFramework} frameworks={frameworks} setIsModalOpen={setIsModalOpen} />}
+          {activeTab === "Controls" && <ControlsTab key="controls" frameworkId={activeFramework} />}
+          {activeTab === "Domains" && <DomainsTab key="domains" frameworkId={activeFramework} />}
+          {activeTab === "Policies" && <PoliciesTab key="policies" frameworkId={activeFramework} />}
+          {activeTab === "Evidence" && <EvidenceTab key="evidence" frameworkId={activeFramework} />}
+        </AnimatePresence>
+      </div>
+      {/* Deep Dive 63-Control Modal */}
+      <ProgramDetailsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        frameworkId={activeFramework}
+      />
     </div>
   );
 }
