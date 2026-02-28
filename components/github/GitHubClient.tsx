@@ -8,6 +8,7 @@ import {
     Bug, Key, Code2, Clock, Package, ShieldAlert, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, RadarChart, PolarGrid, PolarAngleAxis, Radar, Treemap, Cell } from "recharts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -323,6 +324,73 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
         return m;
     }, [repos]);
 
+    const ghDashboardData = useMemo(() => {
+        const allF = [...findings, ...configFindings];
+
+        const sevCounts = { critical: 0, high: 0, medium: 0, low: 0 };
+        for (const f of allF) {
+            const s = f.severity.toLowerCase() as keyof typeof sevCounts;
+            if (s in sevCounts) sevCounts[s]++;
+        }
+
+        const typeCounts = { secret: 0, dependabot: 0, code_scan: 0, config: 0 };
+        for (const f of allF) {
+            if (f.type in typeCounts) typeCounts[f.type as keyof typeof typeCounts]++;
+        }
+
+        // Per-repo finding breakdown
+        const repoMap = new Map<string, { secret: number; dependabot: number; code_scan: number; config: number; critical: number; high: number; total: number }>();
+        for (const f of allF) {
+            if (!repoMap.has(f.repository)) repoMap.set(f.repository, { secret: 0, dependabot: 0, code_scan: 0, config: 0, critical: 0, high: 0, total: 0 });
+            const e = repoMap.get(f.repository)!;
+            if (f.type in e) (e as Record<string, number>)[f.type]++;
+            e.total++;
+            if (f.severity === "critical") e.critical++;
+            if (f.severity === "high") e.high++;
+        }
+        const topRepos = [...repoMap.entries()]
+            .sort((a, b) => (b[1].critical * 4 + b[1].high * 3 + b[1].total) - (a[1].critical * 4 + a[1].high * 3 + a[1].total))
+            .slice(0, 5)
+            .map(([name, v]) => ({ name, ...v, score: Math.max(0, 100 - Math.min(100, v.critical * 15 + v.high * 5 + v.total)) }));
+
+        // Heatmap: top repos × type
+        const heatmapRepos = [...repoMap.entries()]
+            .sort((a, b) => b[1].total - a[1].total)
+            .slice(0, 8);
+
+        // Per-installation scores
+        const instScores = installations.map(inst => {
+            const iF = allF.filter(f => f.installation_id === inst.id);
+            const critical = iF.filter(f => f.severity === "critical").length;
+            const high = iF.filter(f => f.severity === "high").length;
+            const score = Math.max(0, 100 - Math.min(100, critical * 15 + high * 5 + iF.length));
+            return { id: inst.id, name: inst.github_org, score, total: iF.length, critical, high };
+        }).sort((a, b) => a.score - b.score);
+
+        const topFindings = [...allF]
+            .sort((a, b) => {
+                const o: Record<string, number> = { critical: 0, high: 1, medium: 2, low: 3 };
+                return (o[a.severity] ?? 4) - (o[b.severity] ?? 4);
+            })
+            .slice(0, 5);
+
+        const radarData = [
+            { subject: "Secrets",    count: typeCounts.secret },
+            { subject: "Deps",       count: typeCounts.dependabot },
+            { subject: "Code Scan",  count: typeCounts.code_scan },
+            { subject: "Misconfig",  count: typeCounts.config },
+        ];
+
+        const treemapData = [
+            { name: "Secrets",    size: typeCounts.secret },
+            { name: "Dependabot", size: typeCounts.dependabot },
+            { name: "Code Scan",  size: typeCounts.code_scan },
+            { name: "Misconfig",  size: typeCounts.config },
+        ].filter(d => d.size > 0);
+
+        return { sevCounts, typeCounts, topRepos, heatmapRepos, instScores, topFindings, radarData, treemapData };
+    }, [findings, configFindings, installations]);
+
     const handleSync = async (installationId: string) => {
         setSyncing(installationId);
         setSyncErrors(prev => { const n = { ...prev }; delete n[installationId]; return n; });
@@ -439,6 +507,231 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                     </div>
                 ))}
             </div>
+
+            {/* ─── Posture Dashboard ─── */}
+            {stats.total > 0 && (
+                <div className="space-y-6">
+                    {/* Row 1: Per-Installation Score Cards */}
+                    <div className="flex flex-wrap gap-4">
+                        {ghDashboardData.instScores.map(inst => {
+                            const circ = 2 * Math.PI * 36;
+                            const strokeColor = inst.score >= 80 ? "#10b981" : inst.score >= 50 ? "#f59e0b" : "#ef4444";
+                            return (
+                                <div key={inst.id} className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col items-center min-w-[140px] flex-1">
+                                    <div className="relative">
+                                        <svg width="80" height="80" viewBox="0 0 80 80">
+                                            <circle cx="40" cy="40" r="36" fill="none" stroke="#1e293b" strokeWidth="8" />
+                                            <motion.circle
+                                                cx="40" cy="40" r="36" fill="none"
+                                                stroke={strokeColor} strokeWidth="8" strokeLinecap="round"
+                                                strokeDasharray={circ}
+                                                initial={{ strokeDashoffset: circ }}
+                                                animate={{ strokeDashoffset: circ * (1 - inst.score / 100) }}
+                                                transition={{ duration: 1.2, ease: "easeOut" }}
+                                                transform="rotate(-90 40 40)"
+                                            />
+                                        </svg>
+                                        <div className="absolute inset-0 flex items-center justify-center">
+                                            <span className="text-xl font-bold text-slate-100">{inst.score}</span>
+                                        </div>
+                                    </div>
+                                    <span className="text-xs font-semibold text-slate-300 truncate max-w-full mt-2 text-center">{inst.name}</span>
+                                    <div className="flex items-center gap-2 mt-1 text-[10px]">
+                                        {inst.critical > 0 && <span className="text-red-400 font-medium">{inst.critical} crit</span>}
+                                        {inst.high > 0 && <span className="text-orange-400 font-medium">{inst.high} high</span>}
+                                        {inst.critical === 0 && inst.high === 0 && <span className="text-slate-500">{inst.total} total</span>}
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+
+                    {/* Row 2: Severity Bar — full width */}
+                    <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                        <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
+                        <div className="w-full h-44">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart
+                                    data={[
+                                        { name: "Critical", count: ghDashboardData.sevCounts.critical },
+                                        { name: "High",     count: ghDashboardData.sevCounts.high },
+                                        { name: "Medium",   count: ghDashboardData.sevCounts.medium },
+                                        { name: "Low",      count: ghDashboardData.sevCounts.low },
+                                    ]}
+                                    margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                                >
+                                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                    <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
+                                    <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+                                    <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                                        <Cell fill="#ef4444" />
+                                        <Cell fill="#f97316" />
+                                        <Cell fill="#f59e0b" />
+                                        <Cell fill="#10b981" />
+                                    </Bar>
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+
+                    {/* Row 3: Repo Heatmap + Radar */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {/* Repo × Type Heatmap */}
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Finding Type Heatmap by Repo</h3>
+                            {ghDashboardData.heatmapRepos.length === 0 ? (
+                                <div className="flex items-center justify-center h-40 text-xs text-slate-600">No repo data yet</div>
+                            ) : (
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-[10px]">
+                                        <thead>
+                                            <tr>
+                                                <th className="text-left pr-4 pb-2 text-slate-500 font-medium">Repository</th>
+                                                {["Secret", "Dep", "Code", "Config"].map(h => <th key={h} className="text-center pb-2 text-slate-500 font-medium w-12">{h}</th>)}
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-slate-800/30">
+                                            {ghDashboardData.heatmapRepos.map(([repo, v]) => {
+                                                const maxV = Math.max(v.secret, v.dependabot, v.code_scan, v.config, 1);
+                                                return (
+                                                    <tr key={repo}>
+                                                        <td className="pr-4 py-1.5 text-slate-300 font-mono truncate max-w-[120px]">{repo.split("/").pop() ?? repo}</td>
+                                                        {([
+                                                            { count: v.secret,     fill: "#ef4444" },
+                                                            { count: v.dependabot, fill: "#f59e0b" },
+                                                            { count: v.code_scan,  fill: "#a855f7" },
+                                                            { count: v.config,     fill: "#f97316" },
+                                                        ] as { count: number; fill: string }[]).map((cell, ci) => (
+                                                            <td key={ci} className="text-center py-1.5">
+                                                                <div
+                                                                    className="mx-auto w-9 h-6 rounded flex items-center justify-center text-[9px] font-bold text-white"
+                                                                    style={{ backgroundColor: cell.count > 0 ? cell.fill : "transparent", border: cell.count === 0 ? "1px solid #1e293b" : "none", opacity: cell.count > 0 ? 0.4 + 0.6 * (cell.count / maxV) : 1 }}
+                                                                >
+                                                                    {cell.count > 0 ? cell.count : ""}
+                                                                </div>
+                                                            </td>
+                                                        ))}
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Radar */}
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                            <h3 className="text-sm font-semibold text-slate-400 mb-2">Finding Type Distribution</h3>
+                            <div className="w-full h-56">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <RadarChart data={ghDashboardData.radarData}>
+                                        <PolarGrid stroke="#334155" />
+                                        <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 10 }} />
+                                        <Radar name="Findings" dataKey="count" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.3} />
+                                        <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                    </RadarChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 4: Top Findings Feed + Type Breakdown + Top Repos */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        {/* Top Findings */}
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                            <h3 className="text-sm font-semibold text-slate-400 mb-3">Top Findings</h3>
+                            {ghDashboardData.topFindings.length === 0 ? (
+                                <div className="flex flex-col items-center py-4">
+                                    <Shield className="w-8 h-8 text-emerald-500/40 mb-2" />
+                                    <p className="text-xs text-emerald-400">No findings</p>
+                                </div>
+                            ) : (
+                                <div className="space-y-2.5">
+                                    {ghDashboardData.topFindings.map(f => (
+                                        <div key={f.id} className="flex items-start gap-2 border-b border-slate-800/30 last:border-0 pb-2 last:pb-0">
+                                            <SeverityBadge severity={f.severity} />
+                                            <div className="min-w-0">
+                                                <p className="text-xs text-slate-300 leading-tight line-clamp-2">{f.title}</p>
+                                                <p className="text-[10px] text-slate-600 font-mono mt-0.5">{f.repository.split("/").pop()}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Type Breakdown bars */}
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
+                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Type</h3>
+                            <div className="flex-1 flex flex-col justify-center gap-4">
+                                {([
+                                    { label: "Secrets",    count: ghDashboardData.typeCounts.secret,     color: "bg-red-500",    textColor: "text-red-400" },
+                                    { label: "Dependabot", count: ghDashboardData.typeCounts.dependabot, color: "bg-amber-500",  textColor: "text-amber-400" },
+                                    { label: "Code Scan",  count: ghDashboardData.typeCounts.code_scan,  color: "bg-purple-500", textColor: "text-purple-400" },
+                                    { label: "Misconfig",  count: ghDashboardData.typeCounts.config,     color: "bg-orange-500", textColor: "text-orange-400" },
+                                ] as { label: string; count: number; color: string; textColor: string }[]).map(row => (
+                                    <div key={row.label}>
+                                        <div className="flex items-center justify-between text-xs mb-1.5">
+                                            <span className={row.textColor}>{row.label}</span>
+                                            <span className="text-slate-300 font-semibold">{row.count}</span>
+                                        </div>
+                                        <div className="w-full bg-slate-800/60 rounded-full h-2 overflow-hidden">
+                                            <motion.div
+                                                initial={{ width: 0 }}
+                                                animate={{ width: `${stats.total > 0 ? (row.count / stats.total) * 100 : 0}%` }}
+                                                transition={{ duration: 1, ease: "easeOut" }}
+                                                className={cn("h-full rounded-full", row.color)}
+                                            />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Top Repos by Risk */}
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                            <h3 className="text-sm font-semibold text-slate-400 mb-3">Repo Risk Ranking</h3>
+                            <div className="space-y-3">
+                                {ghDashboardData.topRepos.map((repo, i) => (
+                                    <div key={repo.name} className="flex items-center gap-2">
+                                        <span className="text-[10px] text-slate-600 w-3">{i + 1}</span>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <span className="text-xs text-slate-300 truncate">{repo.name.split("/").pop()}</span>
+                                                <span className={cn("text-[10px] font-bold tabular-nums", repo.score >= 80 ? "text-emerald-400" : repo.score >= 50 ? "text-amber-400" : "text-red-400")}>
+                                                    {repo.score}
+                                                </span>
+                                            </div>
+                                            <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                                <div
+                                                    className={cn("h-full rounded-full", repo.score >= 80 ? "bg-emerald-500" : repo.score >= 50 ? "bg-amber-500" : "bg-red-500")}
+                                                    style={{ width: `${repo.score}%` }}
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Row 5: Treemap — Findings by Type */}
+                    {ghDashboardData.treemapData.length > 0 && (
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Type</h3>
+                            <div className="w-full h-48">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <Treemap data={ghDashboardData.treemapData} dataKey="size" stroke="#020617" fill="#7c3aed">
+                                        <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                    </Treemap>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
 
             {/* Connected Installations */}
             <div>

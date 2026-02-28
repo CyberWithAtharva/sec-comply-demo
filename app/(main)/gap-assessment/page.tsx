@@ -71,21 +71,25 @@ export default async function GapAssessmentPage() {
 
     const controlIds = controls.map(c => c.id);
 
-    // 3. Control statuses for this org
-    const { data: controlStatuses } = await supabase
-        .from("control_status")
-        .select("control_id, status, evidence_count")
-        .eq("org_id", orgId)
-        .in("control_id", controlIds);
+    // 3-5. Fetch control statuses, policies, and AWS accounts in parallel
+    const [{ data: controlStatuses }, { data: approvedPolicies }, { data: awsAccounts }] = await Promise.all([
+        supabase
+            .from("control_status")
+            .select("control_id, status, evidence_count")
+            .eq("org_id", orgId)
+            .in("control_id", controlIds),
+        supabase
+            .from("policies")
+            .select("id, title, framework_id, policy_controls(control_id)")
+            .eq("org_id", orgId)
+            .eq("status", "approved"),
+        supabase
+            .from("aws_accounts")
+            .select("id")
+            .eq("org_id", orgId),
+    ]);
 
     const statusMap = new Map((controlStatuses ?? []).map(s => [s.control_id, s]));
-
-    // 4. Approved policies with their linked control UUIDs
-    const { data: approvedPolicies } = await supabase
-        .from("policies")
-        .select("id, title, framework_id, policy_controls(control_id)")
-        .eq("org_id", orgId)
-        .eq("status", "approved");
 
     // Build set of control UUIDs that have at least one approved policy
     const controlsWithPolicy = new Set<string>();
@@ -96,12 +100,7 @@ export default async function GapAssessmentPage() {
         }
     }
 
-    // 5. Active AWS findings — map rule_ids to control_id texts
-    // Build a set of control_id texts that have active findings
-    const { data: awsAccounts } = await supabase
-        .from("aws_accounts")
-        .select("id")
-        .eq("org_id", orgId);
+    // 6. Active AWS findings — map rule_ids to control_id texts (conditional on accounts)
 
     const controlTextsWithFindings = new Map<string, { source: string; severity: string }[]>();
 
@@ -123,7 +122,7 @@ export default async function GapAssessmentPage() {
         }
     }
 
-    // 6. Build GapItem[] — every control that is NOT verified or not_applicable
+    // 7. Build GapItem[] — every control that is NOT verified or not_applicable
     const gaps: GapItem[] = [];
 
     for (const control of controls) {

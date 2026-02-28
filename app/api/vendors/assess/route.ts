@@ -175,10 +175,11 @@ export async function POST(req: NextRequest) {
         const { score, findings } = await assessDomain(domain);
         const checked_at = new Date().toISOString();
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await (supabase.from("vendors") as any)
-            .update({ security_score: score, security_findings: findings, security_checked_at: checked_at })
+        const { error: updateErr } = await supabase.from("vendors")
+            .update({ security_score: score, security_findings: findings as unknown as import("@/types/database").Json, security_checked_at: checked_at })
             .eq("id", vendor_id);
+
+        if (updateErr) throw new Error(`DB update failed: ${updateErr.message}`);
 
         return NextResponse.json({ score, findings, checked_at, domain });
     } catch (e: unknown) {

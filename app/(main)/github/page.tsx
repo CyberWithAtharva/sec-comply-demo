@@ -21,7 +21,7 @@ export default async function GitHubPage() {
     // Fetch GitHub installations for this org
     const { data: installations } = await supabase
         .from("github_installations")
-        .select("id, org_id, installation_id, github_org, status, last_sync, error_message, created_at")
+        .select("id, org_id, installation_id, github_org, status, last_sync, error_message, org_settings, created_at")
         .eq("org_id", orgId)
         .order("created_at", { ascending: false });
 

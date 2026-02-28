@@ -18,18 +18,18 @@ export default async function EvidencesPage() {
 
     const orgId = membership.org_id;
 
-    // Fetch evidence artifacts with uploader profile
-    const { data: artifacts } = await supabase
-        .from("evidence_artifacts")
-        .select("*, profiles(id, full_name)")
-        .eq("org_id", orgId)
-        .order("created_at", { ascending: false });
-
-    // Fetch org's framework IDs to get associated controls
-    const { data: orgFrameworks } = await supabase
-        .from("org_frameworks")
-        .select("framework_id")
-        .eq("org_id", orgId);
+    // Fetch artifacts and org frameworks in parallel (both only need orgId)
+    const [{ data: artifacts }, { data: orgFrameworks }] = await Promise.all([
+        supabase
+            .from("evidence_artifacts")
+            .select("*, profiles(id, full_name)")
+            .eq("org_id", orgId)
+            .order("created_at", { ascending: false }),
+        supabase
+            .from("org_frameworks")
+            .select("framework_id")
+            .eq("org_id", orgId),
+    ]);
 
     const frameworkIds = (orgFrameworks ?? []).map(f => f.framework_id);
 

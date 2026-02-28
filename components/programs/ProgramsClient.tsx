@@ -48,11 +48,23 @@ export interface ControlData {
     status: string;
 }
 
+export interface OpenRisk {
+    id: string;
+    title: string;
+    severity: string;
+    status: string;
+    source: string;
+    category: string;
+    created_at: string;
+}
+
 interface ProgramsClientProps {
     frameworks: FrameworkData[];
     controls: ControlData[];
     gapCounts?: Record<string, number>;
     policiesByFramework?: Record<string, PolicyData[] | null | undefined>;
+    openRisks?: OpenRisk[];
+    allPolicies?: PolicyData[];
 }
 
 const STATUS_COLOR: Record<string, string> = {
@@ -61,7 +73,7 @@ const STATUS_COLOR: Record<string, string> = {
     Critical: "text-red-500",
 };
 
-export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesByFramework = {} }: ProgramsClientProps) {
+export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesByFramework = {}, openRisks = [], allPolicies = [] }: ProgramsClientProps) {
     const [activeFrameworkId, setActiveFrameworkId] = useState(
         frameworks[0]?.frameworkId ?? ""
     );
@@ -147,6 +159,9 @@ export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesB
                             frameworks={overviewFrameworks}
                             setIsModalOpen={setIsModalOpen}
                             activeFrameworkData={activeFramework}
+                            openRisks={openRisks}
+                            allControls={controls}
+                            allPolicies={allPolicies}
                         />
                     )}
                     {activeTab === "Controls" && (
@@ -157,9 +172,22 @@ export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesB
                             controls={activeControls}
                         />
                     )}
-                    {activeTab === "Domains" && <DomainsTab key="domains" frameworkId={activeFrameworkId} />}
+                    {activeTab === "Domains" && (
+                        <DomainsTab
+                            key="domains"
+                            frameworkId={activeFrameworkId}
+                            controls={activeControls}
+                        />
+                    )}
                     {activeTab === "Policies" && <PoliciesTab key="policies" frameworkId={activeFrameworkId} policies={activePolicies} />}
-                    {activeTab === "Evidence" && <EvidenceTab key="evidence" frameworkId={activeFrameworkId} />}
+                    {activeTab === "Evidence" && (
+                        <EvidenceTab
+                            key="evidence"
+                            frameworkId={activeFrameworkId}
+                            controls={activeControls}
+                            evidenceCount={activeFramework?.evidenceCount ?? 0}
+                        />
+                    )}
                 </AnimatePresence>
             </div>
 

@@ -18,18 +18,19 @@ export default async function RisksPage() {
 
     const orgId = membership.org_id;
 
-    // Fetch risks with owner profile
-    const { data: risks } = await supabase
-        .from("risks")
-        .select("*, profiles(id, full_name, avatar_url)")
-        .eq("org_id", orgId)
-        .order("risk_score", { ascending: false });
-
-    // Fetch org members for owner assignment dropdown
-    const { data: members } = await supabase
-        .from("organization_members")
-        .select("user_id, profiles(id, full_name)")
-        .eq("org_id", orgId);
+    // Fetch risks and org members in parallel (both only need orgId)
+    const [{ data: risks }, { data: members }] = await Promise.all([
+        supabase
+            .from("risks")
+            .select("*, profiles(id, full_name, avatar_url)")
+            .eq("org_id", orgId)
+            .order("risk_score", { ascending: false })
+            .limit(500),
+        supabase
+            .from("organization_members")
+            .select("user_id, profiles(id, full_name)")
+            .eq("org_id", orgId),
+    ]);
 
     const owners = (members ?? [])
         .map(m => {

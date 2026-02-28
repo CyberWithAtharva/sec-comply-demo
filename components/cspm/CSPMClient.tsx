@@ -9,6 +9,7 @@ import {
     Shield, Server, Link2, ExternalLink, Clock
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, RadarChart, PolarGrid, PolarAngleAxis, Radar, Treemap, Cell } from "recharts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -319,6 +320,69 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
         return true;
     }), [findings, filterSeverity, filterStatus, search]);
 
+    const dashboardData = useMemo(() => {
+        const sevCounts = { CRITICAL: 0, HIGH: 0, MEDIUM: 0, LOW: 0 };
+        for (const f of findings) {
+            const s = f.severity.toUpperCase() as keyof typeof sevCounts;
+            if (s in sevCounts) sevCounts[s]++;
+        }
+
+        // Group findings by service prefix from rule_id
+        const serviceMap = new Map<string, { critical: number; high: number; medium: number; low: number }>();
+        for (const f of findings) {
+            const prefix = f.rule_id.split("-")[0] || f.resource_type?.split("::")[1] || "Other";
+            if (!serviceMap.has(prefix)) serviceMap.set(prefix, { critical: 0, high: 0, medium: 0, low: 0 });
+            const e = serviceMap.get(prefix)!;
+            const sev = f.severity.toLowerCase() as keyof typeof e;
+            if (sev in e) e[sev]++;
+        }
+        const services = [...serviceMap.entries()]
+            .sort((a, b) => (b[1].critical * 4 + b[1].high * 3 + b[1].medium * 2 + b[1].low) - (a[1].critical * 4 + a[1].high * 3 + a[1].medium * 2 + a[1].low))
+            .slice(0, 8);
+
+        // Per-account scores
+        const accountScores = accounts.map(acc => {
+            const af = findings.filter(f => f.aws_account_id === acc.id);
+            const critical = af.filter(f => f.severity.toUpperCase() === "CRITICAL").length;
+            const high = af.filter(f => f.severity.toUpperCase() === "HIGH").length;
+            const medium = af.filter(f => f.severity.toUpperCase() === "MEDIUM").length;
+            const score = Math.max(0, 100 - Math.min(100, critical * 15 + high * 5 + medium));
+            return { id: acc.id, name: acc.account_alias ?? acc.account_id, score, total: af.length, critical, high };
+        }).sort((a, b) => a.score - b.score);
+
+        const topActive = [...findings]
+            .filter(f => f.status.toUpperCase() === "ACTIVE")
+            .sort((a, b) => {
+                const o: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+                return (o[a.severity.toUpperCase()] ?? 4) - (o[b.severity.toUpperCase()] ?? 4);
+            })
+            .slice(0, 5);
+
+        const active = findings.filter(f => f.status.toUpperCase() === "ACTIVE").length;
+        const resolved = findings.filter(f => f.status.toUpperCase() === "RESOLVED").length;
+
+        const DOMAIN_RULES: Record<string, string> = {
+            IAM: "Access Control", VPC: "Network", EC2: "Compute",
+            S3: "Storage", RDS: "Storage", CT: "Logging", EKS: "Compute",
+            SG: "Network", KMS: "Encryption", Lambda: "Compute",
+        };
+        const domainCounts: Record<string, number> = {
+            "Access Control": 0, Network: 0, Storage: 0,
+            Logging: 0, Compute: 0, Encryption: 0,
+        };
+        for (const f of findings) {
+            const domain = DOMAIN_RULES[f.rule_id.split("-")[0]] ?? null;
+            if (domain && domain in domainCounts) domainCounts[domain]++;
+        }
+        const radarData = Object.entries(domainCounts).map(([subject, count]) => ({ subject, count }));
+
+        const treemapData = services
+            .map(([name, v]) => ({ name, size: v.critical * 4 + v.high * 3 + v.medium * 2 + v.low }))
+            .filter(d => d.size > 0);
+
+        return { sevCounts, services, accountScores, topActive, active, resolved, radarData, treemapData };
+    }, [findings, accounts]);
+
     const handleConnected = (account: AWSAccount) => {
         setAccounts(prev => [account, ...prev]);
     };
@@ -438,6 +502,236 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* ─── Posture Dashboard ─── */}
+                    {findings.length > 0 && (
+                        <div className="space-y-6">
+                            {/* Row 1: Per-Account Score Cards */}
+                            <div className="flex flex-wrap gap-4">
+                                {dashboardData.accountScores.map(acc => {
+                                    const circ = 2 * Math.PI * 36;
+                                    const strokeColor = acc.score >= 80 ? "#10b981" : acc.score >= 50 ? "#f59e0b" : "#ef4444";
+                                    return (
+                                        <div key={acc.id} className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col items-center min-w-[140px] flex-1">
+                                            <div className="relative">
+                                                <svg width="80" height="80" viewBox="0 0 80 80">
+                                                    <circle cx="40" cy="40" r="36" fill="none" stroke="#1e293b" strokeWidth="8" />
+                                                    <motion.circle
+                                                        cx="40" cy="40" r="36" fill="none"
+                                                        stroke={strokeColor} strokeWidth="8" strokeLinecap="round"
+                                                        strokeDasharray={circ}
+                                                        initial={{ strokeDashoffset: circ }}
+                                                        animate={{ strokeDashoffset: circ * (1 - acc.score / 100) }}
+                                                        transition={{ duration: 1.2, ease: "easeOut" }}
+                                                        transform="rotate(-90 40 40)"
+                                                    />
+                                                </svg>
+                                                <div className="absolute inset-0 flex items-center justify-center">
+                                                    <span className="text-xl font-bold text-slate-100">{acc.score}</span>
+                                                </div>
+                                            </div>
+                                            <span className="text-xs font-semibold text-slate-300 truncate max-w-full mt-2 text-center">{acc.name}</span>
+                                            <div className="flex items-center gap-2 mt-1 text-[10px]">
+                                                {acc.critical > 0 && <span className="text-red-400 font-medium">{acc.critical} crit</span>}
+                                                {acc.high > 0 && <span className="text-orange-400 font-medium">{acc.high} high</span>}
+                                                {acc.critical === 0 && acc.high === 0 && <span className="text-slate-500">{acc.total} total</span>}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Row 2: Severity Bar — full width */}
+                            <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                                <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
+                                <div className="w-full h-44">
+                                    <ResponsiveContainer width="100%" height="100%">
+                                        <BarChart
+                                            data={[
+                                                { name: "Critical", count: dashboardData.sevCounts.CRITICAL },
+                                                { name: "High",     count: dashboardData.sevCounts.HIGH },
+                                                { name: "Medium",   count: dashboardData.sevCounts.MEDIUM },
+                                                { name: "Low",      count: dashboardData.sevCounts.LOW },
+                                            ]}
+                                            margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                                        >
+                                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                            <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
+                                            <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+                                            <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
+                                                <Cell fill="#ef4444" />
+                                                <Cell fill="#f97316" />
+                                                <Cell fill="#f59e0b" />
+                                                <Cell fill="#10b981" />
+                                            </Bar>
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                </div>
+                            </div>
+
+                            {/* Row 3: Service Heatmap + Radar */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                {/* Heatmap */}
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Severity Heatmap by Service</h3>
+                                    {dashboardData.services.length === 0 ? (
+                                        <div className="flex items-center justify-center h-40 text-xs text-slate-600">No service data yet</div>
+                                    ) : (
+                                        <div className="overflow-x-auto">
+                                            <table className="w-full text-[10px]">
+                                                <thead>
+                                                    <tr>
+                                                        <th className="text-left pr-4 pb-2 text-slate-500 font-medium">Service</th>
+                                                        {["CRIT", "HIGH", "MED", "LOW"].map(h => <th key={h} className="text-center pb-2 text-slate-500 font-medium w-10">{h}</th>)}
+                                                    </tr>
+                                                </thead>
+                                                <tbody className="divide-y divide-slate-800/30">
+                                                    {dashboardData.services.map(([service, v]) => {
+                                                        const maxV = Math.max(v.critical, v.high, v.medium, v.low, 1);
+                                                        return (
+                                                            <tr key={service}>
+                                                                <td className="pr-4 py-1.5 text-slate-300 font-mono truncate max-w-[100px]">{service}</td>
+                                                                {([
+                                                                    { count: v.critical, fill: "#ef4444" },
+                                                                    { count: v.high,     fill: "#f97316" },
+                                                                    { count: v.medium,   fill: "#f59e0b" },
+                                                                    { count: v.low,      fill: "#10b981" },
+                                                                ] as { count: number; fill: string }[]).map((cell, ci) => (
+                                                                    <td key={ci} className="text-center py-1.5">
+                                                                        <div
+                                                                            className="mx-auto w-9 h-6 rounded flex items-center justify-center text-[9px] font-bold text-white"
+                                                                            style={{ backgroundColor: cell.count > 0 ? cell.fill : "transparent", border: cell.count === 0 ? "1px solid #1e293b" : "none", opacity: cell.count > 0 ? 0.4 + 0.6 * (cell.count / maxV) : 1 }}
+                                                                        >
+                                                                            {cell.count > 0 ? cell.count : ""}
+                                                                        </div>
+                                                                    </td>
+                                                                ))}
+                                                            </tr>
+                                                        );
+                                                    })}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Radar */}
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-2">Security Domain Issues</h3>
+                                    <div className="w-full h-56">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <RadarChart data={dashboardData.radarData}>
+                                                <PolarGrid stroke="#334155" />
+                                                <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 10 }} />
+                                                <Radar name="Issues" dataKey="count" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
+                                                <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                            </RadarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Row 4: Top Findings Feed + Remediation Progress + Account Ranking */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                {/* Top Active Findings */}
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-3">Top Active Findings</h3>
+                                    {dashboardData.topActive.length === 0 ? (
+                                        <div className="flex flex-col items-center py-4">
+                                            <Shield className="w-8 h-8 text-emerald-500/40 mb-2" />
+                                            <p className="text-xs text-emerald-400">No active findings</p>
+                                        </div>
+                                    ) : (
+                                        <div className="space-y-2.5">
+                                            {dashboardData.topActive.map(f => (
+                                                <div key={f.id} className="flex items-start gap-2 border-b border-slate-800/30 last:border-0 pb-2 last:pb-0">
+                                                    <SeverityBadge severity={f.severity} />
+                                                    <div className="min-w-0">
+                                                        <p className="text-xs text-slate-300 leading-tight line-clamp-2">{f.title}</p>
+                                                        <p className="text-[10px] text-slate-600 font-mono mt-0.5">{f.rule_id}</p>
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Remediation Progress */}
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Remediation Progress</h3>
+                                    <div className="flex-1 flex flex-col justify-center gap-5">
+                                        {[
+                                            { label: "Active",   count: dashboardData.active,   color: "bg-red-500",     textColor: "text-red-400" },
+                                            { label: "Resolved", count: dashboardData.resolved, color: "bg-emerald-500", textColor: "text-emerald-400" },
+                                        ].map(row => (
+                                            <div key={row.label}>
+                                                <div className="flex items-center justify-between text-xs mb-1.5">
+                                                    <span className={row.textColor}>{row.label}</span>
+                                                    <span className="text-slate-300 font-semibold">{row.count}</span>
+                                                </div>
+                                                <div className="w-full bg-slate-800/60 rounded-full h-2 overflow-hidden">
+                                                    <motion.div
+                                                        initial={{ width: 0 }}
+                                                        animate={{ width: `${findings.length > 0 ? (row.count / findings.length) * 100 : 0}%` }}
+                                                        transition={{ duration: 1, ease: "easeOut" }}
+                                                        className={cn("h-full rounded-full", row.color)}
+                                                    />
+                                                </div>
+                                            </div>
+                                        ))}
+                                        <div className="text-center border-t border-slate-800/40 pt-3">
+                                            <span className="text-3xl font-bold text-slate-100">
+                                                {findings.length > 0 ? Math.round((dashboardData.resolved / findings.length) * 100) : 0}
+                                                <span className="text-sm font-normal text-slate-500">%</span>
+                                            </span>
+                                            <p className="text-[10px] text-slate-500 mt-0.5">findings resolved</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {/* Account Risk Ranking */}
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-3">Account Risk Ranking</h3>
+                                    <div className="space-y-3">
+                                        {dashboardData.accountScores.map((acc, i) => (
+                                            <div key={acc.id} className="flex items-center gap-2">
+                                                <span className="text-[10px] text-slate-600 w-3">{i + 1}</span>
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex items-center justify-between mb-1">
+                                                        <span className="text-xs text-slate-300 truncate">{acc.name}</span>
+                                                        <span className={cn("text-[10px] font-bold tabular-nums", acc.score >= 80 ? "text-emerald-400" : acc.score >= 50 ? "text-amber-400" : "text-red-400")}>
+                                                            {acc.score}
+                                                        </span>
+                                                    </div>
+                                                    <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                                        <div
+                                                            className={cn("h-full rounded-full", acc.score >= 80 ? "bg-emerald-500" : acc.score >= 50 ? "bg-amber-500" : "bg-red-500")}
+                                                            style={{ width: `${acc.score}%` }}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Row 5: Treemap — Findings by Service */}
+                            {dashboardData.treemapData.length > 0 && (
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Service</h3>
+                                    <div className="w-full h-48">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <Treemap data={dashboardData.treemapData} dataKey="size" stroke="#020617" fill="#3b82f6">
+                                                <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                            </Treemap>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    )}
 
                     {/* Connected Accounts */}
                     <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">

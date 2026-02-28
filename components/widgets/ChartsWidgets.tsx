@@ -18,11 +18,11 @@ const RADAR_DATA = [
     { subject: 'Risk Assessment', A: 65, B: 85, fullMark: 150 },
 ];
 
-export function RadarWidget({ frameworkId = "soc2" }: { frameworkId?: string }) {
-    const data = React.useMemo(() => RADAR_DATA.map(d => ({ ...d, A: Math.min(150, d.A * getMult(frameworkId)) })), [frameworkId]);
+export function RadarWidget({ frameworkId = "soc2", data: propData, label = "Domain Completion" }: { frameworkId?: string; data?: { subject: string; A: number; B: number; fullMark: number }[]; label?: string }) {
+    const data = React.useMemo(() => propData ?? RADAR_DATA.map(d => ({ ...d, A: Math.min(150, d.A * getMult(frameworkId)) })), [propData, frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center">
-            <h3 className="text-sm font-semibold text-slate-400 self-start mb-2">Category Strength Analysis</h3>
+            <h3 className="text-sm font-semibold text-slate-400 self-start mb-2">{label}</h3>
             <div className="w-full h-64">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
@@ -150,8 +150,8 @@ export function RadialWidget({ frameworkId = "soc2" }: { frameworkId?: string })
 // -------------------------
 // 5. Gauge / Simplified Chart
 // -------------------------
-export function GaugeWidget({ frameworkId = "soc2" }: { frameworkId?: string }) {
-    const percent = Math.min(100, Math.round(82 * getMult(frameworkId)));
+export function GaugeWidget({ frameworkId = "soc2", value }: { frameworkId?: string; value?: number }) {
+    const percent = value !== undefined ? value : Math.min(100, Math.round(82 * getMult(frameworkId)));
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col justify-center items-center relative">
             <div className="absolute top-6 left-6 text-sm font-semibold text-slate-400">Readiness</div>
@@ -187,11 +187,11 @@ const BAR_DATA = [
     { name: 'CC4', val: 278 },
     { name: 'CC5', val: 189 },
 ];
-export function BarWidget({ frameworkId = "soc2" }: { frameworkId?: string }) {
-    const data = React.useMemo(() => BAR_DATA.map(d => ({ ...d, val: d.val * getMult(frameworkId) })), [frameworkId]);
+export function BarWidget({ frameworkId = "soc2", data: propData, label = "Category Issues" }: { frameworkId?: string; data?: { name: string; val: number }[]; label?: string }) {
+    const data = React.useMemo(() => propData ?? BAR_DATA.map(d => ({ ...d, val: d.val * getMult(frameworkId) })), [propData, frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col">
-            <h3 className="text-sm font-semibold text-slate-400 mb-4">Category Issues</h3>
+            <h3 className="text-sm font-semibold text-slate-400 mb-4">{label}</h3>
             <div className="w-full h-56">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
@@ -216,11 +216,11 @@ const TREE_DATA = [
     { name: 'Vendors', size: 500 },
     { name: 'Network', size: 800 },
 ];
-export function TreemapWidget({ frameworkId = "soc2" }: { frameworkId?: string }) {
-    const data = React.useMemo(() => TREE_DATA.map(d => ({ ...d, size: d.size * getMult(frameworkId) })), [frameworkId]);
+export function TreemapWidget({ frameworkId = "soc2", data: propData, label = "Control Distribution" }: { frameworkId?: string; data?: { name: string; size: number }[]; label?: string }) {
+    const data = React.useMemo(() => propData ?? TREE_DATA.map(d => ({ ...d, size: d.size * getMult(frameworkId) })), [propData, frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center relative col-span-1 md:col-span-2 lg:col-span-1">
-            <h3 className="text-sm font-semibold text-slate-400 absolute top-6 left-6 z-10">Control Distribution</h3>
+            <h3 className="text-sm font-semibold text-slate-400 absolute top-6 left-6 z-10">{label}</h3>
             <div className="w-full h-56 mt-6">
                 <ResponsiveContainer width="100%" height="100%">
                     <Treemap

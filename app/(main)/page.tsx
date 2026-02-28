@@ -51,15 +51,32 @@ export default async function ProgramsPage() {
 
     const frameworkIds = orgFrameworks.map(f => f.framework_id);
 
-    // Fetch all controls for these frameworks
-    const { data: controls } = await supabase
-        .from("controls")
-        .select("id, framework_id, control_id, title, domain, category")
-        .in("framework_id", frameworkIds);
+    // Fetch controls, policies, and open risks in parallel (all only need orgId/frameworkIds)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const risksQuery = (supabase.from("risks") as any)
+        .select("id, title, severity, status, source, category, created_at")
+        .eq("org_id", orgId)
+        .not("status", "in", "(closed,accepted)")
+        .order("created_at", { ascending: false })
+        .limit(15);
+
+    const [{ data: controls }, { data: approvedPolicies }, { data: openRisksRaw }] = await Promise.all([
+        supabase
+            .from("controls")
+            .select("id, framework_id, control_id, title, domain, category")
+            .in("framework_id", frameworkIds),
+        supabase
+            .from("policies")
+            .select("id, title, status, framework_id, owner_id, next_review, version, updated_at")
+            .eq("org_id", orgId)
+            .in("status", ["approved", "under_review", "draft"])
+            .order("updated_at", { ascending: false }),
+        risksQuery as Promise<{ data: { id: string; title: string; severity: string; status: string; source: string; category: string; created_at: string }[] | null }>,
+    ]);
 
     const controlIds = (controls ?? []).map(c => c.id);
 
-    // Fetch control statuses for this org
+    // Fetch control statuses (needs controlIds from above)
     const { data: controlStatuses } = controlIds.length > 0
         ? await supabase
             .from("control_status")
@@ -143,14 +160,6 @@ export default async function ProgramsPage() {
         gapCounts[of_.framework_id] = gaps;
     }
 
-    // Approved policies for this org (with framework linkage)
-    const { data: approvedPolicies } = await supabase
-        .from("policies")
-        .select("id, title, status, framework_id, owner_id, next_review, version, updated_at")
-        .eq("org_id", orgId)
-        .in("status", ["approved", "under_review", "draft"])
-        .order("updated_at", { ascending: false });
-
     const policiesByFramework: Record<string, typeof approvedPolicies> = {};
     for (const p of approvedPolicies ?? []) {
         if (!p.framework_id) continue;
@@ -158,12 +167,16 @@ export default async function ProgramsPage() {
         policiesByFramework[p.framework_id]!.push(p);
     }
 
+    const openRisksData = (openRisksRaw as { id: string; title: string; severity: string; status: string; source: string; category: string; created_at: string }[] | null) ?? [];
+
     return (
         <ProgramsClient
             frameworks={frameworkData}
             controls={controlsWithStatus}
             gapCounts={gapCounts}
             policiesByFramework={policiesByFramework}
+            openRisks={openRisksData}
+            allPolicies={approvedPolicies ?? []}
         />
     );
 }

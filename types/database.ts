@@ -104,9 +104,9 @@ export type Database = {
         ];
       };
       vendors: {
-        Row: { id: string; org_id: string; name: string; tier: number; risk_level: string; contact_name: string | null; contact_email: string | null; website: string | null; status: string; last_assessment: string | null; created_at: string; updated_at: string };
+        Row: { id: string; org_id: string; name: string; tier: number; risk_level: string; contact_name: string | null; contact_email: string | null; website: string | null; status: string; last_assessment: string | null; security_score: number | null; security_findings: Json | null; security_checked_at: string | null; created_at: string; updated_at: string };
         Insert: { id?: string; org_id: string; name: string; tier?: number; risk_level?: string; contact_name?: string | null; contact_email?: string | null; website?: string | null; status?: string };
-        Update: { name?: string; tier?: number; risk_level?: string; contact_name?: string | null; contact_email?: string | null; website?: string | null; status?: string; last_assessment?: string | null };
+        Update: { name?: string; tier?: number; risk_level?: string; contact_name?: string | null; contact_email?: string | null; website?: string | null; status?: string; last_assessment?: string | null; security_score?: number | null; security_findings?: Json | null; security_checked_at?: string | null };
         Relationships: [
           { foreignKeyName: "vendors_org_id_fkey"; columns: ["org_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] }
         ];
@@ -186,9 +186,9 @@ export type Database = {
         ];
       };
       github_installations: {
-        Row: { id: string; org_id: string; installation_id: number; github_org: string; last_sync: string | null; status: string; error_message: string | null; created_at: string };
+        Row: { id: string; org_id: string; installation_id: number; github_org: string; last_sync: string | null; status: string; error_message: string | null; org_settings: Json | null; created_at: string };
         Insert: { id?: string; org_id: string; installation_id: number; github_org: string };
-        Update: { last_sync?: string | null; status?: string; error_message?: string | null };
+        Update: { last_sync?: string | null; status?: string; error_message?: string | null; org_settings?: Json | null };
         Relationships: [
           { foreignKeyName: "github_installations_org_id_fkey"; columns: ["org_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] }
         ];

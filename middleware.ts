@@ -43,13 +43,13 @@ export async function middleware(request: NextRequest) {
     if (isPublicPath) {
         // If logged-in user hits /login, redirect them home
         if (user && pathname === "/login") {
-            const profile = await supabase
+            const { data: profile } = await supabase
                 .from("profiles")
                 .select("role")
                 .eq("id", user.id)
                 .single();
 
-            const dest = profile.data?.role === "admin" ? "/admin" : "/";
+            const dest = profile?.role === "admin" ? "/admin" : "/";
             return NextResponse.redirect(new URL(dest, request.url));
         }
         return supabaseResponse;
@@ -62,23 +62,27 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(loginUrl);
     }
 
-    // Fetch role to enforce admin-only routes
-    const { data: profile } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", user.id)
-        .single();
+    // Only fetch role when navigating to routes that require the role check:
+    //   - /admin/* — to block non-admins
+    //   - /       — to redirect admins to /admin
+    // All other routes skip the DB query entirely.
+    const needsRoleCheck = pathname === "/" || pathname.startsWith("/admin");
 
-    const isAdmin = profile?.role === "admin";
+    if (needsRoleCheck) {
+        const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .single();
 
-    // Non-admin users cannot access /admin/*
-    if (pathname.startsWith("/admin") && !isAdmin) {
-        return NextResponse.redirect(new URL("/", request.url));
-    }
+        const isAdmin = profile?.role === "admin";
 
-    // Admin users visiting / get redirected to /admin
-    if (pathname === "/" && isAdmin) {
-        return NextResponse.redirect(new URL("/admin", request.url));
+        if (pathname.startsWith("/admin") && !isAdmin) {
+            return NextResponse.redirect(new URL("/", request.url));
+        }
+        if (pathname === "/" && isAdmin) {
+            return NextResponse.redirect(new URL("/admin", request.url));
+        }
     }
 
     return supabaseResponse;

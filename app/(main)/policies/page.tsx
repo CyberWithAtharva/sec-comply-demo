@@ -18,36 +18,36 @@ export default async function PoliciesPage() {
 
     const orgId = membership.org_id;
 
-    // Fetch policies with owner profile
-    const { data: policies } = await supabase
-        .from("policies")
-        .select("*, profiles(id, full_name)")
-        .eq("org_id", orgId)
-        .order("updated_at", { ascending: false });
+    // Fetch policies and org members in parallel (both only need orgId)
+    const [{ data: policies }, { data: members }] = await Promise.all([
+        supabase
+            .from("policies")
+            .select("*, profiles(id, full_name)")
+            .eq("org_id", orgId)
+            .order("updated_at", { ascending: false }),
+        supabase
+            .from("organization_members")
+            .select("user_id, profiles(id, full_name)")
+            .eq("org_id", orgId),
+    ]);
 
-    // Fetch acknowledgements for all policies in this org
+    // Fetch acknowledgements and exceptions in parallel (both need policyIds)
     const policyIds = (policies ?? []).map(p => p.id);
-    const { data: acknowledgements } = policyIds.length > 0
-        ? await supabase
-            .from("policy_acknowledgements")
-            .select("id, policy_id, user_id, acknowledged_at")
-            .in("policy_id", policyIds)
-        : { data: [] };
-
-    // Fetch exceptions
-    const { data: exceptions } = policyIds.length > 0
-        ? await supabase
-            .from("policy_exceptions")
-            .select("*")
-            .in("policy_id", policyIds)
-            .order("created_at", { ascending: false })
-        : { data: [] };
-
-    // Fetch org members (for owner assignment + acknowledgement tracking)
-    const { data: members } = await supabase
-        .from("organization_members")
-        .select("user_id, profiles(id, full_name)")
-        .eq("org_id", orgId);
+    const [{ data: acknowledgements }, { data: exceptions }] = await Promise.all([
+        policyIds.length > 0
+            ? supabase
+                .from("policy_acknowledgements")
+                .select("id, policy_id, user_id, acknowledged_at")
+                .in("policy_id", policyIds)
+            : Promise.resolve({ data: [] as { id: string; policy_id: string; user_id: string; acknowledged_at: string }[] }),
+        policyIds.length > 0
+            ? supabase
+                .from("policy_exceptions")
+                .select("*")
+                .in("policy_id", policyIds)
+                .order("created_at", { ascending: false })
+            : Promise.resolve({ data: [] as import("@/types/database").Database["public"]["Tables"]["policy_exceptions"]["Row"][] }),
+    ]);
 
     const owners = (members ?? [])
         .map(m => {

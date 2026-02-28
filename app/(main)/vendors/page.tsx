@@ -18,14 +18,20 @@ export default async function VendorsPage() {
 
     const orgId = membership.org_id;
 
-    // Fetch vendors
-    const { data: vendors } = await supabase
-        .from("vendors")
-        .select("*")
-        .eq("org_id", orgId)
-        .order("created_at", { ascending: false });
+    // Fetch vendors and org members in parallel (both only need orgId)
+    const [{ data: vendors }, { data: members }] = await Promise.all([
+        supabase
+            .from("vendors")
+            .select("*")
+            .eq("org_id", orgId)
+            .order("created_at", { ascending: false }),
+        supabase
+            .from("organization_members")
+            .select("user_id, profiles(id, full_name)")
+            .eq("org_id", orgId),
+    ]);
 
-    // Fetch assessments for all vendors
+    // Fetch assessments for all vendors (needs vendorIds)
     const vendorIds = (vendors ?? []).map(v => v.id);
     const { data: assessments } = vendorIds.length > 0
         ? await supabase
@@ -34,12 +40,6 @@ export default async function VendorsPage() {
             .in("vendor_id", vendorIds)
             .order("created_at", { ascending: false })
         : { data: [] };
-
-    // Fetch org members for assessor dropdown
-    const { data: members } = await supabase
-        .from("organization_members")
-        .select("user_id, profiles(id, full_name)")
-        .eq("org_id", orgId);
 
     const owners = (members ?? [])
         .map(m => {
