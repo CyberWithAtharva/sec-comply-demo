@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     LayoutDashboard,
@@ -37,6 +37,7 @@ interface NavItem {
 
 export function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const [isCollapsed, setIsCollapsed] = useState(true);
     const [hoveredItem, setHoveredItem] = useState<{ item: NavItem; top: number } | null>(null);
     const { profile } = useAuth();
@@ -142,6 +143,7 @@ export function Sidebar() {
                             <Link key={item.name} href={item.href}>
                                 <div
                                     onMouseEnter={(e) => {
+                                        router.prefetch(item.href);
                                         if (isCollapsed) {
                                             const rect = e.currentTarget.getBoundingClientRect();
                                             setHoveredItem({ item, top: Math.round(rect.top + rect.height / 2) });
