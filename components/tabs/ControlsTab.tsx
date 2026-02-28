@@ -2,9 +2,9 @@
 
 import React from "react";
 import { motion } from "framer-motion";
-import { MetricsCardsWidget } from "@/components/widgets/MetricsCardsWidget";
+import { MetricsCardsWidget, type FrameworkStats } from "@/components/widgets/MetricsCardsWidget";
 import { HeatmapWidget } from "@/components/widgets/HeatmapWidget";
-import { TabularWidget } from "@/components/widgets/TabularWidget";
+import { TabularWidget, type ControlRow } from "@/components/widgets/TabularWidget";
 import {
     RadarWidget,
     TimelineWidget,
@@ -15,7 +15,13 @@ import {
     TreemapWidget
 } from "@/components/widgets/ChartsWidgets";
 
-export function ControlsTab({ frameworkId }: { frameworkId: string }) {
+interface ControlsTabProps {
+    frameworkId: string;
+    frameworkStats?: FrameworkStats;
+    controls?: ControlRow[];
+}
+
+export function ControlsTab({ frameworkId, frameworkStats, controls }: ControlsTabProps) {
     return (
         <motion.div
             key="controls"
@@ -25,7 +31,7 @@ export function ControlsTab({ frameworkId }: { frameworkId: string }) {
             transition={{ duration: 0.5, staggerChildren: 0.1, ease: [0.16, 1, 0.3, 1] }}
             className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
         >
-            <MetricsCardsWidget frameworkId={frameworkId} />
+            <MetricsCardsWidget frameworkId={frameworkId} stats={frameworkStats} />
             <HeatmapWidget frameworkId={frameworkId} />
             <GaugeWidget frameworkId={frameworkId} />
 
@@ -33,7 +39,7 @@ export function ControlsTab({ frameworkId }: { frameworkId: string }) {
             <BarWidget frameworkId={frameworkId} />
             <RadarWidget frameworkId={frameworkId} />
 
-            <TabularWidget frameworkId={frameworkId} />
+            <TabularWidget frameworkId={frameworkId} controls={controls} />
             <ScatterWidget frameworkId={frameworkId} />
 
             <RadialWidget frameworkId={frameworkId} />

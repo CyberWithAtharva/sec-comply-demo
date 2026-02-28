@@ -13,16 +13,20 @@ import {
     Key,
     ServerCrash,
     ShieldAlert,
-    ActivitySquare,
+    Shield,
     BadgeCheck,
     ChevronLeft,
     ChevronRight,
     Search,
     UserCircle,
     FileText,
-    Network
+    LogOut,
+    AlertTriangle,
+    GitBranch,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
+import { useAuth } from "@/context/AuthContext";
+import { signOut } from "@/lib/auth/actions";
 
 interface NavItem {
     name: string;
@@ -35,18 +39,20 @@ export function Sidebar() {
     const pathname = usePathname();
     const [isCollapsed, setIsCollapsed] = useState(true);
     const [hoveredItem, setHoveredItem] = useState<{ item: NavItem; top: number } | null>(null);
+    const { profile } = useAuth();
 
     const navItems: NavItem[] = [
         { name: "Programs", href: "/", icon: LayoutDashboard, caption: "Compliance frameworks overview" },
-        { name: "Domains", href: "/domains", icon: Network, caption: "Trust service criteria domains" },
-        { name: "Policies & Procedures", href: "/policies", icon: BookOpen, caption: "Governing documents & SOPs" },
+{ name: "Policies & Procedures", href: "/policies", icon: BookOpen, caption: "Governing documents & SOPs" },
         { name: "Awareness Training", href: "/training", icon: GraduationCap, caption: "Security awareness programs" },
         { name: "CSPM", href: "/cspm", icon: CloudCog, caption: "Cloud posture monitoring" },
+        { name: "GitHub Security", href: "/github", icon: GitBranch, caption: "Dependabot, secrets & code scan" },
         { name: "Vendor Management", href: "/vendors", icon: Building2, caption: "Third-party risk assessments" },
         { name: "Access Reviews", href: "/access-reviews", icon: Key, caption: "User access certifications" },
         { name: "Asset Inventory", href: "/assets", icon: ServerCrash, caption: "Hardware & software register" },
-        { name: "Vulnerability Management", href: "/vulnerabilities", icon: ShieldAlert, caption: "CVE tracking & remediation" },
-        { name: "Incident Response", href: "/incidents", icon: ActivitySquare, caption: "Incident lifecycle management" },
+        { name: "VAPT Tracker", href: "/vulnerabilities", icon: ShieldAlert, caption: "Pentest findings & remediation" },
+        { name: "Risk Register", href: "/risks", icon: Shield, caption: "Organizational risk management" },
+        { name: "Gap Assessment", href: "/gap-assessment", icon: AlertTriangle, caption: "Compliance gaps & remediation" },
         { name: "Evidences", href: "/evidences", icon: FileText, caption: "Audit artifacts & proof" },
         { name: "Trust Center", href: "/trust", icon: BadgeCheck, caption: "Public compliance portal" },
     ];
@@ -179,25 +185,47 @@ export function Sidebar() {
                 </div>
 
                 {/* Footer User Profile */}
-                <div className="p-4 border-t border-slate-800/80">
+                <div className="p-4 border-t border-slate-800/80 space-y-1">
                     <div className={cn(
-                        "flex items-center p-2 rounded-xl hover:bg-slate-800/50 cursor-pointer transition-colors",
+                        "flex items-center p-2 rounded-xl transition-colors",
                         isCollapsed ? "justify-center" : "justify-start space-x-3"
                     )}>
-                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-                            <UserCircle className="w-6 h-6 text-slate-400" />
+                        <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0">
+                            {profile?.avatar_url ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={profile.avatar_url} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+                            ) : (
+                                <UserCircle className="w-6 h-6 text-slate-400" />
+                            )}
                         </div>
 
                         {!isCollapsed && (
-                            <div className="flex flex-col truncate">
-                                <span className="text-sm font-semibold text-slate-200">Admin User</span>
+                            <div className="flex flex-col truncate flex-1 min-w-0">
+                                <span className="text-sm font-semibold text-slate-200 truncate">
+                                    {profile?.full_name ?? "Loading…"}
+                                </span>
                                 <span className="text-xs text-slate-500 font-mono flex items-center">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5" />
-                                    Online
+                                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 flex-shrink-0" />
+                                    {profile?.role === "admin" ? "Admin" : "Member"}
                                 </span>
                             </div>
                         )}
                     </div>
+
+                    {/* Sign out */}
+                    <form action={signOut}>
+                        <button
+                            type="submit"
+                            className={cn(
+                                "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-500 hover:text-red-400 hover:bg-red-950/30 transition-colors text-sm",
+                                isCollapsed ? "justify-center" : "justify-start"
+                            )}
+                            title="Sign out"
+                        >
+                            <LogOut className="w-4 h-4 flex-shrink-0" />
+                            {!isCollapsed && <span className="font-medium">Sign out</span>}
+                        </button>
+                    </form>
                 </div>
             </motion.div>
 

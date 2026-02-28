@@ -1,107 +1,169 @@
-"use client";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { ShieldCheck } from "lucide-react";
+import { ProgramsClient } from "@/components/programs/ProgramsClient";
 
-import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronRight } from "lucide-react";
+export default async function ProgramsPage() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
 
-import { OverviewTab } from "@/components/tabs/OverviewTab";
-import { ControlsTab } from "@/components/tabs/ControlsTab";
-import { DomainsTab } from "@/components/tabs/DomainsTab";
-import { PoliciesTab } from "@/components/tabs/PoliciesTab";
-import { EvidenceTab } from "@/components/tabs/EvidenceTab";
-import { ProgramDetailsModal } from "@/components/ui/ProgramDetailsModal";
+    // Get user's org membership
+    const { data: membership } = await supabase
+        .from("organization_members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
 
-export default function ProgramsPage() {
-  const [activeFramework, setActiveFramework] = useState("soc2");
-  const [activeTab, setActiveTab] = useState("Overview");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const frameworks = [
-    {
-      id: "soc2",
-      title: "SOC 2 Type II",
-      subtitle: "2017 · AICPA · 0 of 51 controls verified",
-      value: 0,
-      status: "Critical" as const,
-      colorClass: "text-red-500",
-    },
-    {
-      id: "iso27001",
-      title: "ISO 27001",
-      subtitle: "2022 · 15 of 93 controls verified",
-      value: 16,
-      status: "Warning" as const,
-      colorClass: "text-amber-500",
-    },
-    {
-      id: "dpd",
-      title: "DPD Framework",
-      subtitle: "Data Protection · 45 of 60 controls verified",
-      value: 75,
-      status: "Good" as const,
-      colorClass: "text-emerald-500",
+    if (!membership) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+                <ShieldCheck className="w-16 h-16 text-slate-600 mb-4" />
+                <h2 className="text-xl font-semibold text-slate-300 mb-2">No Organization Assigned</h2>
+                <p className="text-slate-500 text-sm max-w-md">
+                    Your account hasn&apos;t been linked to an organization yet. Contact your SecComply admin.
+                </p>
+            </div>
+        );
     }
-  ];
 
-  return (
-    <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-700">
+    const orgId = membership.org_id;
 
-      {/* Header Breadcrumb */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center text-sm font-mono text-slate-400 tracking-wide">
-          <span className="hover:text-slate-200 cursor-pointer transition-colors">Home</span>
-          <ChevronRight className="w-4 h-4 mx-2 opacity-50" />
-          <span className="text-slate-100">Programs</span>
-        </div>
+    // Fetch org frameworks with framework details
+    const { data: orgFrameworks } = await supabase
+        .from("org_frameworks")
+        .select("id, framework_id, status, frameworks(id, name, version, controls_count)")
+        .eq("org_id", orgId);
 
-        {/* Navigate to Questionnaire */}
-        <a href="/questionnaire" className="text-sm font-medium bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-lg shadow-glow transition-all">
-          Go to Assessment &rarr;
-        </a>
-      </div>
+    if (!orgFrameworks || orgFrameworks.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center h-[60vh] text-center">
+                <ShieldCheck className="w-16 h-16 text-slate-600 mb-4" />
+                <h2 className="text-xl font-semibold text-slate-300 mb-2">No Frameworks Assigned</h2>
+                <p className="text-slate-500 text-sm max-w-md">
+                    No compliance frameworks have been assigned to your organization yet.
+                    Contact your SecComply admin to get started.
+                </p>
+            </div>
+        );
+    }
 
-      {/* Replaced by CircularProgress rendering inside OverviewTab */}
+    const frameworkIds = orgFrameworks.map(f => f.framework_id);
 
-      {/* Layout Tabs for the selected framework */}
-      <div className="pt-8 mb-4">
-        <div className="flex space-x-8 border-b border-slate-800 pb-px relative overflow-x-auto no-scrollbar">
-          {["Overview", "Controls", "Domains", "Policies", "Evidence"].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setActiveTab(tab)}
-              className={`pb-4 text-sm font-medium tracking-wide whitespace-nowrap transition-colors relative ${activeTab === tab
-                ? "text-blue-400"
-                : "text-slate-400 hover:text-slate-200"
-                }`}
-            >
-              {tab}
-              {activeTab === tab && (
-                <motion.div
-                  layoutId="activeTab"
-                  className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"
-                />
-              )}
-            </button>
-          ))}
-        </div>
-      </div>
+    // Fetch all controls for these frameworks
+    const { data: controls } = await supabase
+        .from("controls")
+        .select("id, framework_id, control_id, title, domain, category")
+        .in("framework_id", frameworkIds);
 
-      {/* Dynamic Tab Area */}
-      <div className="pb-20">
-        <AnimatePresence mode="wait">
-          {activeTab === "Overview" && <OverviewTab key="overview" activeFramework={activeFramework} setActiveFramework={setActiveFramework} frameworks={frameworks} setIsModalOpen={setIsModalOpen} />}
-          {activeTab === "Controls" && <ControlsTab key="controls" frameworkId={activeFramework} />}
-          {activeTab === "Domains" && <DomainsTab key="domains" frameworkId={activeFramework} />}
-          {activeTab === "Policies" && <PoliciesTab key="policies" frameworkId={activeFramework} />}
-          {activeTab === "Evidence" && <EvidenceTab key="evidence" frameworkId={activeFramework} />}
-        </AnimatePresence>
-      </div>
-      {/* Deep Dive 63-Control Modal */}
-      <ProgramDetailsModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        frameworkId={activeFramework}
-      />
-    </div>
-  );
+    const controlIds = (controls ?? []).map(c => c.id);
+
+    // Fetch control statuses for this org
+    const { data: controlStatuses } = controlIds.length > 0
+        ? await supabase
+            .from("control_status")
+            .select("control_id, status, evidence_count")
+            .eq("org_id", orgId)
+            .in("control_id", controlIds)
+        : { data: [] };
+
+    // Build a map of control_id -> status
+    const statusMap = new Map(
+        (controlStatuses ?? []).map(s => [s.control_id, s])
+    );
+
+    // Group controls by framework
+    const controlsByFramework = new Map<string, NonNullable<typeof controls>>();
+    for (const control of (controls ?? [])) {
+        const existing = controlsByFramework.get(control.framework_id) ?? [];
+        existing.push(control);
+        controlsByFramework.set(control.framework_id, existing);
+    }
+
+    // Build framework data with real stats
+    const frameworkData = orgFrameworks.map(of => {
+        const fw = of.frameworks as { id: string; name: string; version: string; controls_count: number } | null;
+        const fwControls = controlsByFramework.get(of.framework_id) ?? [];
+
+        let verified = 0, inProgress = 0, notStarted = 0;
+        let totalEvidence = 0;
+
+        for (const control of fwControls) {
+            const cs = statusMap.get(control.id);
+            if (!cs) {
+                notStarted++;
+            } else if (cs.status === "verified" || cs.status === "not_applicable") {
+                verified++;
+                totalEvidence += cs.evidence_count ?? 0;
+            } else if (cs.status === "in_progress") {
+                inProgress++;
+            } else {
+                notStarted++;
+            }
+        }
+
+        const total = fw?.controls_count ?? fwControls.length;
+        const pct = total > 0 ? Math.round((verified / total) * 100) : 0;
+
+        return {
+            id: of.id,
+            frameworkId: of.framework_id,
+            name: fw?.name ?? "Unknown Framework",
+            version: fw?.version ?? "",
+            totalControls: total,
+            verifiedControls: verified,
+            inProgressControls: inProgress,
+            notStartedControls: notStarted,
+            evidenceCount: totalEvidence,
+            percentage: pct,
+            status: (pct >= 80 ? "Good" : pct >= 40 ? "Warning" : "Critical") as "Good" | "Warning" | "Critical",
+        };
+    });
+
+    // Build controls with status for tabular display
+    const controlsWithStatus = (controls ?? []).map(c => ({
+        id: c.id,
+        frameworkId: c.framework_id,
+        controlId: c.control_id,
+        title: c.title,
+        domain: c.domain ?? "",
+        category: c.category ?? "",
+        status: statusMap.get(c.id)?.status ?? "not_started",
+    }));
+
+    // Gap counts per framework (controls not verified or N/A)
+    const gapCounts: Record<string, number> = {};
+    for (const of_ of orgFrameworks) {
+        const fwControls = controlsByFramework.get(of_.framework_id) ?? [];
+        const gaps = fwControls.filter(c => {
+            const s = statusMap.get(c.id)?.status;
+            return !s || (s !== "verified" && s !== "not_applicable");
+        }).length;
+        gapCounts[of_.framework_id] = gaps;
+    }
+
+    // Approved policies for this org (with framework linkage)
+    const { data: approvedPolicies } = await supabase
+        .from("policies")
+        .select("id, title, status, framework_id, owner_id, next_review, version, updated_at")
+        .eq("org_id", orgId)
+        .in("status", ["approved", "under_review", "draft"])
+        .order("updated_at", { ascending: false });
+
+    const policiesByFramework: Record<string, typeof approvedPolicies> = {};
+    for (const p of approvedPolicies ?? []) {
+        if (!p.framework_id) continue;
+        if (!policiesByFramework[p.framework_id]) policiesByFramework[p.framework_id] = [];
+        policiesByFramework[p.framework_id]!.push(p);
+    }
+
+    return (
+        <ProgramsClient
+            frameworks={frameworkData}
+            controls={controlsWithStatus}
+            gapCounts={gapCounts}
+            policiesByFramework={policiesByFramework}
+        />
+    );
 }

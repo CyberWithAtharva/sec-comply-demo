@@ -1,60 +1,81 @@
-"use client";
+import { createClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
+import { PoliciesClient } from "@/components/policies/PoliciesClient";
 
-import React from "react";
-import { FileText, Plus, BookOpen } from "lucide-react";
+export default async function PoliciesPage() {
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) redirect("/login");
 
-import { PolicyMaturityWidget } from "@/components/widgets/policies/PolicyMaturityWidget";
-import { AcknowledgeTrackingWidget } from "@/components/widgets/policies/AcknowledgeTrackingWidget";
-import { PolicyExceptionsWidget } from "@/components/widgets/policies/PolicyExceptionsWidget";
-import { MissingPoliciesWidget } from "@/components/widgets/policies/MissingPoliciesWidget";
-import { RecentUpdatesWidget } from "@/components/widgets/policies/RecentUpdatesWidget";
+    const { data: membership } = await supabase
+        .from("organization_members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
 
-export default function PoliciesPage() {
+    if (!membership) redirect("/");
+
+    const orgId = membership.org_id;
+
+    // Fetch policies with owner profile
+    const { data: policies } = await supabase
+        .from("policies")
+        .select("*, profiles(id, full_name)")
+        .eq("org_id", orgId)
+        .order("updated_at", { ascending: false });
+
+    // Fetch acknowledgements for all policies in this org
+    const policyIds = (policies ?? []).map(p => p.id);
+    const { data: acknowledgements } = policyIds.length > 0
+        ? await supabase
+            .from("policy_acknowledgements")
+            .select("id, policy_id, user_id, acknowledged_at")
+            .in("policy_id", policyIds)
+        : { data: [] };
+
+    // Fetch exceptions
+    const { data: exceptions } = policyIds.length > 0
+        ? await supabase
+            .from("policy_exceptions")
+            .select("*")
+            .in("policy_id", policyIds)
+            .order("created_at", { ascending: false })
+        : { data: [] };
+
+    // Fetch org members (for owner assignment + acknowledgement tracking)
+    const { data: members } = await supabase
+        .from("organization_members")
+        .select("user_id, profiles(id, full_name)")
+        .eq("org_id", orgId);
+
+    const owners = (members ?? [])
+        .map(m => {
+            const p = m.profiles as { id: string; full_name: string | null } | null;
+            return p ? { id: p.id, name: p.full_name ?? "Unknown" } : null;
+        })
+        .filter(Boolean) as { id: string; name: string }[];
+
+    // Count acknowledgements per policy
+    const ackCountMap = new Map<string, number>();
+    for (const ack of (acknowledgements ?? [])) {
+        ackCountMap.set(ack.policy_id, (ackCountMap.get(ack.policy_id) ?? 0) + 1);
+    }
+
+    const policiesWithAck = (policies ?? []).map(p => ({
+        ...p,
+        owner: (p.profiles as unknown as { id: string; full_name: string | null } | null),
+        ackCount: ackCountMap.get(p.id) ?? 0,
+        totalMembers: owners.length,
+    }));
+
     return (
-        <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-700">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
-                        <FileText className="w-8 h-8 mr-3 text-indigo-500" />
-                        Governance & Policies
-                    </h1>
-                    <p className="text-sm text-slate-400 mt-2">Central command for policy documentation, acknowledgements, exceptions, and framework alignment.</p>
-                </div>
-                <div className="flex space-x-3">
-                    <button className="px-5 py-2.5 border border-slate-700 hover:bg-slate-800 rounded-xl text-sm font-medium text-slate-300 transition-all flex items-center">
-                        <BookOpen className="w-4 h-4 mr-2" />
-                        Policy Library
-                    </button>
-                    <button className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-all flex items-center">
-                        <Plus className="w-4 h-4 mr-2" />
-                        Create New Policy
-                    </button>
-                </div>
-            </div>
-
-            {/* Top Row: Maturity, Acknowledgements, Exceptions */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-1 h-[320px]">
-                    <PolicyMaturityWidget />
-                </div>
-                <div className="md:col-span-1 lg:col-span-1 h-[320px]">
-                    <AcknowledgeTrackingWidget />
-                </div>
-                <div className="md:col-span-2 lg:col-span-1 h-[320px]">
-                    <PolicyExceptionsWidget />
-                </div>
-            </div>
-
-            {/* Bottom Row: Missing Policies (Gaps), Recent Updates */}
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 min-h-[380px]">
-                <div className="xl:col-span-1">
-                    <MissingPoliciesWidget />
-                </div>
-                <div className="xl:col-span-1">
-                    <RecentUpdatesWidget />
-                </div>
-            </div>
-        </div>
+        <PoliciesClient
+            initialPolicies={policiesWithAck}
+            initialExceptions={exceptions ?? []}
+            orgId={orgId}
+            currentUserId={user.id}
+            owners={owners}
+        />
     );
 }

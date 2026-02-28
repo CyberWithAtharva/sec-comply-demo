@@ -10,11 +10,11 @@ import {
     ShieldCheck,
     TrendingUp,
     Layers,
-    Map,
+    Map as MapIcon,
 } from "lucide-react";
-import { MetricsCardsWidget } from "@/components/widgets/MetricsCardsWidget";
+import { MetricsCardsWidget, type FrameworkStats } from "@/components/widgets/MetricsCardsWidget";
 import { HeatmapWidget } from "@/components/widgets/HeatmapWidget";
-import { TabularWidget } from "@/components/widgets/TabularWidget";
+import { TabularWidget, type ControlRow } from "@/components/widgets/TabularWidget";
 import {
     RadarWidget,
     TimelineWidget,
@@ -32,10 +32,16 @@ export function ProgramDetailsModal({
     isOpen,
     onClose,
     frameworkId,
+    frameworkStats,
+    controls,
+    frameworkName,
 }: {
     isOpen: boolean;
     onClose: () => void;
     frameworkId: string;
+    frameworkStats?: FrameworkStats;
+    controls?: ControlRow[];
+    frameworkName?: string;
 }) {
     const [activeTab, setActiveTab] = useState("Summary");
     const [mainTab, setMainTab] = useState<"Insights" | "Breakdown">("Insights");
@@ -70,26 +76,34 @@ export function ProgramDetailsModal({
         {
             id: "Coverage Map",
             label: "Coverage Map",
-            icon: Map,
+            icon: MapIcon,
             description: "Density & velocity",
         },
     ];
 
-    // Categories for the Sub-Control Matrix
-    const categories = [
-        { name: "Access Control", count: 14, status: "Good" },
-        { name: "Risk Assessment", count: 8, status: "Warning" },
-        { name: "Cryptography", count: 12, status: "Critical" },
-        { name: "Physical Security", count: 9, status: "Good" },
-        { name: "Operations Security", count: 20, status: "Warning" },
-    ];
+    // Build categories from real controls data, grouped by domain
+    const categoryMap = new Map<string, { total: number; verified: number }>();
+    for (const c of (controls ?? [])) {
+        const domain = c.domain || "General";
+        const entry = categoryMap.get(domain) ?? { total: 0, verified: 0 };
+        entry.total++;
+        if (c.status === "verified" || c.status === "not_applicable") entry.verified++;
+        categoryMap.set(domain, entry);
+    }
+    type CategoryEntry = { name: string; count: number; verified: number; pct: number; status: string };
+    const allCategories: CategoryEntry[] = [];
+    categoryMap.forEach((val, name) => {
+        const pct = val.total > 0 ? Math.round((val.verified / val.total) * 100) : 0;
+        allCategories.push({ name, count: val.total, verified: val.verified, pct, status: pct >= 80 ? "Good" : pct >= 40 ? "Warning" : "Critical" });
+    });
+    const categories = allCategories.slice(0, 6);
 
     function renderTabContent() {
         switch (activeTab) {
             case "Summary":
                 return (
                     <div className="flex flex-col space-y-8">
-                        <MetricsCardsWidget frameworkId={frameworkId} />
+                        <MetricsCardsWidget frameworkId={frameworkId} stats={frameworkStats} />
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                             <ExecutiveSummaryWidget />
                             <GaugeWidget frameworkId={frameworkId} />
@@ -114,7 +128,7 @@ export function ProgramDetailsModal({
                     <div className="flex flex-col space-y-8">
                         <TimelineWidget frameworkId={frameworkId} />
                         <BarWidget frameworkId={frameworkId} />
-                        <TabularWidget frameworkId={frameworkId} />
+                        <TabularWidget frameworkId={frameworkId} controls={controls} />
                     </div>
                 );
             case "Control Distribution":
@@ -156,11 +170,12 @@ export function ProgramDetailsModal({
                                         <div className="w-full h-1 bg-slate-800 mt-4 rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full ${cat.status === "Good"
-                                                        ? "bg-emerald-500 w-[85%]"
+                                                        ? "bg-emerald-500"
                                                         : cat.status === "Warning"
-                                                            ? "bg-amber-500 w-[45%]"
-                                                            : "bg-red-500 w-[15%]"
+                                                            ? "bg-amber-500"
+                                                            : "bg-red-500"
                                                     }`}
+                                                style={{ width: `${cat.pct}%` }}
                                             />
                                         </div>
                                     </div>
@@ -207,10 +222,10 @@ export function ProgramDetailsModal({
                         <div className="flex justify-between items-start mb-6">
                             <div>
                                 <h2 className="text-2xl font-bold text-slate-100 tracking-tight">
-                                    {frameworkId.toUpperCase()} Deep Dive
+                                    {frameworkName ?? "Framework"} Deep Dive
                                 </h2>
                                 <p className="text-sm text-slate-400 mt-1 font-medium tracking-wide">
-                                    Comprehensive Analysis & Visualization
+                                    {frameworkStats ? `${frameworkStats.verifiedControls} of ${frameworkStats.totalControls} controls verified · ${frameworkStats.percentage}% compliant` : "Comprehensive Analysis & Visualization"}
                                 </p>
                             </div>
                             <button
@@ -249,7 +264,7 @@ export function ProgramDetailsModal({
                                         : "text-slate-500 hover:text-slate-300"
                                 )}
                             >
-                                63 Controls Breakdown
+                                {frameworkStats?.totalControls ?? "—"} Controls Breakdown
                                 {mainTab === "Breakdown" && (
                                     <motion.div
                                         layoutId="mainTabIndicator"

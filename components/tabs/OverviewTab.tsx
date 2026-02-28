@@ -26,13 +26,23 @@ interface OverviewProps {
         colorClass: string;
     }[];
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    activeFrameworkData?: {
+        totalControls: number;
+        verifiedControls: number;
+        inProgressControls: number;
+        notStartedControls: number;
+        evidenceCount: number;
+        percentage: number;
+    };
 }
 
-export function OverviewTab({ activeFramework, setActiveFramework, frameworks, setIsModalOpen }: OverviewProps) {
-    // Deterministic mock data for global posture
-    const score = 84;
-    const trend = "+6%";
-    const riskCount = 12;
+export function OverviewTab({ activeFramework, setActiveFramework, frameworks, setIsModalOpen, activeFrameworkData }: OverviewProps) {
+    // Compute global posture score from all frameworks (average) or from active framework
+    const totalControls = activeFrameworkData?.totalControls ?? 0;
+    const verifiedControls = activeFrameworkData?.verifiedControls ?? 0;
+    const inProgressControls = activeFrameworkData?.inProgressControls ?? 0;
+    const score = activeFrameworkData ? activeFrameworkData.percentage : 0;
+    const riskCount = totalControls > 0 ? (totalControls - verifiedControls - inProgressControls) : 0;
 
     return (
         <motion.div
@@ -89,10 +99,10 @@ export function OverviewTab({ activeFramework, setActiveFramework, frameworks, s
                         <div className="mt-6 flex flex-col space-y-2">
                             <div className="flex items-center space-x-2">
                                 <TrendingUp className="w-5 h-5 text-emerald-400" />
-                                <span className="text-sm font-medium text-emerald-400">{trend} vs month</span>
+                                <span className="text-sm font-medium text-emerald-400">{verifiedControls} verified controls</span>
                             </div>
                             <div className="flex items-center text-sm text-slate-400">
-                                <span>Target: <span className="text-slate-200">90</span></span>
+                                <span>Target: <span className="text-slate-200">90%</span></span>
                             </div>
                         </div>
                     </div>

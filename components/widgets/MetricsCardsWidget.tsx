@@ -39,63 +39,60 @@ function MetricCard({ title, value, trend, isPositive, icon, delay = 0 }: Metric
     );
 }
 
-type MetricData = { title: string; value: string; trend: string; isPositive: boolean; };
+export interface FrameworkStats {
+    totalControls: number;
+    verifiedControls: number;
+    inProgressControls: number;
+    notStartedControls: number;
+    evidenceCount: number;
+    percentage: number;
+}
 
-const DATA_MAP: Record<string, MetricData[]> = {
-    soc2: [
-        { title: "Total Controls Passed", value: "0 / 51", trend: "0%", isPositive: true },
-        { title: "Critical Vulnerabilities", value: "14", trend: "+2", isPositive: false },
-        { title: "Evidence Coverage", value: "0%", trend: "0%", isPositive: true },
-        { title: "Compliance Score", value: "0", trend: "0", isPositive: false },
-    ],
-    iso27001: [
-        { title: "Total Controls Passed", value: "15 / 93", trend: "+2%", isPositive: true },
-        { title: "Critical Vulnerabilities", value: "12", trend: "+4", isPositive: false },
-        { title: "Evidence Coverage", value: "24%", trend: "+1%", isPositive: true },
-        { title: "Compliance Score", value: "45", trend: "-2", isPositive: false },
-    ],
-    dpd: [
-        { title: "Total Controls Passed", value: "45 / 60", trend: "+8%", isPositive: true },
-        { title: "Critical Vulnerabilities", value: "0", trend: "-1", isPositive: true },
-        { title: "Evidence Coverage", value: "95%", trend: "+2%", isPositive: true },
-        { title: "Compliance Score", value: "98", trend: "+1", isPositive: true },
-    ]
-};
+interface MetricsCardsWidgetProps {
+    frameworkId?: string;
+    stats?: FrameworkStats;
+}
 
-export function MetricsCardsWidget({ frameworkId = "soc2" }: { frameworkId?: string }) {
-    const data = DATA_MAP[frameworkId] || DATA_MAP.soc2;
+export function MetricsCardsWidget({ stats }: MetricsCardsWidgetProps) {
+    const total = stats?.totalControls ?? 0;
+    const verified = stats?.verifiedControls ?? 0;
+    const inProgress = stats?.inProgressControls ?? 0;
+    const evidenceCount = stats?.evidenceCount ?? 0;
+    const pct = stats?.percentage ?? 0;
+    const notStarted = Math.max(0, total - verified - inProgress);
+    const evidenceCoverage = total > 0 ? Math.min(100, Math.round((evidenceCount / total) * 100)) : 0;
 
     return (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 col-span-full">
             <MetricCard
-                title={data[0].title}
-                value={data[0].value}
-                trend={data[0].trend}
-                isPositive={data[0].isPositive}
+                title="Controls Verified"
+                value={`${verified} / ${total}`}
+                trend={`${pct}%`}
+                isPositive={pct >= 50}
                 icon={<ShieldCheck className="w-16 h-16 text-emerald-500" />}
                 delay={0.1}
             />
             <MetricCard
-                title={data[1].title}
-                value={data[1].value}
-                trend={data[1].trend}
-                isPositive={data[1].isPositive}
+                title="Not Started"
+                value={String(notStarted)}
+                trend={notStarted === 0 ? "All done" : `${notStarted} remaining`}
+                isPositive={notStarted === 0}
                 icon={<AlertTriangle className="w-16 h-16 text-red-500" />}
                 delay={0.2}
             />
             <MetricCard
-                title={data[2].title}
-                value={data[2].value}
-                trend={data[2].trend}
-                isPositive={data[2].isPositive}
+                title="Evidence Artifacts"
+                value={String(evidenceCount)}
+                trend={`${evidenceCoverage}% coverage`}
+                isPositive={evidenceCoverage >= 50}
                 icon={<FileCheck2 className="w-16 h-16 text-blue-500" />}
                 delay={0.3}
             />
             <MetricCard
-                title={data[3].title}
-                value={data[3].value}
-                trend={data[3].trend}
-                isPositive={data[3].isPositive}
+                title="In Progress"
+                value={String(inProgress)}
+                trend={inProgress > 0 ? "Active" : "None active"}
+                isPositive={inProgress > 0}
                 icon={<Activity className="w-16 h-16 text-indigo-500" />}
                 delay={0.4}
             />
