@@ -12,11 +12,11 @@ export async function POST(req: NextRequest) {
         if (!installation_id) return NextResponse.json({ error: "installation_id required" }, { status: 400 });
 
         // Fetch the installation record
-        const { data: installation, error: instErr } = await supabase
-            .from("github_installations")
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: installation, error: instErr } = await (supabase.from("github_installations") as any)
             .select("*")
             .eq("id", installation_id)
-            .single();
+            .single() as { data: { id: string; org_id: string; installation_id: number; github_org: string; access_token: string | null; org_settings: Record<string, unknown> | null; last_sync: string | null; status: string } | null; error: unknown };
 
         if (instErr || !installation) return NextResponse.json({ error: "Installation not found" }, { status: 404 });
 
