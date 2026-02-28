@@ -1,0 +1,13 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  # NEXT_PUBLIC_* variables are intentionally inlined into the JS bundle by Next.js.
+  # They are public by design and safe to appear in build output.
+  # .agent/ contains dev tooling that references localhost URLs — not production secrets.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_APP_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
+  SECRETS_SCAN_OMIT_PATHS = ".agent/**,README.md"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
