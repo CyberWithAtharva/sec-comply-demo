@@ -32,21 +32,33 @@ async function queryTxt(name: string): Promise<string[]> {
 // ─── Core assessment logic ────────────────────────────────────────────────────
 
 async function assessDomain(domain: string): Promise<{ score: number; findings: SecurityFinding[] }> {
+    // Run HTTPS probe, SPF lookup, and DMARC lookup all in parallel.
+    // Sequential would be 8s + 5s + 5s = 18s worst-case (hits Vercel limits).
+    // Parallel worst-case: max(8s, 5s) = 8s.
+    const [httpsResult, spfRecords, dmarcRecords] = await Promise.all([
+        // ── HTTPS probe ──────────────────────────────────────────────────────
+        (async () => {
+            try {
+                const r = await fetch(`https://${domain}`, {
+                    method: "HEAD",
+                    redirect: "follow",
+                    signal: AbortSignal.timeout(8_000),
+                });
+                return { ok: r.status < 500, headers: r.headers };
+            } catch {
+                return { ok: false, headers: null as Headers | null };
+            }
+        })(),
+        // ── SPF TXT record ───────────────────────────────────────────────────
+        queryTxt(domain),
+        // ── DMARC TXT record ─────────────────────────────────────────────────
+        queryTxt(`_dmarc.${domain}`),
+    ]);
+
     const findings: SecurityFinding[] = [];
+    const { ok: httpsOk, headers: resHeaders } = httpsResult;
 
     // ── 1. HTTPS accessible ──────────────────────────────────────────────────
-    let httpsOk = false;
-    let resHeaders: Headers | null = null;
-    try {
-        const r = await fetch(`https://${domain}`, {
-            method: "HEAD",
-            redirect: "follow",
-            signal: AbortSignal.timeout(8_000),
-        });
-        httpsOk = r.status < 500;
-        resHeaders = r.headers;
-    } catch { /* unreachable */ }
-
     findings.push({
         label: "HTTPS Accessible",
         passed: httpsOk,
@@ -103,7 +115,6 @@ async function assessDomain(domain: string): Promise<{ score: number; findings: 
     });
 
     // ── 6. SPF record ────────────────────────────────────────────────────────
-    const spfRecords = await queryTxt(domain);
     const spfOk = spfRecords.some(r => r.startsWith("v=spf1"));
     findings.push({
         label: "SPF Record (Email Spoofing Prevention)",
@@ -115,7 +126,6 @@ async function assessDomain(domain: string): Promise<{ score: number; findings: 
     });
 
     // ── 7. DMARC policy ──────────────────────────────────────────────────────
-    const dmarcRecords = await queryTxt(`_dmarc.${domain}`);
     const dmarcOk = dmarcRecords.some(r => r.startsWith("v=DMARC1"));
     findings.push({
         label: "DMARC Policy (Email Authentication)",

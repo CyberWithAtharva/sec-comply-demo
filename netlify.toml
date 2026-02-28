@@ -9,5 +9,11 @@
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_APP_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
   SECRETS_SCAN_OMIT_PATHS = ".agent/**,README.md"
 
+# Extend function timeout to 26s (max on Netlify Pro / max before needing background functions).
+# Required for vendor security assessment (parallel HTTPS + DNS probes ~8s)
+# and GitHub sync (multiple GitHub API calls).
+[functions]
+  timeout = 26
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
