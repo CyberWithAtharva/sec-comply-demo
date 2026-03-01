@@ -8,7 +8,7 @@ import {
     Bug, Key, Code2, Clock, Package, ShieldAlert, ChevronDown,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, RadarChart, PolarGrid, PolarAngleAxis, Radar, Treemap, Cell } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from "recharts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -386,21 +386,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
             })
             .slice(0, 5);
 
-        const radarData = [
-            { subject: "Secrets",    count: typeCounts.secret },
-            { subject: "Deps",       count: typeCounts.dependabot },
-            { subject: "Code Scan",  count: typeCounts.code_scan },
-            { subject: "Misconfig",  count: typeCounts.config },
-        ];
-
-        const treemapData = [
-            { name: "Secrets",    size: typeCounts.secret },
-            { name: "Dependabot", size: typeCounts.dependabot },
-            { name: "Code Scan",  size: typeCounts.code_scan },
-            { name: "Misconfig",  size: typeCounts.config },
-        ].filter(d => d.size > 0);
-
-        return { sevCounts, typeCounts, topRepos, heatmapRepos, instScores, topFindings, radarData, treemapData };
+        return { sevCounts, typeCounts, topRepos, heatmapRepos, instScores, topFindings };
     }, [findings, configFindings, installations]);
 
     const handleSync = async (installationId: string) => {
@@ -634,18 +620,69 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                             )}
                         </div>
 
-                        {/* Radar */}
+                        {/* Custom Donut — Type Distribution */}
                         <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                            <h3 className="text-sm font-semibold text-slate-400 mb-2">Finding Type Distribution</h3>
-                            <div className="flex-1 min-h-[180px]">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <RadarChart data={ghDashboardData.radarData}>
-                                        <PolarGrid stroke="#334155" />
-                                        <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 10 }} />
-                                        <Radar name="Findings" dataKey="count" stroke="#7c3aed" fill="#7c3aed" fillOpacity={0.3} />
-                                        <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#1e293b", borderRadius: "8px" }} />
-                                    </RadarChart>
-                                </ResponsiveContainer>
+                            <h3 className="text-sm font-semibold text-slate-400 mb-2">Type Distribution</h3>
+                            <div className="flex-1 flex items-center justify-center min-h-[180px]">
+                                {(() => {
+                                    const typeRows: { label: string; count: number; color: string; Icon: React.ComponentType<{ className?: string }> }[] = [
+                                        { label: "Secrets",    count: ghDashboardData.typeCounts.secret,     color: "#ef4444", Icon: Key },
+                                        { label: "Dependabot", count: ghDashboardData.typeCounts.dependabot, color: "#f59e0b", Icon: Package },
+                                        { label: "Code Scan",  count: ghDashboardData.typeCounts.code_scan,  color: "#a855f7", Icon: Code2 },
+                                        { label: "Misconfig",  count: ghDashboardData.typeCounts.config,     color: "#f97316", Icon: ShieldAlert },
+                                    ];
+                                    const typeTotal = typeRows.reduce((s, t) => s + t.count, 0);
+                                    const circ = 2 * Math.PI * 30;
+                                    let cumOffset = 0;
+                                    return (
+                                        <div className="flex items-center gap-6">
+                                            <div className="relative flex-shrink-0">
+                                                <svg width="84" height="84" viewBox="0 0 84 84">
+                                                    <circle cx="42" cy="42" r="30" fill="none" stroke="#1e293b" strokeWidth="11" />
+                                                    {typeTotal === 0 ? (
+                                                        <circle cx="42" cy="42" r="30" fill="none" stroke="#334155" strokeWidth="11" strokeDasharray="4 4" />
+                                                    ) : (
+                                                        typeRows.map(t => {
+                                                            if (t.count === 0) return null;
+                                                            const segLen = (t.count / typeTotal) * circ;
+                                                            const dashOffset = circ - cumOffset;
+                                                            cumOffset += segLen;
+                                                            return (
+                                                                <motion.circle
+                                                                    key={t.label}
+                                                                    cx="42" cy="42" r="30" fill="none"
+                                                                    stroke={t.color} strokeWidth="11"
+                                                                    strokeDasharray={`${segLen} ${circ - segLen}`}
+                                                                    strokeDashoffset={dashOffset}
+                                                                    transform="rotate(-90 42 42)"
+                                                                    initial={{ opacity: 0 }}
+                                                                    animate={{ opacity: 1 }}
+                                                                    transition={{ duration: 0.5 }}
+                                                                />
+                                                            );
+                                                        })
+                                                    )}
+                                                </svg>
+                                                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                                                    <span className="text-xl font-bold text-slate-100 leading-none">{typeTotal}</span>
+                                                    <span className="text-[9px] text-slate-500 mt-0.5">total</span>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col gap-2.5">
+                                                {typeRows.map(t => (
+                                                    <div key={t.label} className="flex items-center gap-2 text-[11px]">
+                                                        <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: t.color }} />
+                                                        <span className="text-slate-400 min-w-[62px]">{t.label}</span>
+                                                        <span className="font-bold tabular-nums" style={{ color: t.color }}>{t.count}</span>
+                                                        {typeTotal > 0 && (
+                                                            <span className="text-slate-600 text-[10px]">{Math.round((t.count / typeTotal) * 100)}%</span>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    );
+                                })()}
                             </div>
                         </div>
                     </div>
@@ -730,16 +767,51 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         </div>
                     </div>
 
-                    {/* Row 5: Treemap — Findings by Type */}
-                    {ghDashboardData.treemapData.length > 0 && (
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                    {/* Row 5: Finding Type Breakdown — Icon Cards with Arc */}
+                    {stats.total > 0 && (
+                        <div>
                             <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Type</h3>
-                            <div className="w-full h-64">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <Treemap data={ghDashboardData.treemapData} dataKey="size" stroke="#020617" fill="#7c3aed">
-                                        <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
-                                    </Treemap>
-                                </ResponsiveContainer>
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                {([
+                                    { label: "Secrets",    count: ghDashboardData.typeCounts.secret,     color: "#ef4444", border: "border-red-500/20",    Icon: Key        },
+                                    { label: "Dependabot", count: ghDashboardData.typeCounts.dependabot, color: "#f59e0b", border: "border-amber-500/20",  Icon: Package    },
+                                    { label: "Code Scan",  count: ghDashboardData.typeCounts.code_scan,  color: "#a855f7", border: "border-purple-500/20", Icon: Code2      },
+                                    { label: "Misconfig",  count: ghDashboardData.typeCounts.config,     color: "#f97316", border: "border-orange-500/20", Icon: ShieldAlert },
+                                ] as { label: string; count: number; color: string; border: string; Icon: React.ComponentType<{ className?: string }> }[]).map((t, idx) => {
+                                    const pct = stats.total > 0 ? (t.count / stats.total) * 100 : 0;
+                                    const r = 22;
+                                    const arcCirc = 2 * Math.PI * r;
+                                    return (
+                                        <motion.div
+                                            key={t.label}
+                                            initial={{ opacity: 0, y: 12 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: idx * 0.08 }}
+                                            className={cn("glass-panel rounded-2xl border p-5 flex flex-col items-center text-center gap-2", t.border)}
+                                        >
+                                            <div className="relative">
+                                                <svg width="60" height="60" viewBox="0 0 60 60">
+                                                    <circle cx="30" cy="30" r={r} fill="none" stroke="#1e293b" strokeWidth="6" />
+                                                    <motion.circle
+                                                        cx="30" cy="30" r={r} fill="none"
+                                                        stroke={t.color} strokeWidth="6" strokeLinecap="round"
+                                                        strokeDasharray={arcCirc}
+                                                        initial={{ strokeDashoffset: arcCirc }}
+                                                        animate={{ strokeDashoffset: arcCirc * (1 - pct / 100) }}
+                                                        transition={{ duration: 1.2, ease: "easeOut" }}
+                                                        transform="rotate(-90 30 30)"
+                                                    />
+                                                </svg>
+                                                <div className="absolute inset-0 flex items-center justify-center" style={{ color: t.color }}>
+                                                    <t.Icon className="w-5 h-5" />
+                                                </div>
+                                            </div>
+                                            <div className="text-2xl font-bold text-slate-100">{t.count}</div>
+                                            <div className="text-[11px] text-slate-400 font-medium">{t.label}</div>
+                                            <div className="text-[10px]" style={{ color: t.color }}>{Math.round(pct)}% of total</div>
+                                        </motion.div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}

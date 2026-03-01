@@ -9,7 +9,7 @@ import {
     Shield, Server, Link2, ExternalLink, Clock
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, RadarChart, PolarGrid, PolarAngleAxis, Radar, Treemap, Cell } from "recharts";
+import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from "recharts";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -376,11 +376,7 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
         }
         const radarData = Object.entries(domainCounts).map(([subject, count]) => ({ subject, count }));
 
-        const treemapData = services
-            .map(([name, v]) => ({ name, size: v.critical * 4 + v.high * 3 + v.medium * 2 + v.low }))
-            .filter(d => d.size > 0);
-
-        return { sevCounts, services, accountScores, topActive, active, resolved, radarData, treemapData };
+        return { sevCounts, services, accountScores, topActive, active, resolved, radarData };
     }, [findings, accounts]);
 
     const handleConnected = (account: AWSAccount) => {
@@ -617,18 +613,35 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                     )}
                                 </div>
 
-                                {/* Radar */}
+                                {/* Security Domain Breakdown */}
                                 <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-2">Security Domain Issues</h3>
-                                    <div className="flex-1 min-h-[180px]">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <RadarChart data={dashboardData.radarData}>
-                                                <PolarGrid stroke="#334155" />
-                                                <PolarAngleAxis dataKey="subject" tick={{ fill: "#94a3b8", fontSize: 10 }} />
-                                                <Radar name="Issues" dataKey="count" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
-                                                <Tooltip contentStyle={{ backgroundColor: "#020617", borderColor: "#1e293b", borderRadius: "8px" }} />
-                                            </RadarChart>
-                                        </ResponsiveContainer>
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Security Domain Issues</h3>
+                                    <div className="flex-1 flex flex-col justify-center gap-2.5 min-h-[180px]">
+                                        {[...dashboardData.radarData]
+                                            .sort((a, b) => b.count - a.count)
+                                            .map((domain, i) => {
+                                                const maxCount = Math.max(...dashboardData.radarData.map(d => d.count), 1);
+                                                const pct = (domain.count / maxCount) * 100;
+                                                const colors = ["#ef4444", "#f97316", "#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"];
+                                                const color = colors[i] ?? "#64748b";
+                                                return (
+                                                    <div key={domain.subject}>
+                                                        <div className="flex items-center justify-between text-[11px] mb-1">
+                                                            <span className="text-slate-300 font-medium">{domain.subject}</span>
+                                                            <span className="font-bold tabular-nums" style={{ color }}>{domain.count}</span>
+                                                        </div>
+                                                        <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                                            <motion.div
+                                                                initial={{ width: 0 }}
+                                                                animate={{ width: `${pct}%` }}
+                                                                transition={{ duration: 0.8, ease: "easeOut", delay: i * 0.06 }}
+                                                                className="h-full rounded-full"
+                                                                style={{ backgroundColor: color }}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                );
+                                            })}
                                     </div>
                                 </div>
                             </div>
@@ -718,16 +731,57 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                 </div>
                             </div>
 
-                            {/* Row 5: Treemap — Findings by Service */}
-                            {dashboardData.treemapData.length > 0 && (
+                            {/* Row 5: Findings by Service — Stacked Severity Bars */}
+                            {dashboardData.services.length > 0 && (
                                 <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Service</h3>
-                                    <div className="w-full h-64">
-                                        <ResponsiveContainer width="100%" height="100%">
-                                            <Treemap data={dashboardData.treemapData} dataKey="size" stroke="#020617" fill="#3b82f6">
-                                                <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
-                                            </Treemap>
-                                        </ResponsiveContainer>
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-5">Findings Distribution by Service</h3>
+                                    <div className="space-y-3">
+                                        {dashboardData.services.map(([service, v], i) => {
+                                            const rowTotal = v.critical + v.high + v.medium + v.low;
+                                            const maxTotal = Math.max(...dashboardData.services.map(([, s]) => s.critical + s.high + s.medium + s.low), 1);
+                                            const barPct = (rowTotal / maxTotal) * 100;
+                                            return (
+                                                <div key={service} className="flex items-center gap-3">
+                                                    <div className="w-4 text-[10px] text-slate-600 text-right flex-shrink-0">{i + 1}</div>
+                                                    <div className="w-16 text-xs text-slate-300 font-mono truncate flex-shrink-0">{service}</div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <div className="w-full h-4 bg-slate-800/60 rounded-full overflow-hidden flex">
+                                                            {([
+                                                                { count: v.critical, color: "#ef4444" },
+                                                                { count: v.high,     color: "#f97316" },
+                                                                { count: v.medium,   color: "#f59e0b" },
+                                                                { count: v.low,      color: "#10b981" },
+                                                            ] as { count: number; color: string }[]).map((seg, si) =>
+                                                                seg.count > 0 ? (
+                                                                    <motion.div
+                                                                        key={si}
+                                                                        initial={{ width: 0 }}
+                                                                        animate={{ width: `${(seg.count / rowTotal) * barPct}%` }}
+                                                                        transition={{ duration: 0.8, ease: "easeOut", delay: i * 0.05 + si * 0.02 }}
+                                                                        style={{ backgroundColor: seg.color }}
+                                                                        className="h-full"
+                                                                    />
+                                                                ) : null
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-xs font-bold text-slate-300 tabular-nums w-6 text-right">{rowTotal}</div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    <div className="flex gap-5 mt-5 pt-3 border-t border-slate-800/40">
+                                        {[
+                                            { label: "Critical", color: "#ef4444" },
+                                            { label: "High",     color: "#f97316" },
+                                            { label: "Medium",   color: "#f59e0b" },
+                                            { label: "Low",      color: "#10b981" },
+                                        ].map(l => (
+                                            <div key={l.label} className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color }} />
+                                                {l.label}
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             )}
