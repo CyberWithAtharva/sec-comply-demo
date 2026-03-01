@@ -17,19 +17,19 @@ export function CostEstimatorWidget() {
         <div className="glass-panel p-6 rounded-2xl flex flex-col h-full relative overflow-hidden group border border-slate-800/50">
             <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none transition-transform duration-700 group-hover:scale-110" />
 
-            <div className="flex items-center justify-between mb-6 z-10">
-                <div className="flex items-center space-x-3">
-                    <div className="p-2 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
-                        <Calculator className="w-5 h-5 text-emerald-400" />
+            <div className="flex items-center justify-between mb-4 z-10">
+                <div className="flex items-center space-x-2">
+                    <div className="p-1.5 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
+                        <Calculator className="w-4 h-4 text-emerald-400" />
                     </div>
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Compliance ROI Estimator</h3>
+                    <h3 className="text-sm font-semibold text-slate-100 tracking-tight">Compliance ROI Estimator</h3>
                 </div>
                 <span className="text-xs font-mono bg-slate-800 text-slate-400 px-2 py-1 rounded">Architect Tool</span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 z-10">
+            <div className="flex flex-col gap-4 z-10">
                 {/* Inputs */}
-                <div className="flex flex-col space-y-6">
+                <div className="flex flex-col space-y-4">
                     <div>
                         <div className="flex justify-between mb-2">
                             <label className="text-sm tracking-wide text-slate-400">Headcount (Employees)</label>
@@ -59,12 +59,12 @@ export function CostEstimatorWidget() {
                 </div>
 
                 {/* Output */}
-                <div className="bg-slate-900/50 rounded-xl p-5 border border-slate-800/50 flex flex-col justify-center relative">
+                <div className="bg-slate-900/50 rounded-xl p-4 border border-slate-800/50 relative">
                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-xl" />
 
                     <span className="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Projected Annual Savings</span>
                     <div className="flex items-baseline space-x-2">
-                        <span className="text-4xl font-black text-white tracking-tighter">
+                        <span className="text-3xl font-black text-white tracking-tighter">
                             ${(savings / 1000).toFixed(1)}k
                         </span>
                         <div className="flex items-center text-emerald-400 text-sm font-medium">
@@ -73,7 +73,7 @@ export function CostEstimatorWidget() {
                         </div>
                     </div>
 
-                    <div className="mt-4 pt-4 border-t border-slate-800/50 flex justify-between items-center text-sm">
+                    <div className="mt-3 pt-3 border-t border-slate-800/50 flex justify-between items-center text-sm">
                         <span className="text-slate-400">Manual Cost: <span className="line-through text-slate-600">${(currentCost / 1000).toFixed(1)}k</span></span>
                         <button className="text-blue-400 hover:text-blue-300 font-medium flex items-center transition-colors">
                             Export PDF <ArrowRight className="w-4 h-4 ml-1" />

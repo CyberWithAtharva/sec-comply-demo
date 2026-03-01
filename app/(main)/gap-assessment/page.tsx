@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { AlertTriangle } from "lucide-react";
-import { GapAssessmentClient, type GapItem } from "@/components/gap-assessment/GapAssessmentClient";
+import { GapAssessmentClient, type GapItem, type ControlItem } from "@/components/gap-assessment/GapAssessmentClient";
 import { RULE_CONTROL_MAP } from "@/lib/aws/controlMapping";
 
 export default async function GapAssessmentPage() {
@@ -158,7 +158,7 @@ export default async function GapAssessmentPage() {
         });
     }
 
-    // Sort: most urgent first (has_finding > no_evidence > no_policy > not_started)
+    // Sort gaps: most urgent first (has_finding > no_evidence > no_policy > not_started)
     const urgencyScore = (g: GapItem) =>
         (g.gapTypes.includes("has_finding") ? 8 : 0) +
         (g.gapTypes.includes("no_evidence") ? 4 : 0) +
@@ -174,9 +174,26 @@ export default async function GapAssessmentPage() {
     }).length;
     const complianceScore = totalControls > 0 ? Math.round((verifiedControls / totalControls) * 100) : 0;
 
+    // Build allControlItems for the questionnaire view (ALL controls including verified)
+    const allControlItems: ControlItem[] = controls.map(control => {
+        const cs = statusMap.get(control.id);
+        return {
+            id: control.id,
+            controlRef: control.control_id,
+            title: control.title,
+            domain: control.domain,
+            category: control.category,
+            frameworkId: control.framework_id,
+            frameworkName: fwNameMap.get(control.framework_id) ?? "Unknown Framework",
+            status: cs?.status ?? "not_started",
+            evidenceCount: cs?.evidence_count ?? 0,
+        };
+    });
+
     return (
         <GapAssessmentClient
             gaps={gaps}
+            allControls={allControlItems}
             orgId={orgId}
             totalControls={totalControls}
             verifiedControls={verifiedControls}

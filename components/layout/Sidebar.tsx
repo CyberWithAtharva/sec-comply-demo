@@ -23,6 +23,8 @@ import {
     LogOut,
     AlertTriangle,
     GitBranch,
+    BrainCircuit,
+    Bot,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
@@ -41,6 +43,11 @@ export function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(true);
     const [hoveredItem, setHoveredItem] = useState<{ item: NavItem; top: number } | null>(null);
     const { profile } = useAuth();
+
+    const previewItems: NavItem[] = [
+        { name: "AI Governance", href: "/ai-governance", icon: BrainCircuit, caption: "AI model risk & EU AI Act" },
+        { name: "AI Identity",   href: "/ai-identity",   icon: Bot,          caption: "Non-human identity & AI agents" },
+    ];
 
     const navItems: NavItem[] = [
         { name: "Programs", href: "/", icon: LayoutDashboard, caption: "Compliance frameworks overview" },
@@ -183,6 +190,61 @@ export function Sidebar() {
                                 </div>
                             </Link>
                         )
+                    })}
+
+                    {/* ── Coming Soon Preview Items ── */}
+                    {!isCollapsed && (
+                        <p className="text-[10px] uppercase tracking-widest text-slate-600 font-semibold px-3 pt-4 pb-1 select-none">
+                            Coming Soon
+                        </p>
+                    )}
+                    {isCollapsed && <div className="mx-3 my-2 h-px bg-slate-800/80" />}
+
+                    {previewItems.map((item) => {
+                        const isActive = pathname === item.href;
+                        return (
+                            <Link key={item.name} href={item.href}>
+                                <div
+                                    onMouseEnter={(e) => {
+                                        if (isCollapsed) {
+                                            const rect = e.currentTarget.getBoundingClientRect();
+                                            setHoveredItem({ item, top: Math.round(rect.top + rect.height / 2) });
+                                        }
+                                    }}
+                                    onMouseLeave={() => setHoveredItem(null)}
+                                    className={cn(
+                                        "flex items-center px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 group relative",
+                                        isActive
+                                            ? "bg-amber-500/10 text-amber-400"
+                                            : "text-slate-500 hover:bg-slate-800/50 hover:text-slate-300"
+                                    )}
+                                >
+                                    {/* amber dot indicator when collapsed */}
+                                    {isCollapsed && (
+                                        <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-amber-400/70" />
+                                    )}
+                                    <item.icon className={cn(
+                                        "w-5 h-5 flex-shrink-0",
+                                        isActive ? "text-amber-400" : "text-slate-600 group-hover:text-slate-400"
+                                    )} />
+                                    <AnimatePresence>
+                                        {!isCollapsed && (
+                                            <motion.span
+                                                initial={{ opacity: 0, x: -10 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                exit={{ opacity: 0, width: 0, overflow: "hidden" }}
+                                                className="ml-3 text-sm font-medium tracking-wide whitespace-nowrap flex-1 flex items-center"
+                                            >
+                                                {item.name}
+                                                <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/20">
+                                                    PREVIEW
+                                                </span>
+                                            </motion.span>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+                            </Link>
+                        );
                     })}
                 </div>
 

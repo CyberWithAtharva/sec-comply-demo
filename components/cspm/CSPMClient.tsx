@@ -541,37 +541,38 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                 })}
                             </div>
 
-                            {/* Row 2: Severity Bar — full width */}
-                            <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                                <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
-                                <div className="w-full h-44">
-                                    <ResponsiveContainer width="100%" height="100%">
-                                        <BarChart
-                                            data={[
-                                                { name: "Critical", count: dashboardData.sevCounts.CRITICAL },
-                                                { name: "High",     count: dashboardData.sevCounts.HIGH },
-                                                { name: "Medium",   count: dashboardData.sevCounts.MEDIUM },
-                                                { name: "Low",      count: dashboardData.sevCounts.LOW },
-                                            ]}
-                                            margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
-                                        >
-                                            <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                            <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
-                                            <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
-                                            <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
-                                            <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                                                <Cell fill="#ef4444" />
-                                                <Cell fill="#f97316" />
-                                                <Cell fill="#f59e0b" />
-                                                <Cell fill="#10b981" />
-                                            </Bar>
-                                        </BarChart>
-                                    </ResponsiveContainer>
+                            {/* Rows 2+3: Severity Bar + Heatmap + Radar — unified 3-col row */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                {/* Severity Bar */}
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
+                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
+                                    <div className="flex-1 min-h-[180px]">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart
+                                                data={[
+                                                    { name: "Critical", count: dashboardData.sevCounts.CRITICAL },
+                                                    { name: "High",     count: dashboardData.sevCounts.HIGH },
+                                                    { name: "Medium",   count: dashboardData.sevCounts.MEDIUM },
+                                                    { name: "Low",      count: dashboardData.sevCounts.LOW },
+                                                ]}
+                                                margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                                                barCategoryGap="45%"
+                                            >
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                                <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
+                                                <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+                                                <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                                <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={56}>
+                                                    <Cell fill="#ef4444" />
+                                                    <Cell fill="#f97316" />
+                                                    <Cell fill="#f59e0b" />
+                                                    <Cell fill="#10b981" />
+                                                </Bar>
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* Row 3: Service Heatmap + Radar */}
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {/* Heatmap */}
                                 <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
                                     <h3 className="text-sm font-semibold text-slate-400 mb-4">Severity Heatmap by Service</h3>
@@ -617,9 +618,9 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                 </div>
 
                                 {/* Radar */}
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
                                     <h3 className="text-sm font-semibold text-slate-400 mb-2">Security Domain Issues</h3>
-                                    <div className="w-full h-56">
+                                    <div className="flex-1 min-h-[180px]">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <RadarChart data={dashboardData.radarData}>
                                                 <PolarGrid stroke="#334155" />
@@ -721,7 +722,7 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                             {dashboardData.treemapData.length > 0 && (
                                 <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
                                     <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Service</h3>
-                                    <div className="w-full h-48">
+                                    <div className="w-full h-64">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <Treemap data={dashboardData.treemapData} dataKey="size" stroke="#020617" fill="#3b82f6">
                                                 <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />

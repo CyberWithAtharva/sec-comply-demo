@@ -5,7 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Plus, X, Loader2, Shield, AlertTriangle, ChevronRight, Filter, Search, Trash2, Edit2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { toast } from "sonner";
-import { ResponsiveContainer, ScatterChart, Scatter, XAxis, YAxis, Tooltip, Cell } from "recharts";
 import type { Database } from "@/types/database";
 
 type Risk = Database["public"]["Tables"]["risks"]["Row"] & {
@@ -32,13 +31,6 @@ const STATUS_STYLES: Record<string, string> = {
     closed: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
 };
 
-const SCATTER_COLORS = ["#ef4444", "#f97316", "#f59e0b", "#22c55e"];
-const getScatterColor = (score: number) => {
-    if (score >= 20) return SCATTER_COLORS[0];
-    if (score >= 12) return SCATTER_COLORS[1];
-    if (score >= 6) return SCATTER_COLORS[2];
-    return SCATTER_COLORS[3];
-};
 
 interface RiskFormData {
     title: string;
@@ -167,10 +159,31 @@ export function RiskRegisterClient({ initialRisks, orgId, owners }: Props) {
         return { critical, high, open, total };
     }, [risks]);
 
-    // Heat map data (scatter)
-    const scatterData = risks
-        .filter(r => !["closed"].includes(r.status))
-        .map(r => ({ x: r.impact, y: r.likelihood, z: r.risk_score, name: r.title, score: r.risk_score }));
+    // 5×5 heatmap grid — count of non-closed risks per (likelihood, impact) cell
+    const heatmapGrid = useMemo(() => {
+        const grid: { l: number; i: number; count: number; risks: Risk[]; score: number }[] = [];
+        for (let l = 5; l >= 1; l--) {
+            for (let i = 1; i <= 5; i++) {
+                const cell = risks.filter(r => r.likelihood === l && r.impact === i && r.status !== "closed");
+                grid.push({ l, i, count: cell.length, risks: cell, score: l * i });
+            }
+        }
+        return grid;
+    }, [risks]);
+
+    // Data-driven category breakdown
+    const categoryData = useMemo(() => {
+        const counts: Record<string, number> = {};
+        for (const r of risks) {
+            const cat = r.category
+                ? r.category.charAt(0).toUpperCase() + r.category.slice(1).toLowerCase()
+                : "Other";
+            counts[cat] = (counts[cat] || 0) + 1;
+        }
+        return Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8);
+    }, [risks]);
+
+    const maxCatCount = Math.max(...categoryData.map(([, c]) => c), 1);
 
     // Filtered risks
     const filtered = useMemo(() => {
@@ -216,85 +229,195 @@ export function RiskRegisterClient({ initialRisks, orgId, owners }: Props) {
                 ))}
             </div>
 
-            {/* Heat Map + Filters Row */}
+            {/* Heat Map + Category Row */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Risk Heat Map */}
+                {/* Risk Matrix — gradient background + floating bubbles */}
                 <div className="lg:col-span-2 glass-panel rounded-2xl p-6">
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">Risk Matrix — Likelihood × Impact</h3>
-                    <div className="relative">
-                        {/* Background grid */}
-                        <div className="absolute inset-0 grid grid-cols-5 grid-rows-5 opacity-10 pointer-events-none">
-                            {Array.from({ length: 25 }).map((_, i) => {
-                                const row = Math.floor(i / 5);
-                                const col = i % 5;
-                                const score = (5 - row) * (col + 1);
-                                const bg = score >= 20 ? "bg-red-500" : score >= 12 ? "bg-orange-500" : score >= 6 ? "bg-amber-500" : "bg-emerald-500";
-                                return <div key={i} className={`${bg} opacity-30`} />;
-                            })}
+                    <div className="flex items-center justify-between mb-5">
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Risk Matrix</h3>
+                        <div className="flex gap-4">
+                            {[
+                                { label: "Critical", color: "#ef4444" },
+                                { label: "High", color: "#f97316" },
+                                { label: "Medium", color: "#f59e0b" },
+                                { label: "Low", color: "#22c55e" },
+                            ].map(({ label, color }) => (
+                                <div key={label} className="flex items-center gap-1.5">
+                                    <div className="w-2 h-2 rounded-full" style={{ background: color }} />
+                                    <span className="text-[10px] text-slate-500">{label}</span>
+                                </div>
+                            ))}
                         </div>
-                        <ResponsiveContainer width="100%" height={240}>
-                            <ScatterChart margin={{ top: 10, right: 20, bottom: 20, left: 20 }}>
-                                <XAxis
-                                    type="number" dataKey="x" name="Impact" domain={[0.5, 5.5]}
-                                    ticks={[1, 2, 3, 4, 5]} tick={{ fill: '#64748b', fontSize: 11 }}
-                                    label={{ value: "Impact →", position: "insideBottom", offset: -10, fill: '#64748b', fontSize: 11 }}
-                                    axisLine={false} tickLine={false}
-                                />
-                                <YAxis
-                                    type="number" dataKey="y" name="Likelihood" domain={[0.5, 5.5]}
-                                    ticks={[1, 2, 3, 4, 5]} tick={{ fill: '#64748b', fontSize: 11 }}
-                                    label={{ value: "Likelihood →", angle: -90, position: "insideLeft", offset: 10, fill: '#64748b', fontSize: 11 }}
-                                    axisLine={false} tickLine={false}
-                                />
-                                <Tooltip
-                                    content={({ payload }) => {
-                                        if (!payload?.length) return null;
-                                        const d = payload[0].payload as typeof scatterData[0];
-                                        const sev = SEVERITY_FROM_SCORE(d.score);
-                                        return (
-                                            <div className="bg-slate-900 border border-slate-700 rounded-xl p-3 text-xs shadow-xl">
-                                                <p className="font-semibold text-slate-200 mb-1 max-w-[200px] truncate">{d.name}</p>
-                                                <p className={sev.color}>Score: {d.score} ({sev.label})</p>
-                                                <p className="text-slate-400">Likelihood: {d.y} · Impact: {d.x}</p>
-                                            </div>
-                                        );
-                                    }}
-                                />
-                                <Scatter data={scatterData} shape="circle">
-                                    {scatterData.map((entry, index) => (
-                                        <Cell key={index} fill={getScatterColor(entry.score)} fillOpacity={0.85} />
-                                    ))}
-                                </Scatter>
-                            </ScatterChart>
-                        </ResponsiveContainer>
                     </div>
-                    {scatterData.length === 0 && (
-                        <div className="flex items-center justify-center h-24 text-slate-600 text-sm">
-                            No active risks to display on the matrix.
+
+                    <div className="flex gap-3 items-start">
+                        {/* Y-axis label + ticks */}
+                        <div className="flex flex-col items-center gap-0 pt-1 pb-7 self-stretch justify-between">
+                            <div style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
+                                className="text-[9px] text-slate-600 uppercase tracking-widest select-none mb-2">
+                                Likelihood
+                            </div>
+                            {[5, 4, 3, 2, 1].map(n => (
+                                <span key={n} className="text-[11px] font-mono text-slate-500">{n}</span>
+                            ))}
                         </div>
-                    )}
+
+                        {/* Matrix canvas */}
+                        <div className="flex-1 flex flex-col gap-2">
+                            <div
+                                className="relative rounded-2xl overflow-hidden border border-slate-700/30"
+                                style={{ height: 300 }}
+                            >
+                                {/* Zone background — diagonal gradient green → amber → red */}
+                                <div className="absolute inset-0" style={{
+                                    background: `linear-gradient(135deg,
+                                        rgba(16,185,129,0.06) 0%,
+                                        rgba(16,185,129,0.10) 18%,
+                                        rgba(245,158,11,0.10) 38%,
+                                        rgba(249,115,22,0.13) 62%,
+                                        rgba(239,68,68,0.18) 100%)`
+                                }} />
+
+                                {/* Subtle grid lines */}
+                                <div className="absolute inset-0 grid grid-cols-5 grid-rows-5">
+                                    {Array.from({ length: 25 }).map((_, idx) => (
+                                        <div key={idx} className="border border-slate-700/15" />
+                                    ))}
+                                </div>
+
+                                {/* Corner zone labels */}
+                                <div className="absolute bottom-2 left-3 text-[9px] font-mono uppercase tracking-widest text-emerald-600/30 select-none">LOW RISK</div>
+                                <div className="absolute top-2 right-3 text-[9px] font-mono uppercase tracking-widest text-red-500/30 select-none">CRITICAL</div>
+
+                                {/* Floating risk bubbles */}
+                                {heatmapGrid.filter(c => c.count > 0).map(({ l, i, count, score }) => {
+                                    const CELL = 100 / 5;
+                                    const cx = (i - 0.5) * CELL;
+                                    const cy = (5 - l + 0.5) * CELL;
+                                    const size = Math.max(36, Math.min(60, 30 + count * 5));
+                                    const [fill, glow] =
+                                        score >= 20 ? ["#ef4444", "rgba(239,68,68,0.5)"] :
+                                        score >= 12 ? ["#f97316", "rgba(249,115,22,0.4)"] :
+                                        score >= 6  ? ["#f59e0b", "rgba(245,158,11,0.35)"] :
+                                                      ["#22c55e", "rgba(34,197,94,0.3)"];
+                                    return (
+                                        <div
+                                            key={`${l}-${i}`}
+                                            className="absolute flex items-center justify-center rounded-full font-black text-white cursor-default transition-transform hover:scale-110 select-none"
+                                            style={{
+                                                left: `${cx}%`,
+                                                top: `${cy}%`,
+                                                width: size,
+                                                height: size,
+                                                transform: "translate(-50%, -50%)",
+                                                background: fill,
+                                                boxShadow: `0 0 ${size * 0.6}px ${glow}, 0 0 ${size * 1.2}px ${glow}50`,
+                                                fontSize: count > 9 ? 13 : 15,
+                                                zIndex: 10,
+                                            }}
+                                            title={`${count} risk${count > 1 ? "s" : ""} — Likelihood ${l} × Impact ${i} = Score ${score}`}
+                                        >
+                                            {count}
+                                        </div>
+                                    );
+                                })}
+
+                                {/* Empty state */}
+                                {heatmapGrid.every(c => c.count === 0) && (
+                                    <div className="absolute inset-0 flex items-center justify-center">
+                                        <span className="text-slate-700 text-sm">No active risks</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* X-axis ticks + label */}
+                            <div className="grid grid-cols-5 px-0">
+                                {[1, 2, 3, 4, 5].map(n => (
+                                    <div key={n} className="text-center text-[11px] font-mono text-slate-500">{n}</div>
+                                ))}
+                            </div>
+                            <p className="text-center text-[9px] text-slate-600 uppercase tracking-widest -mt-1 select-none">Impact →</p>
+                        </div>
+                    </div>
                 </div>
 
-                {/* Breakdown by Category */}
-                <div className="glass-panel rounded-2xl p-6">
-                    <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">By Category</h3>
-                    <div className="space-y-2">
-                        {RISK_CATEGORIES.map(cat => {
-                            const count = risks.filter(r => r.category === cat).length;
-                            if (count === 0) return null;
-                            const maxCount = Math.max(...RISK_CATEGORIES.map(c => risks.filter(r => r.category === c).length), 1);
-                            return (
-                                <div key={cat} className="flex items-center gap-3">
-                                    <span className="text-xs text-slate-400 w-24 truncate">{cat}</span>
-                                    <div className="flex-1 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                        <div className="h-full bg-blue-500 rounded-full transition-all" style={{ width: `${(count / maxCount) * 100}%` }} />
-                                    </div>
-                                    <span className="text-xs font-mono text-slate-500 w-4 text-right">{count}</span>
-                                </div>
-                            );
-                        })}
-                        {risks.length === 0 && <p className="text-slate-600 text-sm text-center py-4">No risks yet.</p>}
+                {/* Right column: Category bars + Severity breakdown */}
+                <div className="glass-panel rounded-2xl p-6 flex flex-col gap-6">
+                    {/* By Category */}
+                    <div>
+                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4">By Category</h3>
+                        {categoryData.length === 0 ? (
+                            <p className="text-slate-600 text-sm text-center py-4">No risks yet.</p>
+                        ) : (
+                            <div className="space-y-3">
+                                {categoryData.map(([cat, count]) => {
+                                    const pct = Math.round((count / maxCatCount) * 100);
+                                    const barColor = pct > 66 ? "bg-red-500" : pct > 33 ? "bg-orange-500" : "bg-blue-500";
+                                    return (
+                                        <div key={cat} className="group flex items-center gap-3">
+                                            <span className="text-xs text-slate-400 w-24 truncate capitalize">{cat}</span>
+                                            <div className="flex-1 h-2 bg-slate-800/60 rounded-full overflow-hidden">
+                                                <div className={`h-full ${barColor} rounded-full transition-all`} style={{ width: `${pct}%` }} />
+                                            </div>
+                                            <span className="text-xs font-mono text-slate-400 w-5 text-right font-semibold">{count}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        )}
                     </div>
+
+                    {/* By Severity */}
+                    {risks.length > 0 && (
+                        <div className="pt-5 border-t border-slate-800/40">
+                            <h3 className="text-xs text-slate-500 uppercase tracking-wider mb-4">By Severity</h3>
+                            <div className="space-y-3">
+                                {[
+                                    { label: "Critical", min: 20, max: 26, fill: "#ef4444", text: "text-red-400" },
+                                    { label: "High",     min: 12, max: 20, fill: "#f97316", text: "text-orange-400" },
+                                    { label: "Medium",   min: 6,  max: 12, fill: "#f59e0b", text: "text-amber-400" },
+                                    { label: "Low",      min: 0,  max: 6,  fill: "#22c55e", text: "text-emerald-400" },
+                                ].map(({ label, min, max, fill, text }) => {
+                                    const count = risks.filter(r => r.risk_score >= min && r.risk_score < max).length;
+                                    const pct = risks.length > 0 ? Math.round((count / risks.length) * 100) : 0;
+                                    return (
+                                        <div key={label} className="flex items-center gap-3">
+                                            <div className="w-2 h-2 rounded-full flex-shrink-0" style={{ background: fill }} />
+                                            <span className={`text-xs w-12 ${text}`}>{label}</span>
+                                            <div className="flex-1 h-2 bg-slate-800/60 rounded-full overflow-hidden">
+                                                <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: fill }} />
+                                            </div>
+                                            <span className="text-xs font-mono text-slate-500 w-5 text-right">{count}</span>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Mini donut-like stat */}
+                            <div className="mt-5 pt-4 border-t border-slate-800/40 flex items-center justify-between">
+                                <div className="text-center">
+                                    <p className="text-2xl font-black text-red-400">{stats.critical}</p>
+                                    <p className="text-[10px] text-slate-600 uppercase tracking-wider">Critical</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-black text-orange-400">{stats.high}</p>
+                                    <p className="text-[10px] text-slate-600 uppercase tracking-wider">High</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-black text-amber-400">
+                                        {risks.filter(r => r.risk_score >= 6 && r.risk_score < 12).length}
+                                    </p>
+                                    <p className="text-[10px] text-slate-600 uppercase tracking-wider">Medium</p>
+                                </div>
+                                <div className="text-center">
+                                    <p className="text-2xl font-black text-emerald-400">
+                                        {risks.filter(r => r.risk_score < 6).length}
+                                    </p>
+                                    <p className="text-[10px] text-slate-600 uppercase tracking-wider">Low</p>
+                                </div>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 

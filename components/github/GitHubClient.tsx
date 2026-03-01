@@ -72,6 +72,18 @@ const REPO_ISSUE_SEV: Record<string, "critical" | "high" | "medium" | "low"> = {
     "CC6.7b": "low",
 };
 
+// Normalize compliance_issues — handles both legacy object {key: string} format
+// and array [{type, description}] format stored by the SQL seeder/syncer.
+function getComplianceEntries(issues: unknown): Array<[string, string]> {
+    if (Array.isArray(issues)) {
+        return issues.map(i => [String((i as Record<string, unknown>).type ?? ""), String((i as Record<string, unknown>).description ?? "")]);
+    }
+    if (issues && typeof issues === "object") {
+        return Object.entries(issues as Record<string, unknown>).map(([k, v]) => [k, String(v ?? "")]);
+    }
+    return [];
+}
+
 interface GitHubClientProps {
     initialInstallations: GitHubInstallation[];
     initialRepos: GitHubRepo[];
@@ -272,7 +284,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
             }
         }
         for (const repo of repos) {
-            const issues = Object.entries(repo.compliance_issues ?? {});
+            const issues = getComplianceEntries(repo.compliance_issues);
             for (const [key, val] of issues) {
                 result.push({
                     id: `config-repo-${repo.id}-${key}`,
@@ -280,7 +292,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                     type: "config",
                     severity: REPO_ISSUE_SEV[key] ?? "medium",
                     repository: repo.repo_name,
-                    title: val as string,
+                    title: val,
                     details: { control: key, source: "repo_settings" },
                     state: "open",
                     external_id: `config-repo-${repo.id}-${key}`,
@@ -546,37 +558,38 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         })}
                     </div>
 
-                    {/* Row 2: Severity Bar — full width */}
-                    <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                        <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
-                        <div className="w-full h-44">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    data={[
-                                        { name: "Critical", count: ghDashboardData.sevCounts.critical },
-                                        { name: "High",     count: ghDashboardData.sevCounts.high },
-                                        { name: "Medium",   count: ghDashboardData.sevCounts.medium },
-                                        { name: "Low",      count: ghDashboardData.sevCounts.low },
-                                    ]}
-                                    margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
-                                >
-                                    <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
-                                    <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
-                                    <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
-                                    <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
-                                    <Bar dataKey="count" radius={[4, 4, 0, 0]}>
-                                        <Cell fill="#ef4444" />
-                                        <Cell fill="#f97316" />
-                                        <Cell fill="#f59e0b" />
-                                        <Cell fill="#10b981" />
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
+                    {/* Rows 2+3: Severity Bar + Heatmap + Radar — unified 3-col row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        {/* Severity Bar */}
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
+                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
+                            <div className="flex-1 min-h-[180px]">
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <BarChart
+                                        data={[
+                                            { name: "Critical", count: ghDashboardData.sevCounts.critical },
+                                            { name: "High",     count: ghDashboardData.sevCounts.high },
+                                            { name: "Medium",   count: ghDashboardData.sevCounts.medium },
+                                            { name: "Low",      count: ghDashboardData.sevCounts.low },
+                                        ]}
+                                        margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
+                                        barCategoryGap="45%"
+                                    >
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                        <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
+                                        <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
+                                        <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                        <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={56}>
+                                            <Cell fill="#ef4444" />
+                                            <Cell fill="#f97316" />
+                                            <Cell fill="#f59e0b" />
+                                            <Cell fill="#10b981" />
+                                        </Bar>
+                                    </BarChart>
+                                </ResponsiveContainer>
+                            </div>
                         </div>
-                    </div>
 
-                    {/* Row 3: Repo Heatmap + Radar */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Repo × Type Heatmap */}
                         <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
                             <h3 className="text-sm font-semibold text-slate-400 mb-4">Finding Type Heatmap by Repo</h3>
@@ -622,9 +635,9 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         </div>
 
                         {/* Radar */}
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
                             <h3 className="text-sm font-semibold text-slate-400 mb-2">Finding Type Distribution</h3>
-                            <div className="w-full h-56">
+                            <div className="flex-1 min-h-[180px]">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <RadarChart data={ghDashboardData.radarData}>
                                         <PolarGrid stroke="#334155" />
@@ -721,7 +734,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                     {ghDashboardData.treemapData.length > 0 && (
                         <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
                             <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Type</h3>
-                            <div className="w-full h-48">
+                            <div className="w-full h-64">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <Treemap data={ghDashboardData.treemapData} dataKey="size" stroke="#020617" fill="#7c3aed">
                                         <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
@@ -757,10 +770,10 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                             const instRepos = reposByInstallation.get(inst.id) ?? [];
                             const instFindings = findings.filter(f => f.installation_id === inst.id);
                             const isExpanded = expandedRepos.has(inst.id);
-                            const hasRepoIssues = instRepos.some(r => Object.keys(r.compliance_issues ?? {}).length > 0);
+                            const hasRepoIssues = instRepos.some(r => getComplianceEntries(r.compliance_issues).length > 0);
                             const os = inst.org_settings;
                             const orgIssueCount = os?.issues?.length ?? 0;
-                            const totalIssues = orgIssueCount + instRepos.reduce((acc, r) => acc + Object.keys(r.compliance_issues ?? {}).length, 0);
+                            const totalIssues = orgIssueCount + instRepos.reduce((acc, r) => acc + getComplianceEntries(r.compliance_issues).length, 0);
 
                             return (
                                 <div key={inst.id}>
@@ -929,7 +942,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                     <div className={cn("px-5 py-3 space-y-2", os && "border-t border-slate-800/40")}>
                                                         <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Repositories</p>
                                                         {instRepos.map(repo => {
-                                                            const issues = Object.entries(repo.compliance_issues ?? {});
+                                                            const issues = getComplianceEntries(repo.compliance_issues);
                                                             const bp = repo.settings?.branch_protection as {
                                                                 enabled?: boolean;
                                                                 required_reviews?: number;
@@ -954,7 +967,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                                         {issues.length > 0 && (
                                                                             <div className="flex flex-wrap gap-1 mt-1">
                                                                                 {issues.map(([key, val]) => (
-                                                                                    <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400">{val as string}</span>
+                                                                                    <span key={key} className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/20 text-amber-400">{val}</span>
                                                                                 ))}
                                                                             </div>
                                                                         )}

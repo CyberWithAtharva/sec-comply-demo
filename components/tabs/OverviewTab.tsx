@@ -10,6 +10,7 @@ import Link from "next/link";
 import { cn } from "@/components/ui/Card";
 import { CircularProgress } from "@/components/ui/CircularProgress";
 import { CostEstimatorWidget } from "@/components/widgets/overview/CostEstimatorWidget";
+import { GeographicThreatMap } from "@/components/widgets/overview/GeographicThreatMap";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -290,7 +291,7 @@ export function OverviewTab({
                             <p className="text-xs text-slate-500">Connect AWS, GitHub, or upload a VAPT report to see findings here.</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-slate-800/40">
+                        <div className="divide-y divide-slate-800/40 overflow-y-auto max-h-72">
                             {sortedVulns.map(v => (
                                 <div key={v.id} className="flex items-start gap-4 px-6 py-3.5 hover:bg-slate-800/20 transition-colors">
                                     <div className="flex gap-2 pt-0.5 shrink-0">
@@ -364,10 +365,10 @@ export function OverviewTab({
                 </div>
             </div>
 
-            {/* ── Row 4: Next Actions + Cost Estimator ── */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* ── Row 4: Next Actions + Geo Threats + Cost Estimator ── */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Next Action Items — data-driven */}
-                <div className="glass-panel p-6 rounded-2xl">
+                <div className="glass-panel p-6 rounded-2xl flex flex-col">
                     <div className="flex items-center justify-between border-b border-slate-800/50 pb-4 mb-4">
                         <h3 className="text-sm font-semibold text-slate-100">Next Action Items</h3>
                         {actionItems.length > 0 && (
@@ -378,7 +379,7 @@ export function OverviewTab({
                     </div>
 
                     {actionItems.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-8 text-center">
+                        <div className="flex flex-col items-center justify-center py-8 text-center flex-1">
                             <CheckCircle2 className="w-9 h-9 text-emerald-500/50 mb-3" />
                             <p className="text-sm font-medium text-slate-300 mb-1">All caught up!</p>
                             <p className="text-xs text-slate-500">No pending controls, policy reviews, or open risks.</p>
@@ -414,10 +415,11 @@ export function OverviewTab({
                     )}
                 </div>
 
+                {/* Active Geo-Threats */}
+                <GeographicThreatMap />
+
                 {/* Cost Estimator */}
-                <div>
-                    <CostEstimatorWidget />
-                </div>
+                <CostEstimatorWidget />
             </div>
         </motion.div>
     );

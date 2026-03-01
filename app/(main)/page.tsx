@@ -51,7 +51,7 @@ export default async function ProgramsPage() {
 
     const frameworkIds = orgFrameworks.map(f => f.framework_id);
 
-    // Fetch controls, policies, and open risks in parallel (all only need orgId/frameworkIds)
+    // Fetch controls, policies, open risks, and integration account IDs in parallel
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const risksQuery = (supabase.from("risks") as any)
         .select("id, title, severity, status, source, category, created_at")
@@ -60,7 +60,9 @@ export default async function ProgramsPage() {
         .order("created_at", { ascending: false })
         .limit(15);
 
-    const [{ data: controls }, { data: approvedPolicies }, { data: openRisksRaw }] = await Promise.all([
+    type RiskShape = { id: string; title: string; severity: string; status: string; source: string; category: string; created_at: string };
+
+    const [{ data: controls }, { data: approvedPolicies }, { data: openRisksRaw }, { data: awsAccounts }, { data: githubInstalls }, { data: vaptVulnsRaw }] = await Promise.all([
         supabase
             .from("controls")
             .select("id, framework_id, control_id, title, domain, category")
@@ -71,19 +73,32 @@ export default async function ProgramsPage() {
             .eq("org_id", orgId)
             .in("status", ["approved", "under_review", "draft"])
             .order("updated_at", { ascending: false }),
-        risksQuery as Promise<{ data: { id: string; title: string; severity: string; status: string; source: string; category: string; created_at: string }[] | null }>,
+        risksQuery as Promise<{ data: RiskShape[] | null }>,
+        supabase.from("aws_accounts").select("id").eq("org_id", orgId).eq("status", "active"),
+        supabase.from("github_installations").select("id").eq("org_id", orgId).eq("status", "active"),
+        supabase.from("vulnerabilities").select("id, title, severity, status").eq("org_id", orgId).not("status", "in", "(resolved,fixed)").limit(10),
     ]);
 
     const controlIds = (controls ?? []).map(c => c.id);
 
-    // Fetch control statuses (needs controlIds from above)
-    const { data: controlStatuses } = controlIds.length > 0
-        ? await supabase
-            .from("control_status")
-            .select("control_id, status, evidence_count")
-            .eq("org_id", orgId)
-            .in("control_id", controlIds)
-        : { data: [] };
+    const awsAccountIds = (awsAccounts ?? []).map(a => a.id);
+    const githubInstallIds = (githubInstalls ?? []).map(i => i.id);
+
+    // Fetch control statuses + integration findings in parallel
+    const [{ data: controlStatuses }, awsFindingsResult, githubFindingsResult] = await Promise.all([
+        controlIds.length > 0
+            ? supabase.from("control_status").select("control_id, status, evidence_count").eq("org_id", orgId).in("control_id", controlIds)
+            : Promise.resolve({ data: [] as { control_id: string; status: string; evidence_count: number }[] }),
+        awsAccountIds.length > 0
+            ? supabase.from("aws_findings").select("id, title, severity").in("aws_account_id", awsAccountIds).eq("status", "ACTIVE").limit(10)
+            : Promise.resolve({ data: [] as { id: string; title: string; severity: string }[] }),
+        githubInstallIds.length > 0
+            ? supabase.from("github_findings").select("id, title, severity").in("installation_id", githubInstallIds).eq("state", "open").limit(10)
+            : Promise.resolve({ data: [] as { id: string; title: string; severity: string }[] }),
+    ]);
+
+    const awsFindings = awsFindingsResult.data ?? [];
+    const githubFindings = githubFindingsResult.data ?? [];
 
     // Build a map of control_id -> status
     const statusMap = new Map(
@@ -167,7 +182,26 @@ export default async function ProgramsPage() {
         policiesByFramework[p.framework_id]!.push(p);
     }
 
-    const openRisksData = (openRisksRaw as { id: string; title: string; severity: string; status: string; source: string; category: string; created_at: string }[] | null) ?? [];
+    // Merge: risks table + raw integration findings
+    const now = new Date().toISOString();
+    const openRisksData: RiskShape[] = [
+        ...((openRisksRaw as RiskShape[] | null) ?? []),
+        ...(awsFindings as { id: string; title: string; severity: string }[]).map(f => ({
+            id: `aws-${f.id}`, title: f.title,
+            severity: f.severity.toLowerCase(),
+            status: "identified", source: "aws", category: "technical", created_at: now,
+        })),
+        ...(githubFindings as { id: string; title: string; severity: string }[]).map(f => ({
+            id: `gh-${f.id}`, title: f.title,
+            severity: f.severity ?? "medium",
+            status: "identified", source: "github", category: "technical", created_at: now,
+        })),
+        ...((vaptVulnsRaw as { id: string; title: string; severity: string; status: string }[] | null) ?? []).map(f => ({
+            id: `vapt-${f.id}`, title: f.title,
+            severity: f.severity ?? "medium",
+            status: f.status, source: "vapt", category: "technical", created_at: now,
+        })),
+    ];
 
     return (
         <ProgramsClient
