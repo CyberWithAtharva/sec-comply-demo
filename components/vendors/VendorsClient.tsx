@@ -410,6 +410,7 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ vendor_id: vendorId, domain: website }),
+                signal: AbortSignal.timeout(20_000),
             });
             const json = await res.json();
             if (res.ok) {

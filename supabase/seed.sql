@@ -183,3 +183,56 @@ INSERT INTO controls (framework_id, control_id, domain, category, title, descrip
 ('f3000000-0000-0000-0000-000000000003', 'RC.CO-03', 'Recover', 'RC.CO: Incident Recovery Communication', 'Reputation Repair', 'Recovery activities and progress in restoring operational capabilities are communicated to designated internal and external stakeholders.', 'manual');
 
 UPDATE frameworks SET controls_count = (SELECT COUNT(*) FROM controls WHERE framework_id = 'f3000000-0000-0000-0000-000000000003') WHERE id = 'f3000000-0000-0000-0000-000000000003';
+
+-- ============================================================
+-- DPDPA 2023 (India Digital Personal Data Protection Act)
+-- ============================================================
+INSERT INTO frameworks (id, name, version, description, controls_count) VALUES
+    ('f4000000-0000-0000-0000-000000000004', 'DPDPA', '2023', 'India''s Digital Personal Data Protection Act 2023 — Governing consent, data principal rights, fiduciary obligations and cross-border transfer of personal data.', 30);
+
+INSERT INTO controls (framework_id, control_id, domain, category, title, description, type) VALUES
+-- Consent Management (Section 6-7)
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-6.1', 'Consent Management', 'S.6: Notice & Consent', 'Privacy Notice Before Consent', 'The Data Fiduciary must give a notice to the Data Principal before or at the same time as seeking consent, in clear and plain language.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-6.2', 'Consent Management', 'S.6: Notice & Consent', 'Explicit and Free Consent', 'Consent must be free, specific, informed, unconditional, and unambiguous with a clear affirmative action by the Data Principal.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-6.3', 'Consent Management', 'S.6: Notice & Consent', 'Consent Withdrawal Mechanism', 'The Data Principal shall have the right to withdraw consent at any time, as easily as consent was given, without affecting lawfulness of processing before withdrawal.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-6.4', 'Consent Management', 'S.6: Notice & Consent', 'Consent Manager Registration', 'Organizations using a Consent Manager must ensure the Consent Manager is registered with the Data Protection Board and interoperable.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-7.1', 'Consent Management', 'S.7: Deemed Consent', 'Legitimate Uses (Deemed Consent)', 'Personal data may be processed without explicit consent only for specified legitimate uses: state functions, legal compliance, medical emergencies, employment, and public interest.', 'manual'),
+
+-- Data Principal Rights (Sections 11-14)
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-11.1', 'Data Principal Rights', 'S.11: Right to Information', 'Right to Access Personal Data', 'Data Principals have the right to obtain a summary of personal data processed and identities of all Data Fiduciaries with whom data has been shared.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-11.2', 'Data Principal Rights', 'S.11: Right to Information', 'Grievance Redressal Contact', 'Data Fiduciary must provide means for Data Principal to contact the Grievance Officer and obtain information regarding processing activities.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-12.1', 'Data Principal Rights', 'S.12: Right to Correction & Erasure', 'Right to Correction of Inaccurate Data', 'Data Principals have the right to request correction of inaccurate or misleading personal data.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-12.2', 'Data Principal Rights', 'S.12: Right to Correction & Erasure', 'Right to Erasure', 'Data Principals have the right to erasure of personal data that is no longer necessary for the purpose for which it was collected.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-13.1', 'Data Principal Rights', 'S.13: Grievance Redressal', 'Grievance Redressal Mechanism', 'Data Fiduciary must establish a grievance redressal mechanism and respond to Data Principal complaints within prescribed timelines.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-14.1', 'Data Principal Rights', 'S.14: Right to Nominate', 'Nominee Rights on Death or Incapacity', 'Data Principals have the right to nominate another person to exercise their rights in the event of death or incapacity.', 'manual'),
+
+-- Data Fiduciary Obligations (Section 8)
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-8.1', 'Data Fiduciary Obligations', 'S.8: General Obligations', 'Purpose Limitation', 'Personal data shall only be processed for the specific, clear and lawful purpose for which consent was obtained.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-8.2', 'Data Fiduciary Obligations', 'S.8: General Obligations', 'Data Minimisation', 'Only personal data that is necessary for the specified purpose shall be collected and processed.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-8.3', 'Data Fiduciary Obligations', 'S.8: General Obligations', 'Data Accuracy', 'Data Fiduciary must ensure personal data processed is accurate and complete where it may be used to make decisions affecting Data Principals.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-8.4', 'Data Fiduciary Obligations', 'S.8: General Obligations', 'Storage Limitation and Erasure', 'Personal data shall not be retained beyond the period necessary; upon withdrawal of consent or cessation of purpose, the data must be erased.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-8.5', 'Data Fiduciary Obligations', 'S.8: General Obligations', 'Security Safeguards', 'Data Fiduciary must implement appropriate technical and organisational measures to ensure security of personal data and prevent data breaches.', 'automated'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-8.6', 'Data Fiduciary Obligations', 'S.8: General Obligations', 'Data Breach Notification to Board', 'In the event of a personal data breach, the Data Fiduciary shall notify the Data Protection Board and affected Data Principals in the prescribed manner.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-8.7', 'Data Fiduciary Obligations', 'S.8: General Obligations', 'Data Processor Agreements', 'Data Fiduciary must ensure Data Processors process personal data only as instructed and under a valid contract with appropriate safeguards.', 'manual'),
+
+-- Children''s Data (Section 9)
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-9.1', 'Children''s Data', 'S.9: Children''s Data', 'Verifiable Parental Consent', 'Before processing personal data of a child (under 18), the Data Fiduciary must obtain verifiable consent from the parent or guardian.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-9.2', 'Children''s Data', 'S.9: Children''s Data', 'No Profiling or Tracking of Children', 'Data Fiduciaries must not process personal data of children in a manner that is detrimental to their wellbeing, or track, behaviorally monitor, or target advertising at children.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-9.3', 'Children''s Data', 'S.9: Children''s Data', 'Age Verification Mechanism', 'Data Fiduciary must implement a mechanism to verify the age of Data Principals and identify whether the user is a child before collecting personal data.', 'automated'),
+
+-- Cross-border Data Transfer (Section 16)
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-16.1', 'Cross-border Transfer', 'S.16: Data Localisation & Transfer', 'Permitted Cross-border Transfers', 'Personal data may only be transferred to countries or territories notified by the Central Government as permitted destinations for transfer.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-16.2', 'Cross-border Transfer', 'S.16: Data Localisation & Transfer', 'Transfer Agreements and Safeguards', 'Transfer of personal data outside India must be subject to contractual safeguards and standard clauses as prescribed by the Data Protection Board.', 'manual'),
+
+-- Significant Data Fiduciary (Section 10)
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-10.1', 'Significant Data Fiduciary', 'S.10: Significant Data Fiduciary', 'Data Protection Officer Appointment', 'Significant Data Fiduciaries must appoint a Data Protection Officer (DPO) based in India to represent the organisation and be accountable to the Board of Directors.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-10.2', 'Significant Data Fiduciary', 'S.10: Significant Data Fiduciary', 'Independent Data Audit', 'Significant Data Fiduciaries must have their processing activities audited by an independent data auditor at least annually.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-10.3', 'Significant Data Fiduciary', 'S.10: Significant Data Fiduciary', 'Data Protection Impact Assessment (DPIA)', 'Significant Data Fiduciaries must conduct a DPIA before processing that is likely to result in high risk to rights and freedoms of Data Principals.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-10.4', 'Significant Data Fiduciary', 'S.10: Significant Data Fiduciary', 'Algorithmic Accountability', 'Significant Data Fiduciaries must ensure that algorithms used for processing do not pose risks to rights of Data Principals and demonstrate accountability for automated decisions.', 'manual'),
+
+-- Governance & Compliance
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-GV.1', 'Governance', 'Governance & Compliance', 'Privacy Policy Publication', 'Data Fiduciary must publish a clear, accessible privacy policy covering categories of data collected, purposes, retention periods, and Data Principal rights.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-GV.2', 'Governance', 'Governance & Compliance', 'Record of Processing Activities', 'Data Fiduciary must maintain records of all personal data processing activities including purpose, categories, retention period, and security measures.', 'manual'),
+('f4000000-0000-0000-0000-000000000004', 'DPDPA-GV.3', 'Governance', 'Governance & Compliance', 'Staff Training on Data Protection', 'All personnel handling personal data must receive adequate training on obligations under the DPDPA and organisational data protection policies.', 'manual');
+
+UPDATE frameworks SET controls_count = (SELECT COUNT(*) FROM controls WHERE framework_id = 'f4000000-0000-0000-0000-000000000004') WHERE id = 'f4000000-0000-0000-0000-000000000004';

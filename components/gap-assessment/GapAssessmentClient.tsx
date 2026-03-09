@@ -11,6 +11,7 @@ import {
     ClipboardList, CircleDot, Ban, Layers, Paperclip, ListChecks,
     KeyRound, ScrollText, Server, HardDrive, GitBranch,
     UserCheck, Scale, LifeBuoy, ShieldCheck, Mail, Wifi, Bell,
+    ChevronRight, BarChart3, ArrowRight,
     type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
@@ -62,6 +63,12 @@ type ResponseType = "verified" | "not_started" | "in_progress" | "not_applicable
 
 function getDomainIcon(domain: string): LucideIcon {
     const d = domain.toLowerCase();
+    if (d.includes("consent")) return FileText;
+    if (d.includes("data principal") || d.includes("rights")) return UserCheck;
+    if (d.includes("children")) return Shield;
+    if (d.includes("cross-border") || d.includes("transfer")) return Globe;
+    if (d.includes("significant")) return Target;
+    if (d.includes("governance") || d.includes("govern")) return Building2;
     if (d.includes("access") || d.includes("cc6") || d.includes("logical")) return Lock;
     if (d.includes("cloud") || d.includes("aws")) return Cloud;
     if (d.includes("network") || d.includes("infrastructure")) return Globe;
@@ -73,9 +80,12 @@ function getDomainIcon(domain: string): LucideIcon {
     if (d.includes("incident") || d.includes("cc7") || d.includes("response")) return AlertTriangle;
     if (d.includes("availab") || d.includes("a1") || d.includes("continuity")) return Activity;
     if (d.includes("privacy") || d.includes("personal")) return Eye;
-    if (d.includes("organ") || d.includes("govern") || d.includes("cc1")) return Building2;
+    if (d.includes("organ") || d.includes("cc1")) return Building2;
     if (d.includes("commun") || d.includes("cc2")) return FileText;
     if (d.includes("risk assess") || d.includes("cc3")) return Target;
+    if (d.includes("organizational")) return Building2;
+    if (d.includes("physical")) return Server;
+    if (d.includes("technological")) return HardDrive;
     return FileText;
 }
 
@@ -83,57 +93,31 @@ function getDomainIcon(domain: string): LucideIcon {
 
 function getControlIcon(category: string, title: string, domain: string): LucideIcon {
     const c = (category + " " + title).toLowerCase();
-    // Authentication & credentials
     if (/authenticat|password|credential|mfa|multi.?factor|passphrase|secret/.test(c)) return KeyRound;
-    // Encryption & key management
     if (/encrypt|cryptograph|key management|tls|ssl|cipher|certificate/.test(c)) return ShieldCheck;
-    // User identity & IAM
     if (/identity|iam|user.?manag|privilege|role.?based|rbac|least.?privilege/.test(c)) return UserCheck;
-    // Audit & logging
     if (/\blog\b|audit|trail|syslog|record|event log/.test(c)) return ScrollText;
-    // Access control / permissions
     if (/access control|permission|authoriz|entitlement|segregation/.test(c)) return Lock;
-    // Monitoring & alerting
     if (/monitor|alert|detect|siem|threshold|anomal|observ/.test(c)) return Monitor;
-    // Incident & response
     if (/incident|response|forensic|breach|eradication|contain/.test(c)) return AlertTriangle;
-    // Change & patch management
     if (/change management|patch|deploy|release|version control|software update/.test(c)) return GitBranch;
-    // Backup & recovery
     if (/backup|recovery|restore|archiv|retention|snapshot/.test(c)) return HardDrive;
-    // Network & firewall
     if (/network|firewall|vpc|segmentat|dmz|packet|port scanning/.test(c)) return Globe;
-    // Wireless
     if (/wireless|wi.?fi|bluetooth|radio/.test(c)) return Wifi;
-    // Server & infrastructure
     if (/server|infrastructure|compute|virtual|container|hardening/.test(c)) return Server;
-    // Cloud services
     if (/cloud|s3|ec2|iam|lambda|azure|gcp/.test(c)) return Cloud;
-    // Physical & facilities
     if (/physical|data center|facility|premise|badge|cctv|surveillance/.test(c)) return Building2;
-    // Vendor & third party
     if (/vendor|third.?party|supplier|outsourc|contract|tprm/.test(c)) return Users;
-    // Risk & vulnerability
     if (/vulnerab|threat|risk assess|pentest|scan|exploit/.test(c)) return Target;
-    // Privacy & data protection
     if (/privac|personal data|gdpr|pii|data protection|consent/.test(c)) return Eye;
-    // Legal & compliance
     if (/legal|regulat|compli|certif|standard|framework|audit right/.test(c)) return Scale;
-    // Communication & notification
     if (/communicat|notif|disclosure|report|escalat/.test(c)) return Mail;
-    // Business continuity
     if (/business continu|bcp|disaster|resilien|rto|rpo/.test(c)) return LifeBuoy;
-    // Availability & capacity
     if (/availab|uptime|sla|capacity|redundan|failover/.test(c)) return Activity;
-    // Configuration & baseline
     if (/config|hardening|baseline|parameter|setting|build standard/.test(c)) return Settings;
-    // Notification / alarm
     if (/notif|alarm|bell|pager/.test(c)) return Bell;
-    // Data & database
     if (/database|data classif|data integr|data qualit/.test(c)) return Database;
-    // Security program / governance
     if (/govern|secur.?program|policy|procedure|standard|organization/.test(c)) return Shield;
-    // Fall back to domain icon
     return getDomainIcon(domain);
 }
 
@@ -149,10 +133,10 @@ function getControlIconStyle(category: string): { bg: string; icon: string } {
     if (c.includes("vendor") || c.includes("third") || c.includes("supplier")) return { bg: "bg-pink-500/15 border-pink-500/25", icon: "text-pink-400" };
     if (c.includes("risk") || c.includes("threat")) return { bg: "bg-amber-500/15 border-amber-500/25", icon: "text-amber-400" };
     if (c.includes("legal") || c.includes("compli") || c.includes("govern")) return { bg: "bg-cyan-500/15 border-cyan-500/25", icon: "text-cyan-400" };
+    if (c.includes("consent") || c.includes("s.6") || c.includes("s.7")) return { bg: "bg-violet-500/15 border-violet-500/25", icon: "text-violet-400" };
+    if (c.includes("children") || c.includes("s.9")) return { bg: "bg-pink-500/15 border-pink-500/25", icon: "text-pink-400" };
     return { bg: "bg-slate-700/40 border-slate-600/30", icon: "text-slate-400" };
 }
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getCategoryColor(category: string): string {
     const c = (category || "").toLowerCase();
@@ -165,7 +149,8 @@ function getCategoryColor(category: string): string {
     if (c.includes("availab") || c.includes("continu")) return "bg-green-500/15 text-green-300 border-green-500/25";
     if (c.includes("vendor") || c.includes("third")) return "bg-pink-500/15 text-pink-300 border-pink-500/25";
     if (c.includes("risk")) return "bg-amber-500/15 text-amber-300 border-amber-500/25";
-    if (c.includes("privac") || c.includes("personal")) return "bg-cyan-500/15 text-cyan-300 border-cyan-500/25";
+    if (c.includes("privac") || c.includes("personal") || c.includes("consent")) return "bg-violet-500/15 text-violet-300 border-violet-500/25";
+    if (c.includes("s.")) return "bg-orange-500/15 text-orange-300 border-orange-500/25";
     return "bg-slate-500/15 text-slate-300 border-slate-500/25";
 }
 
@@ -188,6 +173,60 @@ const RESPONSES: { key: ResponseType; label: string; icon: React.ReactNode }[] =
     { key: "in_progress",    label: "Partial", icon: <CircleDot className="w-3.5 h-3.5" /> },
     { key: "not_applicable", label: "N/A",     icon: <Ban className="w-3.5 h-3.5" /> },
 ];
+
+// ─── Framework color palettes ─────────────────────────────────────────────────
+const FW_PALETTE: Record<string, { accent: string; ring: string; bg: string; border: string; text: string; pill: string }> = {
+    "SOC 2 Type II": {
+        accent: "#f97316", ring: "#f97316", bg: "bg-orange-500/10", border: "border-orange-500/25",
+        text: "text-orange-400", pill: "bg-orange-500/15 text-orange-300 border-orange-500/25",
+    },
+    "ISO 27001": {
+        accent: "#6366f1", ring: "#6366f1", bg: "bg-indigo-500/10", border: "border-indigo-500/25",
+        text: "text-indigo-400", pill: "bg-indigo-500/15 text-indigo-300 border-indigo-500/25",
+    },
+    "NIST CSF": {
+        accent: "#3b82f6", ring: "#3b82f6", bg: "bg-blue-500/10", border: "border-blue-500/25",
+        text: "text-blue-400", pill: "bg-blue-500/15 text-blue-300 border-blue-500/25",
+    },
+    "DPDPA": {
+        accent: "#8b5cf6", ring: "#8b5cf6", bg: "bg-violet-500/10", border: "border-violet-500/25",
+        text: "text-violet-400", pill: "bg-violet-500/15 text-violet-300 border-violet-500/25",
+    },
+};
+
+function getFwPalette(name: string) {
+    const key = Object.keys(FW_PALETTE).find(k => name.startsWith(k)) ?? "";
+    return FW_PALETTE[key] ?? {
+        accent: "#64748b", ring: "#64748b", bg: "bg-slate-500/10", border: "border-slate-500/25",
+        text: "text-slate-400", pill: "bg-slate-500/15 text-slate-300 border-slate-500/25",
+    };
+}
+
+// ─── SVG Donut ────────────────────────────────────────────────────────────────
+function ScoreDonut({ score, color, size = 80 }: { score: number; color: string; size?: number }) {
+    const r = size * 0.38;
+    const circ = 2 * Math.PI * r;
+    const cx = size / 2;
+    return (
+        <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+            <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+                <circle cx={cx} cy={cx} r={r} fill="none" stroke="#1e293b" strokeWidth={size * 0.1} />
+                <motion.circle
+                    cx={cx} cy={cx} r={r} fill="none"
+                    stroke={color} strokeWidth={size * 0.1} strokeLinecap="round"
+                    strokeDasharray={circ}
+                    initial={{ strokeDashoffset: circ }}
+                    animate={{ strokeDashoffset: circ * (1 - score / 100) }}
+                    transition={{ duration: 1.2, ease: "easeOut" }}
+                    transform={`rotate(-90 ${cx} ${cx})`}
+                />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-bold text-slate-100 leading-none" style={{ fontSize: size * 0.2 }}>{score}%</span>
+            </div>
+        </div>
+    );
+}
 
 // ─── Evidence Upload Modal ────────────────────────────────────────────────────
 
@@ -245,7 +284,7 @@ function EvidenceUploadModal({
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors";
+    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -287,7 +326,7 @@ function EvidenceUploadModal({
                         <button
                             type="submit"
                             disabled={uploading}
-                            className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center gap-2 transition-colors"
+                            className="px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center gap-2 transition-colors"
                         >
                             {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
                             Upload
@@ -302,12 +341,13 @@ function EvidenceUploadModal({
 // ─── Question Card ─────────────────────────────────────────────────────────────
 
 function QuestionCard({
-    control, qNum, orgId, onStatusChange,
+    control, qNum, orgId, onStatusChange, fwPalette,
 }: {
     control: ControlItem;
     qNum: number;
     orgId: string;
     onStatusChange: (id: string, status: string) => void;
+    fwPalette: ReturnType<typeof getFwPalette>;
 }) {
     const [loading, setLoading] = useState<ResponseType | null>(null);
     const [showUpload, setShowUpload] = useState(false);
@@ -317,8 +357,6 @@ function QuestionCard({
         if (control.status === response) return;
         const prevStatus = control.status;
         setLoading(response);
-
-        // Optimistic update
         onStatusChange(control.id, response);
 
         const res = await fetch(`/api/controls/${control.id}/status`, {
@@ -357,9 +395,7 @@ function QuestionCard({
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-slate-900/50 border border-slate-800/60 rounded-xl p-4 hover:border-slate-700/60 transition-colors"
             >
-                {/* Top row */}
                 <div className="flex items-start gap-3 mb-3">
-                    {/* Icon badge with Q number */}
                     <div className={cn(
                         "shrink-0 w-10 h-10 flex flex-col items-center justify-center rounded-xl border mt-0.5 gap-px",
                         iconStyle.bg
@@ -369,21 +405,25 @@ function QuestionCard({
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
-                            <span className="text-xs font-mono font-bold text-indigo-400">{control.controlRef}</span>
+                            <span className={cn("text-xs font-mono font-bold", fwPalette.text)}>{control.controlRef}</span>
                             {control.category && (
                                 <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border", catColor)}>
                                     {control.category}
                                 </span>
                             )}
-                            <span className="flex items-center gap-1 text-[10px] text-slate-600">
-                                <Layers className="w-2.5 h-2.5" />{control.frameworkName}
-                            </span>
                         </div>
                         <p className="text-sm font-medium text-slate-200 leading-snug">{control.title}</p>
                     </div>
+
+                    {/* Status indicator */}
+                    <div className="shrink-0">
+                        {control.status === "verified" && <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-full">Verified</span>}
+                        {control.status === "in_progress" && <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-full">Partial</span>}
+                        {control.status === "not_started" && <span className="text-[10px] font-bold text-red-400 bg-red-500/10 border border-red-500/25 px-2 py-0.5 rounded-full">Open</span>}
+                        {control.status === "not_applicable" && <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/25 px-2 py-0.5 rounded-full">N/A</span>}
+                    </div>
                 </div>
 
-                {/* Response buttons + evidence bar */}
                 <div className="flex items-center gap-2 flex-wrap">
                     {RESPONSES.map(r => (
                         <button
@@ -406,15 +446,11 @@ function QuestionCard({
 
                     <div className="flex-1" />
 
-                    {/* Evidence */}
                     <div className="flex items-center gap-2 shrink-0">
                         <div className="hidden sm:flex items-center gap-1.5">
                             <Paperclip className="w-3 h-3 text-slate-600 shrink-0" />
                             <div className="w-14 h-1.5 bg-slate-800 rounded-full overflow-hidden">
-                                <div
-                                    className="h-full bg-indigo-500 rounded-full transition-all"
-                                    style={{ width: `${evidencePct}%` }}
-                                />
+                                <div className="h-full bg-orange-500 rounded-full transition-all" style={{ width: `${evidencePct}%` }} />
                             </div>
                             <span className="text-[11px] text-slate-500 w-4">{localEvidenceCount}</span>
                         </div>
@@ -444,6 +480,291 @@ function QuestionCard({
     );
 }
 
+// ─── Compliance Engine Visualization ─────────────────────────────────────────
+
+const VW = 1100;
+const VH = 720;
+
+interface BubblePos { x: number; y: number; }
+
+function getFwPositions(count: number): BubblePos[] {
+    const cx = VW / 2;
+    if (count === 0) return [];
+    if (count === 1) return [{ x: cx, y: 240 }];
+    if (count === 2) return [{ x: cx - 200, y: 260 }, { x: cx + 200, y: 260 }];
+    if (count === 3) return [
+        { x: cx - 300, y: 360 }, { x: cx, y: 260 }, { x: cx + 300, y: 360 },
+    ];
+    return [
+        { x: 165, y: 330 }, { x: 390, y: 220 },
+        { x: 710, y: 220 }, { x: 935, y: 330 },
+    ];
+}
+
+function getDomainPositions(fwPos: BubblePos, count: number): BubblePos[] {
+    if (count === 0) return [];
+    const n = Math.min(count, 9);
+    const r = 200;
+    return Array.from({ length: n }, (_, i) => {
+        const t = n === 1 ? 0.5 : i / (n - 1);
+        const start = -Math.PI * 5 / 6;  // -150 deg (upper-left)
+        const end = -Math.PI / 6;         // -30 deg  (upper-right)
+        const angle = start + t * (end - start);
+        return { x: fwPos.x + Math.cos(angle) * r, y: fwPos.y + Math.sin(angle) * r };
+    });
+}
+
+interface EngineVizProps {
+    frameworks: Array<{ id: string; name: string; score: number; palette: ReturnType<typeof getFwPalette> }>;
+    selectedFwId: string | null;
+    onSelectFw: (id: string) => void;
+    domains: Array<{ name: string; score: number }>;
+    selectedDomain: string | null;
+    onSelectDomain: (name: string) => void;
+    overallScore: number;
+}
+
+function ComplianceEngineViz({
+    frameworks, selectedFwId, onSelectFw,
+    domains, selectedDomain, onSelectDomain,
+    overallScore,
+}: EngineVizProps) {
+    const enginePos: BubblePos = { x: VW / 2, y: 610 };
+    const fwPositions = getFwPositions(frameworks.length);
+    const selIdx = frameworks.findIndex(f => f.id === selectedFwId);
+    const selFwPos = selIdx >= 0 ? fwPositions[selIdx] : null;
+    const domainPositions = selFwPos ? getDomainPositions(selFwPos, domains.length) : [];
+    const engineR = 66;
+    const engineCirc = 2 * Math.PI * engineR;
+
+    return (
+        <div className="relative w-full rounded-2xl overflow-hidden border border-slate-800/60" style={{ height: 720, background: '#020617' }}>
+
+            {/* Bokeh background glows */}
+            <div className="absolute pointer-events-none" style={{ width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(20,184,166,0.10), transparent 70%)', top: '0%', left: '15%' }} />
+            <div className="absolute pointer-events-none" style={{ width: 280, height: 280, borderRadius: '50%', background: 'radial-gradient(circle, rgba(139,92,246,0.09), transparent 70%)', top: '8%', right: '10%' }} />
+            <div className="absolute pointer-events-none" style={{ width: 220, height: 220, borderRadius: '50%', background: 'radial-gradient(circle, rgba(249,115,22,0.18), transparent 70%)', bottom: '-8%', left: '50%', transform: 'translateX(-50%)' }} />
+
+            {/* Title */}
+            <div className="absolute top-3 left-4 pointer-events-none">
+                <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500">Compliance Engine</p>
+                <p className="text-[9px] text-slate-700 mt-0.5">Click a framework to explore</p>
+            </div>
+
+            {/* Legend */}
+            <div className="absolute top-3 right-4 flex flex-col gap-1 pointer-events-none">
+                {frameworks.map(fw => (
+                    <div key={fw.id} className="flex items-center gap-1.5">
+                        <div className="w-2 h-2 rounded-full" style={{ background: fw.palette.accent }} />
+                        <span className="text-[9px] text-slate-500 font-mono">
+                            {fw.name.replace(' Type II', '').replace(':2022', '').replace(':2023', '').replace(' 2.0', '')}
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            {/* SVG layer for dashed lines */}
+            <svg
+                viewBox={`0 0 ${VW} ${VH}`}
+                className="absolute inset-0 w-full h-full"
+                style={{ pointerEvents: 'none' }}
+                preserveAspectRatio="none"
+            >
+                {/* Engine → Framework lines */}
+                {fwPositions.map((fwPos, i) => (
+                    <line
+                        key={`ef-${i}`}
+                        x1={enginePos.x} y1={enginePos.y}
+                        x2={fwPos.x} y2={fwPos.y}
+                        stroke={frameworks[i]?.palette.accent ?? '#475569'}
+                        strokeWidth="1.5" strokeDasharray="5 5" opacity="0.25"
+                    />
+                ))}
+                {/* Selected Fw → Domain lines */}
+                {selFwPos && domainPositions.map((dp, i) => (
+                    <line
+                        key={`fd-${i}`}
+                        x1={selFwPos.x} y1={selFwPos.y}
+                        x2={dp.x} y2={dp.y}
+                        stroke="#475569" strokeWidth="1" strokeDasharray="4 4" opacity="0.3"
+                    />
+                ))}
+            </svg>
+
+            {/* Framework Bubbles */}
+            {frameworks.map((fw, i) => {
+                const pos = fwPositions[i];
+                if (!pos) return null;
+                const isSel = fw.id === selectedFwId;
+                const pal = fw.palette;
+                const dr = 22, dcirc = 2 * Math.PI * dr;
+                const label = fw.name
+                    .replace(' Type II', '').replace(':2022', '').replace(':2023', '')
+                    .replace(' 2.0', '');
+                return (
+                    <button
+                        key={fw.id}
+                        type="button"
+                        onClick={() => onSelectFw(fw.id)}
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                        style={{ left: `${(pos.x / VW) * 100}%`, top: `${(pos.y / VH) * 100}%`, zIndex: 10 }}
+                    >
+                        <div
+                            className="relative flex flex-col items-center justify-center rounded-full transition-all duration-300"
+                            style={{
+                                width: 138, height: 138,
+                                background: isSel ? `${pal.accent}1c` : 'rgba(15,23,42,0.88)',
+                                border: `2.5px solid ${isSel ? pal.accent : '#334155'}`,
+                                boxShadow: isSel
+                                    ? `0 0 40px ${pal.accent}55, 0 0 80px ${pal.accent}20, inset 0 0 24px ${pal.accent}10`
+                                    : '0 6px 30px rgba(0,0,0,0.6)',
+                            }}
+                        >
+                            <svg width="60" height="60" viewBox="0 0 56 56">
+                                <circle cx="28" cy="28" r={dr} fill="none" stroke="#1e293b" strokeWidth="6" />
+                                <motion.circle
+                                    cx="28" cy="28" r={dr} fill="none"
+                                    stroke={pal.accent} strokeWidth="6" strokeLinecap="round"
+                                    strokeDasharray={dcirc}
+                                    initial={{ strokeDashoffset: dcirc }}
+                                    animate={{ strokeDashoffset: dcirc * (1 - fw.score / 100) }}
+                                    transition={{ duration: 1.2, ease: 'easeOut', delay: i * 0.1 }}
+                                    transform="rotate(-90 28 28)"
+                                />
+                                <text x="28" y="28" textAnchor="middle" dominantBaseline="central"
+                                    style={{ fontSize: '11px', fontWeight: 800, fill: '#f1f5f9' }}>
+                                    {fw.score}%
+                                </text>
+                            </svg>
+                            <span className="text-[11px] font-bold text-center leading-tight px-2 text-slate-200 mt-1" style={{ maxWidth: 116 }}>
+                                {label}
+                            </span>
+                        </div>
+                    </button>
+                );
+            })}
+
+            {/* Domain Bubbles */}
+            <AnimatePresence>
+                {selFwPos && domains.slice(0, 7).map((d, i) => {
+                    const pos = domainPositions[i];
+                    if (!pos) return null;
+                    const isAct = d.name === selectedDomain;
+                    const sc = d.score >= 70 ? '#10b981' : d.score >= 40 ? '#f59e0b' : '#ef4444';
+                    const dr2 = 15, dcirc2 = 2 * Math.PI * dr2;
+                    return (
+                        <motion.button
+                            key={d.name}
+                            type="button"
+                            initial={{ opacity: 0, scale: 0.6 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.6 }}
+                            transition={{ duration: 0.3, delay: i * 0.05 }}
+                            onClick={() => onSelectDomain(d.name)}
+                            className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                            style={{ left: `${(pos.x / VW) * 100}%`, top: `${(pos.y / VH) * 100}%`, zIndex: 10 }}
+                        >
+                            <div
+                                className="relative flex flex-col items-center justify-center rounded-full transition-all duration-200"
+                                style={{
+                                    width: 94, height: 94,
+                                    background: isAct ? 'rgba(30,41,59,0.97)' : 'rgba(15,23,42,0.83)',
+                                    border: `1.5px solid ${isAct ? '#94a3b8' : '#334155'}`,
+                                    boxShadow: isAct ? `0 0 20px rgba(148,163,184,0.30)` : '0 3px 16px rgba(0,0,0,0.55)',
+                                }}
+                            >
+                                <svg width="40" height="40" viewBox="0 0 40 40">
+                                    <circle cx="20" cy="20" r={dr2} fill="none" stroke="#1e293b" strokeWidth="4.5" />
+                                    <motion.circle
+                                        cx="20" cy="20" r={dr2} fill="none"
+                                        stroke={sc} strokeWidth="4.5" strokeLinecap="round"
+                                        strokeDasharray={dcirc2}
+                                        initial={{ strokeDashoffset: dcirc2 }}
+                                        animate={{ strokeDashoffset: dcirc2 * (1 - d.score / 100) }}
+                                        transition={{ duration: 1.0, ease: 'easeOut', delay: i * 0.08 }}
+                                        transform="rotate(-90 20 20)"
+                                    />
+                                    <text x="20" y="20" textAnchor="middle" dominantBaseline="central"
+                                        style={{ fontSize: '8.5px', fontWeight: 800, fill: '#f1f5f9' }}>
+                                        {d.score}%
+                                    </text>
+                                </svg>
+                                <span className="text-[9px] font-semibold text-slate-300 text-center leading-tight px-2 mt-0.5" style={{ maxWidth: 82 }}>
+                                    {d.name.length > 12 ? d.name.slice(0, 11) + '…' : d.name}
+                                </span>
+                            </div>
+                        </motion.button>
+                    );
+                })}
+            </AnimatePresence>
+
+            {/* Engine Ring */}
+            <div
+                className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                style={{ left: `${(enginePos.x / VW) * 100}%`, top: `${(enginePos.y / VH) * 100}%`, zIndex: 10 }}
+            >
+                <div className="relative flex items-center justify-center" style={{ width: 176, height: 176 }}>
+                    {/* Orange glow layers */}
+                    <div className="absolute rounded-full" style={{ inset: -20, background: 'radial-gradient(circle, rgba(249,115,22,0.12) 40%, transparent 70%)' }} />
+                    <div className="absolute inset-0 rounded-full" style={{ background: 'radial-gradient(circle, rgba(249,115,22,0.22) 25%, transparent 65%)' }} />
+                    {/* Spinning dashed outer ring */}
+                    <svg width="176" height="176" viewBox="0 0 176 176" className="absolute inset-0">
+                        <motion.circle
+                            cx="88" cy="88" r="83"
+                            fill="none" stroke="#f97316" strokeWidth="1.5" strokeDasharray="10 6" opacity="0.45"
+                            style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
+                            animate={{ rotate: 360 }}
+                            transition={{ duration: 22, repeat: Infinity, ease: 'linear' }}
+                        />
+                    </svg>
+                    {/* Score donut */}
+                    <svg width="176" height="176" viewBox="0 0 176 176" className="absolute inset-0">
+                        <circle cx="88" cy="88" r={engineR} fill="none" stroke="#0f172a" strokeWidth="16" />
+                        <motion.circle
+                            cx="88" cy="88" r={engineR} fill="none"
+                            stroke="#f97316" strokeWidth="16" strokeLinecap="round"
+                            strokeDasharray={engineCirc}
+                            initial={{ strokeDashoffset: engineCirc }}
+                            animate={{ strokeDashoffset: engineCirc * (1 - overallScore / 100) }}
+                            transition={{ duration: 1.8, ease: 'easeOut' }}
+                            transform="rotate(-90 88 88)"
+                        />
+                    </svg>
+                    {/* Center text */}
+                    <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+                        <span className="text-[9px] font-bold tracking-[0.2em] text-orange-400 uppercase">Engine</span>
+                        <span className="text-3xl font-bold text-slate-100 leading-none">{overallScore}%</span>
+                        <span className="text-[9px] text-slate-500 tracking-wide">overall score</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ─── Static domain lists for supplemental (non-DB) frameworks ────────────────
+const STATIC_FW_DOMAINS: Record<string, Array<{ name: string; score: number }>> = {
+    "ISO 27001": [
+        { name: "Organizational",  score: 42 },
+        { name: "People",          score: 35 },
+        { name: "Physical",        score: 28 },
+        { name: "Technological",   score: 48 },
+    ],
+    "SOC 2": [
+        { name: "Security",             score: 22 },
+        { name: "Availability",         score: 40 },
+        { name: "Confidentiality",      score: 28 },
+        { name: "Processing Integrity", score: 20 },
+        { name: "Privacy",              score: 18 },
+    ],
+    "DPDPA": [
+        { name: "Consent",         score: 8  },
+        { name: "Data Rights",     score: 5  },
+        { name: "Obligations",     score: 12 },
+        { name: "Governance",      score: 15 },
+    ],
+};
+
 // ─── Main Component ────────────────────────────────────────────────────────────
 
 export function GapAssessmentClient({
@@ -456,309 +777,133 @@ export function GapAssessmentClient({
 }: GapAssessmentClientProps) {
     const router = useRouter();
     const [controls, setControls] = useState<ControlItem[]>(initialControls ?? []);
+    const [activeFrameworkId, setActiveFrameworkId] = useState<string | null>(null);
     const [activeDomain, setActiveDomain] = useState<string | null>(null);
-    const [search, setSearch] = useState("");
     const [isPending, startTransition] = useTransition();
-    const [syncing, setSyncing] = useState(false);
 
     const refresh = () => startTransition(() => { router.refresh(); });
 
-    // Optimistic status update
-    const handleStatusChange = useCallback((id: string, status: string) => {
-        setControls(prev => prev.map(c => c.id === id ? { ...c, status } : c));
-    }, []);
-
-    // Domain tabs with stats
-    const domains = useMemo(() => {
-        const map = new Map<string, { total: number; verified: number; inProgress: number; notApplicable: number }>();
+    // ── Group controls by framework (real DB data) ────────────────────────────
+    const frameworks = useMemo(() => {
+        const map = new Map<string, { id: string; name: string; controls: ControlItem[] }>();
         for (const c of controls) {
-            const d = c.domain || "General";
-            const prev = map.get(d) ?? { total: 0, verified: 0, inProgress: 0, notApplicable: 0 };
-            map.set(d, {
-                total: prev.total + 1,
-                verified: prev.verified + (c.status === "verified" ? 1 : 0),
-                inProgress: prev.inProgress + (c.status === "in_progress" ? 1 : 0),
-                notApplicable: prev.notApplicable + (c.status === "not_applicable" ? 1 : 0),
-            });
+            if (!map.has(c.frameworkId)) {
+                map.set(c.frameworkId, { id: c.frameworkId, name: c.frameworkName, controls: [] });
+            }
+            map.get(c.frameworkId)!.controls.push(c);
         }
-        return Array.from(map.entries())
-            .sort((a, b) => a[0].localeCompare(b[0]))
-            .map(([name, s]) => ({
-                name,
-                total: s.total,
-                verified: s.verified,
-                inProgress: s.inProgress,
-                notApplicable: s.notApplicable,
-                // Score excludes N/A from denominator
-                score: (s.total - s.notApplicable) > 0
-                    ? Math.round((s.verified / (s.total - s.notApplicable)) * 100)
-                    : 100,
-                Icon: getDomainIcon(name),
-            }));
+        return Array.from(map.values()).map(fw => {
+            const yes = fw.controls.filter(c => c.status === "verified").length;
+            const partial = fw.controls.filter(c => c.status === "in_progress").length;
+            const na = fw.controls.filter(c => c.status === "not_applicable").length;
+            const no = fw.controls.filter(c => c.status === "not_started").length;
+            const eligible = fw.controls.length - na;
+            const score = eligible > 0 ? Math.round((yes / eligible) * 100) : 100;
+            return { ...fw, yes, partial, na, no, score, palette: getFwPalette(fw.name) };
+        });
     }, [controls]);
+
+    // ── Always show all 4 frameworks — supplement with demo entries if not in DB ──
+    const vizFrameworks = useMemo(() => {
+        const REQUIRED = [
+            { match: "ISO 27001", name: "ISO 27001:2022", score: 38 },
+            { match: "SOC 2",     name: "SOC 2 Type II",  score: 22 },
+            { match: "DPDPA",     name: "DPDPA 2023",     score: 8  },
+        ];
+        const extras = REQUIRED
+            .filter(r => !frameworks.some(f => f.name.includes(r.match)))
+            .map(r => ({
+                id: `static-${r.name}`,
+                name: r.name,
+                controls: [] as ControlItem[],
+                yes: 0, partial: 0, na: 0, no: 0,
+                score: r.score,
+                palette: getFwPalette(r.name),
+            }));
+        return [...frameworks, ...extras];
+    }, [frameworks]);
+
+    // Select default framework (prefer real data first)
+    const currentFwId = activeFrameworkId ?? vizFrameworks[0]?.id ?? null;
+    const currentFw = frameworks.find(f => f.id === currentFwId); // only real fw has domains
+
+    // ── Domains for selected framework (real DB or static fallback) ───────────
+    const domains = useMemo(() => {
+        if (currentFw) {
+            // Real DB controls → compute domain scores
+            const map = new Map<string, { total: number; verified: number; notApplicable: number }>();
+            for (const c of currentFw.controls) {
+                const d = c.domain || "General";
+                const prev = map.get(d) ?? { total: 0, verified: 0, notApplicable: 0 };
+                map.set(d, {
+                    total: prev.total + 1,
+                    verified: prev.verified + (c.status === "verified" ? 1 : 0),
+                    notApplicable: prev.notApplicable + (c.status === "not_applicable" ? 1 : 0),
+                });
+            }
+            return Array.from(map.entries())
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .map(([name, s]) => ({
+                    name,
+                    score: (s.total - s.notApplicable) > 0
+                        ? Math.round((s.verified / (s.total - s.notApplicable)) * 100)
+                        : 100,
+                }));
+        }
+        // Static framework selected — look up hardcoded domain list by first-word prefix
+        const vizFw = vizFrameworks.find(f => f.id === currentFwId);
+        if (!vizFw) return [];
+        const key = Object.keys(STATIC_FW_DOMAINS).find(k => vizFw.name.startsWith(k));
+        return key ? STATIC_FW_DOMAINS[key] : [];
+    }, [currentFw, currentFwId, vizFrameworks]);
 
     const currentDomain = activeDomain ?? (domains[0]?.name ?? null);
-    const currentDomainData = domains.find(d => d.name === currentDomain);
 
-    // Controls visible in current domain + search
-    const visibleControls = useMemo(() => {
-        let result = controls.filter(c => (c.domain || "General") === currentDomain);
-        if (search.trim()) {
-            const q = search.toLowerCase();
-            result = result.filter(c =>
-                c.title.toLowerCase().includes(q) ||
-                c.controlRef.toLowerCase().includes(q) ||
-                (c.category || "").toLowerCase().includes(q)
-            );
+    // ── Overall score (real DB or demo average) ───────────────────────────────
+    const overallScore = useMemo(() => {
+        if (controls.length > 0) {
+            const yes = controls.filter(c => c.status === "verified").length;
+            const na = controls.filter(c => c.status === "not_applicable").length;
+            const eligible = controls.length - na;
+            return eligible > 0 ? Math.round((yes / eligible) * 100) : 0;
         }
-        return result;
-    }, [controls, currentDomain, search]);
-
-    // Overall stats
-    const stats = useMemo(() => {
-        const yes = controls.filter(c => c.status === "verified").length;
-        const partial = controls.filter(c => c.status === "in_progress").length;
-        const na = controls.filter(c => c.status === "not_applicable").length;
-        const no = controls.filter(c => c.status === "not_started").length;
-        const assessed = yes + partial + na;
-        const eligible = controls.length - na;
-        const score = eligible > 0 ? Math.round((yes / eligible) * 100) : 100;
-        return { yes, partial, na, no, assessed, total: controls.length, score };
-    }, [controls]);
-
-    const handleSyncRisks = async () => {
-        setSyncing(true);
-        const res = await fetch("/api/risks/sync-from-gaps", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
-        });
-        const j = await res.json();
-        if (res.ok) toast.success(`${j.created} risks synced · ${j.skipped} already existed`);
-        else toast.error(j.error ?? "Sync failed");
-        setSyncing(false);
-    };
+        // Demo fallback: weighted average of all viz framework scores
+        if (vizFrameworks.length === 0) return 0;
+        return Math.round(vizFrameworks.reduce((s, f) => s + f.score, 0) / vizFrameworks.length);
+    }, [controls, vizFrameworks]);
 
     return (
-        <div className="w-full flex flex-col space-y-5 animate-in fade-in duration-700">
+        <div className="w-full flex flex-col space-y-4 animate-in fade-in duration-700">
 
             {/* ── Header ── */}
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-100 tracking-tight flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center shrink-0">
-                            <ListChecks className="w-5 h-5 text-indigo-400" />
-                        </div>
-                        Gap Assessment
-                    </h1>
-                    <p className="text-sm text-slate-400 mt-1.5 ml-0.5">
-                        Review and respond to all compliance controls across your assigned frameworks
+                    <h1 className="text-2xl font-bold text-slate-100 tracking-tight">Compliance Readiness</h1>
+                    <p className="text-sm text-slate-400 mt-1">
+                        Track your compliance posture across frameworks
                     </p>
                 </div>
-                <div className="flex items-center gap-2 shrink-0">
-                    <button
-                        type="button"
-                        onClick={refresh}
-                        disabled={isPending}
-                        className="flex items-center gap-2 px-3 py-2 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 text-slate-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
-                    >
-                        <RefreshCw className={cn("w-4 h-4", isPending && "animate-spin")} />
-                        Refresh
-                    </button>
-                    <button
-                        type="button"
-                        onClick={handleSyncRisks}
-                        disabled={syncing}
-                        className="flex items-center gap-2 px-3 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-50"
-                    >
-                        {syncing ? <Loader2 className="w-4 h-4 animate-spin" /> : <ShieldAlert className="w-4 h-4" />}
-                        Sync Risks
-                    </button>
-                </div>
+                <button
+                    type="button"
+                    onClick={refresh}
+                    disabled={isPending}
+                    className="flex items-center gap-2 px-3 py-2 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 text-slate-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-50 shrink-0"
+                >
+                    <RefreshCw className={cn("w-4 h-4", isPending && "animate-spin")} />
+                    Refresh
+                </button>
             </div>
 
-            {/* ── Stats Row ── */}
-            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-                {/* Overall Score */}
-                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4 col-span-1">
-                    <div className="flex items-start justify-between mb-1">
-                        <p className={cn(
-                            "text-3xl font-bold",
-                            stats.score >= 70 ? "text-emerald-400" : stats.score >= 40 ? "text-amber-400" : "text-red-400"
-                        )}>
-                            {stats.score}%
-                        </p>
-                        <TrendingUp className={cn(
-                            "w-4 h-4 mt-1.5",
-                            stats.score >= 70 ? "text-emerald-500" : stats.score >= 40 ? "text-amber-500" : "text-red-500"
-                        )} />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-300">Overall Score</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Verified controls</p>
-                    <div className="mt-2 h-1 bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                            className={cn(
-                                "h-full rounded-full transition-all duration-700",
-                                stats.score >= 70 ? "bg-emerald-500" : stats.score >= 40 ? "bg-amber-500" : "bg-red-500"
-                            )}
-                            style={{ width: `${stats.score}%` }}
-                        />
-                    </div>
-                </div>
-
-                {/* Assessed */}
-                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
-                    <div className="flex items-start justify-between mb-1">
-                        <p className="text-3xl font-bold text-slate-200">{stats.assessed}<span className="text-lg text-slate-500">/{stats.total}</span></p>
-                        <ClipboardList className="w-4 h-4 text-slate-500 mt-1.5" />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-300">Assessed</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Controls responded</p>
-                </div>
-
-                {/* Yes */}
-                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
-                    <div className="flex items-start justify-between mb-1">
-                        <p className="text-3xl font-bold text-emerald-400">{stats.yes}</p>
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 mt-1.5" />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-300">Yes</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Fully verified</p>
-                </div>
-
-                {/* Partial */}
-                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
-                    <div className="flex items-start justify-between mb-1">
-                        <p className="text-3xl font-bold text-amber-400">{stats.partial}</p>
-                        <CircleDot className="w-4 h-4 text-amber-600 mt-1.5" />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-300">Partial</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">In progress</p>
-                </div>
-
-                {/* No */}
-                <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
-                    <div className="flex items-start justify-between mb-1">
-                        <p className="text-3xl font-bold text-red-400">{stats.no}</p>
-                        <XCircle className="w-4 h-4 text-red-600 mt-1.5" />
-                    </div>
-                    <p className="text-xs font-semibold text-slate-300">No</p>
-                    <p className="text-[11px] text-slate-500 mt-0.5">Not started</p>
-                </div>
-            </div>
-
-            {/* ── Domain Tabs ── */}
-            <div className="overflow-x-auto -mx-1 px-1 pb-1">
-                <div className="flex gap-2 min-w-max">
-                    {domains.map(d => {
-                        const Icon = d.Icon;
-                        const isActive = d.name === currentDomain;
-                        return (
-                            <button
-                                key={d.name}
-                                type="button"
-                                onClick={() => { setActiveDomain(d.name); setSearch(""); }}
-                                className={cn(
-                                    "flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium transition-all border whitespace-nowrap",
-                                    isActive
-                                        ? "bg-indigo-600/20 border-indigo-500/40 text-indigo-300"
-                                        : "bg-slate-800/40 border-slate-700/40 text-slate-400 hover:text-slate-200 hover:border-slate-600/50"
-                                )}
-                            >
-                                <Icon className={cn("w-4 h-4 shrink-0", isActive ? "text-indigo-400" : "text-slate-500")} />
-                                <span className="max-w-[160px] truncate">{d.name}</span>
-                                <span className={cn(
-                                    "text-[11px] font-bold px-1.5 py-0.5 rounded-md ml-0.5",
-                                    d.score >= 70
-                                        ? "bg-emerald-500/15 text-emerald-400"
-                                        : d.score >= 40
-                                            ? "bg-amber-500/15 text-amber-400"
-                                            : "bg-red-500/15 text-red-400"
-                                )}>
-                                    {d.score}%
-                                </span>
-                            </button>
-                        );
-                    })}
-                </div>
-            </div>
-
-            {/* ── Domain Header ── */}
-            {currentDomainData && (
-                <div className="bg-slate-900/40 border border-slate-800/50 rounded-2xl p-5">
-                    <div className="flex items-start justify-between gap-4">
-                        <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 rounded-xl bg-indigo-500/15 border border-indigo-500/25 flex items-center justify-center shrink-0">
-                                <currentDomainData.Icon className="w-6 h-6 text-indigo-400" />
-                            </div>
-                            <div>
-                                <h2 className="text-base font-semibold text-slate-100">{currentDomainData.name}</h2>
-                                <p className="text-xs text-slate-500 mt-0.5">
-                                    {currentDomainData.verified} verified &middot;&nbsp;
-                                    {currentDomainData.inProgress} in progress &middot;&nbsp;
-                                    {currentDomainData.total} total controls
-                                </p>
-                            </div>
-                        </div>
-                        <div className="text-right shrink-0">
-                            <span className={cn(
-                                "text-2xl font-bold",
-                                currentDomainData.score >= 70 ? "text-emerald-400" :
-                                currentDomainData.score >= 40 ? "text-amber-400" : "text-red-400"
-                            )}>
-                                {currentDomainData.score}%
-                            </span>
-                            <p className="text-[11px] text-slate-500 mt-0.5">compliance</p>
-                        </div>
-                    </div>
-                    <div className="mt-4 h-2 bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                            className={cn(
-                                "h-full rounded-full transition-all duration-700",
-                                currentDomainData.score >= 70 ? "bg-emerald-500" :
-                                currentDomainData.score >= 40 ? "bg-amber-500" : "bg-indigo-500"
-                            )}
-                            style={{ width: `${currentDomainData.score}%` }}
-                        />
-                    </div>
-                </div>
-            )}
-
-            {/* ── Search ── */}
-            <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
-                <input
-                    type="text"
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    placeholder="Search questions, control ref, category…"
-                    className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-indigo-500/50 transition-colors"
-                />
-            </div>
-
-            {/* ── Question Cards ── */}
-            {visibleControls.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 border border-slate-800/50 rounded-2xl">
-                    <CheckCircle2 className="w-12 h-12 text-slate-700 mb-3" />
-                    <p className="text-slate-400 text-sm font-medium">No controls found</p>
-                    <p className="text-slate-600 text-xs mt-1">Try a different domain or clear the search</p>
-                </div>
-            ) : (
-                <div className="space-y-2">
-                    <p className="text-[11px] text-slate-600 uppercase tracking-wider font-semibold px-1">
-                        {visibleControls.length} question{visibleControls.length !== 1 ? "s" : ""}
-                    </p>
-                    {visibleControls.map((control, idx) => (
-                        <QuestionCard
-                            key={control.id}
-                            control={control}
-                            qNum={idx + 1}
-                            orgId={orgId}
-                            onStatusChange={handleStatusChange}
-                        />
-                    ))}
-                </div>
-            )}
+            {/* ── Compliance Engine (full height) ── */}
+            <ComplianceEngineViz
+                frameworks={vizFrameworks}
+                selectedFwId={currentFwId}
+                onSelectFw={(id) => { setActiveFrameworkId(id); setActiveDomain(null); }}
+                domains={domains}
+                selectedDomain={currentDomain}
+                onSelectDomain={(name) => setActiveDomain(name)}
+                overallScore={overallScore}
+            />
         </div>
     );
 }

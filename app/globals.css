@@ -5,35 +5,27 @@
   --font-sans: "Fira Sans", monospace;
   --font-mono: "Fira Code", monospace;
 
-  /* Color Palette - Premium Dark Theme */
   --color-background: #020617;
-  /* Very dark slate, almost black */
   --color-foreground: #F8FAFC;
 
-  --color-primary: #3B82F6;
-  /* Trust blue */
-  --color-primary-light: #60A5FA;
-  --color-primary-dark: #2563EB;
+  --color-primary: #f97316;
+  --color-primary-light: #fb923c;
+  --color-primary-dark: #ea6c0a;
 
   --color-accent: #10B981;
-  /* Emerald */
   --color-accent-2: #F59E0B;
-  /* Amber/Orange */
 
-  /* Glassmorphism Tokens */
-  --color-glass: rgba(255, 255, 255, 0.05);
-  --color-glass-hover: rgba(255, 255, 255, 0.08);
-  --color-glass-border: rgba(255, 255, 255, 0.1);
-  --color-glass-border-hover: rgba(255, 255, 255, 0.2);
+  --color-glass: rgba(12, 16, 21, 0.85);
+  --color-glass-hover: rgba(12, 16, 21, 0.92);
+  --color-glass-border: rgba(30, 41, 59, 0.8);
+  --color-glass-border-hover: rgba(51, 65, 85, 0.9);
 
-  /* Radii for sharp aesthetic */
   --radius-sm: 0.125rem;
   --radius-md: 0.25rem;
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
 
-  /* Custom shadows for depth */
-  --shadow-glow: 0 0 20px rgba(59, 130, 246, 0.15);
+  --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.15);
   --shadow-glow-accent: 0 0 20px rgba(16, 185, 129, 0.15);
 }
 
@@ -48,8 +40,8 @@
 @layer utilities {
   .glass-panel {
     background: var(--color-glass);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     border: 1px solid var(--color-glass-border);
   }
 
@@ -60,6 +52,14 @@
 
   .text-glow {
     text-shadow: 0 0 10px currentColor;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   /* Custom Scrollbar */
