@@ -62,6 +62,19 @@
     display: none;
   }
 
+  /* Policy WYSIWYG editor */
+  .policy-editor h1 { font-size: 1.25rem; font-weight: 700; color: #f1f5f9; margin: 1rem 0 0.25rem; }
+  .policy-editor h2 { font-size: 1rem; font-weight: 600; color: #e2e8f0; margin: 0.875rem 0 0.25rem; }
+  .policy-editor h3 { font-size: 0.875rem; font-weight: 600; color: #cbd5e1; margin: 0.75rem 0 0.25rem; }
+  .policy-editor p  { margin: 0.25rem 0; color: #cbd5e1; }
+  .policy-editor ul { list-style: disc; padding-left: 1.5rem; margin: 0.25rem 0; color: #94a3b8; }
+  .policy-editor ol { list-style: decimal; padding-left: 1.5rem; margin: 0.25rem 0; color: #94a3b8; }
+  .policy-editor li { margin: 0.15rem 0; }
+  .policy-editor strong { font-weight: 600; color: #e2e8f0; }
+  .policy-editor em { font-style: italic; }
+  .policy-editor a  { color: #f97316; text-decoration: underline; }
+  .policy-editor blockquote { border-left: 2px solid #f97316; padding-left: 0.75rem; color: #94a3b8; font-style: italic; margin: 0.5rem 0; }
+
   /* Custom Scrollbar */
   ::-webkit-scrollbar {
     width: 6px;

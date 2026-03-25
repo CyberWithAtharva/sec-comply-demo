@@ -856,8 +856,8 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                                                 <td className="px-5 py-3">
                                                     <div className="flex flex-col">
                                                         <button
-                                                            onClick={() => setViewing(p)}
-                                                            className="text-sm text-slate-200 font-medium hover:text-indigo-400 text-left transition-colors"
+                                                            onClick={() => router.push(`/policies/${p.id}`)}
+                                                            className="text-sm text-slate-200 font-medium hover:text-orange-400 text-left transition-colors"
                                                         >
                                                             {p.title}
                                                         </button>
@@ -887,15 +887,15 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <button
-                                                            onClick={() => setViewing(p)}
-                                                            className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
-                                                            title="View"
+                                                            onClick={() => router.push(`/policies/${p.id}`)}
+                                                            className="p-1.5 text-slate-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors"
+                                                            title="Open Editor"
                                                         >
                                                             <Eye className="w-4 h-4" />
                                                         </button>
                                                         <button
-                                                            onClick={() => { setEditing(p); setShowCreate(true); }}
-                                                            className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                                            onClick={() => router.push(`/policies/${p.id}`)}
+                                                            className="p-1.5 text-slate-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors"
                                                             title="Edit"
                                                         >
                                                             <Edit2 className="w-4 h-4" />

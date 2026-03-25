@@ -17,6 +17,7 @@ const PAGE_BREADCRUMBS: Record<string, BreadcrumbConfig> = {
     "/vendors": { section: "Compliance", page: "Vendor Management" },
     "/risks": { section: "Risk Management", page: "Risk Register" },
     "/policies": { section: "Compliance", page: "Document Control" },
+    "/policies/[id]": { section: "Document Control", page: "Policy Editor" },
     "/training": { section: "People", page: "Awareness Training" },
     "/cspm": { section: "Security Posture", page: "Cloud Security" },
     "/github": { section: "Security Posture", page: "SCM Security" },
