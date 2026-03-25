@@ -81,6 +81,134 @@ function StatusBadge({ status }: { status: PolicyData["status"] }) {
     );
 }
 
+// ─── Markdown Editor ──────────────────────────────────────────────────────────
+
+interface MarkdownEditorProps {
+    value: string;
+    onChange: (val: string) => void;
+    compact?: boolean;
+}
+
+const MD_TOOLBAR = [
+    { label: "B",   action: (v: string, sel: [number, number]) => wrapSelection(v, sel, "**", "**"),       title: "Bold" },
+    { label: "I",   action: (v: string, sel: [number, number]) => wrapSelection(v, sel, "_", "_"),          title: "Italic" },
+    { label: "H2",  action: (v: string, sel: [number, number]) => prefixLine(v, sel, "## "),               title: "Heading 2" },
+    { label: "H3",  action: (v: string, sel: [number, number]) => prefixLine(v, sel, "### "),              title: "Heading 3" },
+    { label: "•",   action: (v: string, sel: [number, number]) => prefixLine(v, sel, "- "),                title: "Bullet list" },
+    { label: "1.",  action: (v: string, sel: [number, number]) => prefixLine(v, sel, "1. "),               title: "Numbered list" },
+    { label: "``",  action: (v: string, sel: [number, number]) => wrapSelection(v, sel, "`", "`"),         title: "Inline code" },
+    { label: "—",   action: (v: string, sel: [number, number]) => insertText(v, sel, "\n---\n"),           title: "Divider" },
+];
+
+function wrapSelection(value: string, [start, end]: [number, number], prefix: string, suffix: string): string {
+    const selected = value.slice(start, end) || "text";
+    return value.slice(0, start) + prefix + selected + suffix + value.slice(end);
+}
+function prefixLine(value: string, [start]: [number, number], prefix: string): string {
+    const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+    return value.slice(0, lineStart) + prefix + value.slice(lineStart);
+}
+function insertText(value: string, [start]: [number, number], text: string): string {
+    return value.slice(0, start) + text + value.slice(start);
+}
+
+function MarkdownEditor({ value, onChange, compact = false }: MarkdownEditorProps) {
+    const [mode, setMode] = useState<"write" | "preview">("write");
+    const textareaRef = React.useRef<HTMLTextAreaElement>(null);
+
+    const applyAction = (action: (v: string, sel: [number, number]) => string) => {
+        const el = textareaRef.current;
+        if (!el) return;
+        const sel: [number, number] = [el.selectionStart, el.selectionEnd];
+        const next = action(value, sel);
+        onChange(next);
+        // Restore focus after state update
+        setTimeout(() => { el.focus(); }, 0);
+    };
+
+    return (
+        <div className="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-800/40">
+            {/* Toolbar */}
+            <div className="flex items-center gap-1 px-2 py-1.5 border-b border-slate-700/50 bg-slate-800/60">
+                {MD_TOOLBAR.map(btn => (
+                    <button
+                        key={btn.label}
+                        type="button"
+                        title={btn.title}
+                        onMouseDown={e => { e.preventDefault(); applyAction(btn.action); }}
+                        className="px-2 py-1 text-xs font-mono text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 rounded transition-colors"
+                    >
+                        {btn.label}
+                    </button>
+                ))}
+                <div className="flex-1" />
+                <div className="flex items-center rounded-lg overflow-hidden border border-slate-700/50">
+                    {(["write", "preview"] as const).map(m => (
+                        <button
+                            key={m}
+                            type="button"
+                            onClick={() => setMode(m)}
+                            className={cn(
+                                "px-3 py-1 text-[11px] font-medium capitalize transition-colors",
+                                mode === m
+                                    ? "bg-slate-700 text-slate-100"
+                                    : "text-slate-500 hover:text-slate-300"
+                            )}
+                        >
+                            {m}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            {/* Write */}
+            {mode === "write" && (
+                <textarea
+                    ref={textareaRef}
+                    value={value}
+                    onChange={e => onChange(e.target.value)}
+                    rows={compact ? 5 : 12}
+                    placeholder="Write policy content in Markdown…&#10;&#10;## Objective&#10;Describe the purpose of this policy.&#10;&#10;## Scope&#10;Define who and what this policy applies to."
+                    className="w-full bg-transparent px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none resize-none font-mono leading-relaxed"
+                />
+            )}
+
+            {/* Preview */}
+            {mode === "preview" && (
+                <div className={cn("px-4 py-3 text-sm text-slate-300 leading-relaxed space-y-2 overflow-y-auto", compact ? "min-h-[120px]" : "min-h-[280px]")}>
+                    {value.trim() ? (
+                        <ReactMarkdown
+                            remarkPlugins={[remarkGfm]}
+                            components={{
+                                h1: ({ children }) => <h1 className="text-lg font-bold text-white mt-3 mb-1 first:mt-0">{children}</h1>,
+                                h2: ({ children }) => <h2 className="text-base font-semibold text-slate-100 mt-3 mb-1 first:mt-0">{children}</h2>,
+                                h3: ({ children }) => <h3 className="text-sm font-semibold text-slate-200 mt-2 mb-1">{children}</h3>,
+                                p: ({ children }) => <p className="text-slate-300 leading-relaxed">{children}</p>,
+                                ul: ({ children }) => <ul className="list-disc list-inside space-y-1 text-slate-400 pl-2">{children}</ul>,
+                                ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 text-slate-400 pl-2">{children}</ol>,
+                                li: ({ children }) => <li className="text-slate-400 text-sm">{children}</li>,
+                                strong: ({ children }) => <strong className="font-semibold text-slate-200">{children}</strong>,
+                                em: ({ children }) => <em className="italic text-slate-300">{children}</em>,
+                                hr: () => <hr className="border-slate-700/50 my-3" />,
+                                blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-500/50 pl-3 italic text-slate-400">{children}</blockquote>,
+                                code: ({ children }) => <code className="bg-slate-800 text-blue-300 px-1.5 py-0.5 rounded text-[11px] font-mono">{children}</code>,
+                                table: ({ children }) => <div className="overflow-x-auto rounded-lg border border-slate-700/50 my-2"><table className="w-full text-xs">{children}</table></div>,
+                                thead: ({ children }) => <thead className="bg-slate-800/60">{children}</thead>,
+                                th: ({ children }) => <th className="px-3 py-2 text-left font-semibold text-slate-300 text-[10px] uppercase tracking-wider">{children}</th>,
+                                td: ({ children }) => <td className="px-3 py-2 text-slate-400">{children}</td>,
+                            }}
+                        >
+                            {value}
+                        </ReactMarkdown>
+                    ) : (
+                        <p className="text-slate-600 italic">Nothing to preview yet…</p>
+                    )}
+                </div>
+            )}
+        </div>
+    );
+}
+
 // ─── Policy Modal (Create / Edit) ─────────────────────────────────────────────
 
 interface PolicyModalProps {
@@ -241,9 +369,11 @@ function PolicyModal({ orgId, owners, editing, onClose, onSaved }: PolicyModalPr
 
                     <div>
                         <label className="block text-xs font-medium text-slate-400 mb-1.5">Content / Summary</label>
-                        <textarea rows={4} value={form.content} onChange={e => setForm(f => ({ ...f, content: e.target.value }))}
-                            placeholder="Policy objective, scope, and key requirements…"
-                            className={cn(inputCls, "resize-none")} />
+                        <MarkdownEditor
+                            value={form.content ?? ""}
+                            onChange={v => setForm(f => ({ ...f, content: v }))}
+                            compact
+                        />
                     </div>
 
                     <div>
@@ -405,13 +535,9 @@ function PolicyDetailDrawer({ policy, currentUserId, onClose, onAcknowledge, onU
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-[10px] text-slate-500 uppercase tracking-widest mb-1.5">Content / Summary</label>
-                                <textarea
+                                <MarkdownEditor
                                     value={editContent}
-                                    onChange={e => setEditContent(e.target.value)}
-                                    rows={8}
-                                    className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 resize-none"
-                                    placeholder="Policy summary or content…"
+                                    onChange={setEditContent}
                                 />
                             </div>
                             {saveError && <p className="text-xs text-red-400">{saveError}</p>}

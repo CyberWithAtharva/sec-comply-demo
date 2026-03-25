@@ -9,26 +9,26 @@ import {
     GraduationCap,
     CloudCog,
     Building2,
-    Key,
     ShieldAlert,
     Shield,
-    BadgeCheck,
     ChevronLeft,
     ChevronRight,
     UserCircle,
-    FileText,
     LogOut,
     AlertTriangle,
     GitBranch,
-    Bot,
     Flame,
     ListChecks,
     Server,
     BookOpen,
-    Presentation,
     Database,
     ScanSearch,
     Activity,
+    ClipboardList,
+    Siren,
+    ClipboardCheck,
+    Code2,
+    Plug,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
@@ -52,15 +52,15 @@ const navSections: NavSection[] = [
         items: [
             { name: "Dashboard", href: "/", icon: LayoutDashboard, caption: "Compliance frameworks overview" },
             { name: "Action Items", href: "/action-items", icon: ListChecks, caption: "Prioritized compliance tasks" },
-            { name: "Product Deck", href: "/pitch", icon: Presentation, caption: "SecComply pitch & overview" },
+            { name: "Integrations", href: "/integrations", icon: Plug, caption: "Cloud, SCM & identity providers" },
         ],
     },
     {
         label: "COMPLIANCE",
         items: [
             { name: "Compliance Readiness", href: "/gap-assessment", icon: AlertTriangle, caption: "Compliance gaps & remediation" },
+            { name: "Control Requirements", href: "/control-requirements", icon: ClipboardList, caption: "Track your compliance posture" },
             { name: "Vendor Management", href: "/vendors", icon: Building2, caption: "Third-party risk assessments" },
-            { name: "Risk Management", href: "/risks", icon: Shield, caption: "Organizational risk management" },
             { name: "Document Control", href: "/policies", icon: BookOpen, caption: "Governing documents & SOPs" },
         ],
     },
@@ -77,18 +77,28 @@ const navSections: NavSection[] = [
             { name: "SCM Security", href: "/github", icon: GitBranch, caption: "Dependabot, secrets & code scan" },
             { name: "Supply Chain Security", href: "/assets", icon: Server, caption: "Hardware & software register" },
             { name: "Vulnerability Assessment", href: "/vulnerabilities", icon: ShieldAlert, caption: "Pentest findings & remediation" },
-            { name: "Evidence Vault", href: "/evidences", icon: FileText, caption: "Audit artifacts & proof" },
-            { name: "Access Reviews", href: "/access-reviews", icon: Key, caption: "User access certifications" },
-            { name: "Trust Center", href: "/trust", icon: BadgeCheck, caption: "Public compliance portal" },
+        ],
+    },
+    {
+        label: "OPERATIONS",
+        items: [
+            { name: "Incident Management", href: "/incident-management", icon: Siren, caption: "Log, track and resolve incidents" },
+        ],
+    },
+    {
+        label: "AUDIT",
+        items: [
+            { name: "Internal Audit", href: "/internal-audit", icon: ClipboardCheck, caption: "Plan and execute internal audits" },
         ],
     },
 ];
 
 const comingSoonItems: NavItem[] = [
-    { name: "AI System Inventory",  href: "/ai-governance/inventory",         icon: Database,    caption: "Central AI system registry",       badge: "preview" },
-    { name: "Shadow AI Detection",  href: "/ai-governance/shadow-ai",         icon: ScanSearch,  caption: "Unauthorized AI tool discovery",    badge: "preview" },
-    { name: "AI Output Monitoring", href: "/ai-governance/output-monitoring", icon: Activity,    caption: "Output audit & violation logs",     badge: "preview" },
-    { name: "AI Identity",          href: "/ai-identity",                     icon: Bot,         caption: "Non-human identity & AI agents",    badge: "preview" },
+    { name: "Risk Management",      href: "/risks",                           icon: Shield,      caption: "Organizational risk management",     badge: "soon" },
+    { name: "CSPM",                 href: "/cspm-posture",                    icon: Database,    caption: "Cloud security posture mgmt",       badge: "soon" },
+    { name: "Code Security",        href: "/code-security",                   icon: Code2,       caption: "SAST & code vulnerability scans",   badge: "soon" },
+    { name: "AI System Inventory",  href: "/ai-governance/inventory",         icon: ScanSearch,  caption: "Central AI system registry",        badge: "preview" },
+    { name: "AI Output Monitoring", href: "/ai-governance/output-monitoring", icon: Activity,    caption: "Output audit & violation logs",      badge: "preview" },
 ];
 
 function isItemActive(pathname: string, href: string): boolean {
@@ -142,8 +152,8 @@ export function Sidebar() {
                             >
                                 <Flame className="w-6 h-6 text-orange-500 flex-shrink-0" />
                                 <div className="flex flex-col leading-tight">
-                                    <span className="text-sm font-bold tracking-wider text-white">SECCOMPLY</span>
-                                    <span className="text-[9px] tracking-widest text-slate-500 font-medium">AI-DRIVEN GRC</span>
+                                    <span className="text-sm font-bold tracking-wider text-white">OVERWATCH</span>
+                                    <span className="text-[9px] tracking-widest text-slate-500 font-medium">BY SECCOMPLY</span>
                                 </div>
                             </motion.div>
                         )}
@@ -288,8 +298,13 @@ export function Sidebar() {
                                                     className="ml-3 text-sm font-medium whitespace-nowrap overflow-hidden flex-1 flex items-center"
                                                 >
                                                     {item.name}
-                                                    <span className="ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/20">
-                                                        PREVIEW
+                                                    <span className={cn(
+                                                        "ml-auto text-[9px] font-bold px-1.5 py-0.5 rounded border",
+                                                        item.badge === "soon"
+                                                            ? "bg-slate-700/50 text-slate-400 border-slate-600/50"
+                                                            : "bg-amber-500/15 text-amber-400 border-amber-500/20"
+                                                    )}>
+                                                        {item.badge === "soon" ? "SOON" : "PREVIEW"}
                                                     </span>
                                                 </motion.span>
                                             )}
