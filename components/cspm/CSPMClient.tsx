@@ -342,11 +342,15 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
 
         // Per-account scores
         const accountScores = accounts.map(acc => {
-            const af = findings.filter(f => f.aws_account_id === acc.id);
+            const af = findings.filter(f => f.aws_account_id === acc.account_id || f.aws_account_id === acc.id);
             const critical = af.filter(f => f.severity.toUpperCase() === "CRITICAL").length;
             const high = af.filter(f => f.severity.toUpperCase() === "HIGH").length;
             const medium = af.filter(f => f.severity.toUpperCase() === "MEDIUM").length;
-            const score = Math.max(0, 100 - Math.min(100, critical * 15 + high * 5 + medium));
+            const total = af.length;
+            const penalty = total > 0
+                ? Math.round(((critical * 3 + high * 2 + medium) / (total * 3)) * 100)
+                : 0;
+            const score = Math.max(0, 100 - Math.min(100, penalty));
             return { id: acc.id, name: acc.account_alias ?? acc.account_id, score, total: af.length, critical, high };
         }).sort((a, b) => a.score - b.score);
 

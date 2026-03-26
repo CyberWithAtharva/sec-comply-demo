@@ -30,6 +30,7 @@ const PAGE_BREADCRUMBS: Record<string, BreadcrumbConfig> = {
     "/internal-audit": { section: "Audit", page: "Internal Audit" },
     "/ai-governance": { section: "AI Governance", page: "AI Governance" },
     "/ai-identity": { section: "AI Governance", page: "AI Identity" },
+    "/shadow-ai": { section: "AI Governance", page: "Shadow AI Detection" },
     "/admin": { page: "Admin Portal" },
     "/pitch": { page: "Product Deck" },
 };

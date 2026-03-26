@@ -21,14 +21,13 @@ import {
     ListChecks,
     Server,
     BookOpen,
-    Database,
-    ScanSearch,
-    Activity,
     ClipboardList,
     Siren,
     ClipboardCheck,
-    Code2,
     Plug,
+    Brain,
+    BrainCircuit,
+    Fingerprint,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
@@ -94,11 +93,10 @@ const navSections: NavSection[] = [
 ];
 
 const comingSoonItems: NavItem[] = [
-    { name: "Risk Management",      href: "/risks",                           icon: Shield,      caption: "Organizational risk management",     badge: "soon" },
-    { name: "CSPM",                 href: "/cspm-posture",                    icon: Database,    caption: "Cloud security posture mgmt",       badge: "soon" },
-    { name: "Code Security",        href: "/code-security",                   icon: Code2,       caption: "SAST & code vulnerability scans",   badge: "soon" },
-    { name: "AI System Inventory",  href: "/ai-governance/inventory",         icon: ScanSearch,  caption: "Central AI system registry",        badge: "preview" },
-    { name: "AI Output Monitoring", href: "/ai-governance/output-monitoring", icon: Activity,    caption: "Output audit & violation logs",      badge: "preview" },
+    { name: "Risk Management",    href: "/risks",         icon: Shield,       caption: "Organizational risk management",  badge: "soon"    },
+    { name: "AI Identity",        href: "/ai-identity",   icon: Fingerprint,  caption: "AI agent identity management",    badge: "preview" },
+    { name: "Shadow AI Detection",href: "/shadow-ai", icon: Brain, caption: "Detect unauthorised AI usage", badge: "preview" },
+    { name: "AI Governance",      href: "/ai-governance", icon: BrainCircuit, caption: "AI model registry & compliance",  badge: "preview" },
 ];
 
 function isItemActive(pathname: string, href: string): boolean {
