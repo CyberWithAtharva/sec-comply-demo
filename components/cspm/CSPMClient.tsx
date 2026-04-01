@@ -494,12 +494,12 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                             { label: "Critical",        count: stats.critical, color: stats.critical > 0 ? "text-red-400" : "text-slate-400" },
                             { label: "High",            count: stats.high,     color: stats.high > 0 ? "text-orange-400" : "text-slate-400" },
                             { label: "Open",            count: stats.open,     color: stats.open > 0 ? "text-amber-400" : "text-slate-400" },
-                        ].map((s, i) => (
-                            <motion.div key={s.label} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.07 }}
+                        ].map((s) => (
+                            <div key={s.label}
                                 className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col">
                                 <span className="text-[10px] text-slate-500 mb-1">{s.label}</span>
                                 <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
-                            </motion.div>
+                            </div>
                         ))}
                     </div>
 

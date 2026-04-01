@@ -777,12 +777,9 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                     { label: "Draft / Review",     count: stats.draft,             color: "text-amber-400",   icon: <Clock className="w-4 h-4" /> },
                     { label: "Overdue Reviews",    count: stats.overdue,           color: stats.overdue > 0 ? "text-red-400" : "text-slate-400",  icon: <AlertTriangle className="w-4 h-4" /> },
                     { label: "Open Exceptions",    count: stats.pendingExceptions, color: stats.pendingExceptions > 0 ? "text-orange-400" : "text-slate-400", icon: <Shield className="w-4 h-4" /> },
-                ].map((s, i) => (
-                    <motion.div
+                ].map((s) => (
+                    <div
                         key={s.label}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.07 }}
                         className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col"
                     >
                         <div className={cn("flex items-center space-x-1.5 mb-1", s.color)}>
@@ -790,7 +787,7 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                             <span className="text-[10px] text-slate-500">{s.label}</span>
                         </div>
                         <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
-                    </motion.div>
+                    </div>
                 ))}
             </div>
 
@@ -856,7 +853,7 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                                                 <td className="px-5 py-3">
                                                     <div className="flex flex-col">
                                                         <button
-                                                            onClick={() => router.push(`/policies/${p.id}`)}
+                                                            onClick={() => setViewing(p)}
                                                             className="text-sm text-slate-200 font-medium hover:text-orange-400 text-left transition-colors"
                                                         >
                                                             {p.title}
@@ -887,16 +884,16 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         <button
-                                                            onClick={() => router.push(`/policies/${p.id}`)}
+                                                            onClick={() => setViewing(p)}
                                                             className="p-1.5 text-slate-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors"
-                                                            title="Open Editor"
+                                                            title="Preview"
                                                         >
                                                             <Eye className="w-4 h-4" />
                                                         </button>
                                                         <button
                                                             onClick={() => router.push(`/policies/${p.id}`)}
-                                                            className="p-1.5 text-slate-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors"
-                                                            title="Edit"
+                                                            className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
+                                                            title="Open full editor"
                                                         >
                                                             <Edit2 className="w-4 h-4" />
                                                         </button>

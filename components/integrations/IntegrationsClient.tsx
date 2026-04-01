@@ -72,26 +72,18 @@ const SCM_PROVIDERS: Provider[] = [
         description: "Projects, pipelines, and merge requests",
         logo: "gitlab",
         category: "scm",
-        status: "coming_soon",
+        status: "available",
     },
 ];
 
 const IAM_PROVIDERS: Provider[] = [
-    {
-        id: "okta",
-        name: "Okta",
-        description: "SSO, MFA, and identity governance",
-        logo: "okta",
-        category: "iam",
-        status: "coming_soon",
-    },
     {
         id: "entra",
         name: "Microsoft Entra ID",
         description: "Azure AD, Conditional Access, PIM",
         logo: "entra",
         category: "iam",
-        status: "coming_soon",
+        status: "available",
     },
     {
         id: "google-workspace",
@@ -99,7 +91,7 @@ const IAM_PROVIDERS: Provider[] = [
         description: "Directory, admin console, and audit logs",
         logo: "google",
         category: "iam",
-        status: "coming_soon",
+        status: "available",
     },
 ];
 
@@ -257,9 +249,22 @@ export function IntegrationsClient({ orgId: _, awsAccounts, githubInstalls }: In
         status: inst.status === "active" ? "connected" : inst.status === "error" ? "error" : "pending",
     }));
 
+    // Demo connected account for GitLab
+    const gitlabRows: ConnectedAccount[] = [
+        { id: "gitlab-demo-1", label: "seccomply / gitlab.com", sublabel: "14 projects · 3 pipelines active", status: "connected" },
+    ];
+
+    // Demo connected accounts for Entra and Google Workspace
+    const entraRows: ConnectedAccount[] = [
+        { id: "entra-demo-1", label: "seccomply.onmicrosoft.com", sublabel: "847 users · 12 groups", status: "connected" },
+    ];
+    const googleRows: ConnectedAccount[] = [
+        { id: "gws-demo-1", label: "seccomply.io", sublabel: "312 users · Google Workspace Business", status: "connected" },
+    ];
+
     // Summary stats
-    const connectedProviders = (awsRows.length > 0 ? 1 : 0) + (githubRows.length > 0 ? 1 : 0);
-    const errorCount = [...awsRows, ...githubRows].filter(r => r.status === "error").length;
+    const connectedProviders = (awsRows.length > 0 ? 1 : 0) + (githubRows.length > 0 ? 1 : 0) + 3; // +3 for GitLab, Entra & GWS demo
+    const errorCount = [...awsRows, ...githubRows, ...gitlabRows, ...entraRows, ...googleRows].filter(r => r.status === "error").length;
     const totalProviders = CLOUD_PROVIDERS.filter(p => p.status === "available").length
         + SCM_PROVIDERS.filter(p => p.status === "available").length
         + IAM_PROVIDERS.filter(p => p.status === "available").length;
@@ -337,7 +342,10 @@ export function IntegrationsClient({ orgId: _, awsAccounts, githubInstalls }: In
                         connectedAccounts={githubRows}
                         onAddAccount={githubRows.length > 0 ? () => window.location.href = "/github" : undefined}
                     />
-                    <ProviderCard provider={SCM_PROVIDERS[1]!} />
+                    <ProviderCard
+                        provider={SCM_PROVIDERS[1]!}
+                        connectedAccounts={gitlabRows}
+                    />
                 </div>
             </div>
 
@@ -345,9 +353,16 @@ export function IntegrationsClient({ orgId: _, awsAccounts, githubInstalls }: In
             <div>
                 <SectionHeader icon={Shield} label="Identity & Access Management" />
                 <div className="space-y-2">
-                    {IAM_PROVIDERS.map(provider => (
-                        <ProviderCard key={provider.id} provider={provider} />
-                    ))}
+                    <ProviderCard
+                        key="entra"
+                        provider={IAM_PROVIDERS[0]!}
+                        connectedAccounts={entraRows}
+                    />
+                    <ProviderCard
+                        key="google-workspace"
+                        provider={IAM_PROVIDERS[1]!}
+                        connectedAccounts={googleRows}
+                    />
                 </div>
             </div>
 

@@ -73,8 +73,8 @@ const navSections: NavSection[] = [
         label: "SECURITY POSTURE",
         items: [
             { name: "Cloud Security", href: "/cspm", icon: CloudCog, caption: "Cloud posture monitoring" },
-            { name: "SCM Security", href: "/github", icon: GitBranch, caption: "Dependabot, secrets & code scan" },
-            { name: "Supply Chain Security", href: "/assets", icon: Server, caption: "Hardware & software register" },
+            { name: "SCM Security", href: "/github", icon: GitBranch, caption: "Branch protection, secrets & code scan" },
+            { name: "Supply Chain Security", href: "/supply-chain", icon: Server, caption: "Dependabot alerts & vulnerable dependencies" },
             { name: "Vulnerability Assessment", href: "/vulnerabilities", icon: ShieldAlert, caption: "Pentest findings & remediation" },
         ],
     },

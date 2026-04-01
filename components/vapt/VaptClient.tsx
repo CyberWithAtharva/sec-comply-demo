@@ -615,17 +615,14 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                     { label: "Medium", count: stats.medium, color: "text-amber-400" },
                     { label: "Low", count: stats.low, color: "text-emerald-400" },
                     { label: "Resolved", count: `${stats.resolvedPct}%`, color: "text-blue-400" },
-                ].map((s, i) => (
-                    <motion.div
+                ].map((s) => (
+                    <div
                         key={s.label}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.07 }}
                         className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col"
                     >
                         <span className="text-xs text-slate-500 mb-1">{s.label}</span>
                         <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
-                    </motion.div>
+                    </div>
                 ))}
             </div>
 

@@ -258,7 +258,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
     const [syncErrors, setSyncErrors] = useState<Record<string, string>>({});
     const [syncResults, setSyncResults] = useState<Record<string, string>>({});
     const [search, setSearch] = useState("");
-    const [filterType, setFilterType] = useState<"all" | "secret" | "dependabot" | "code_scan" | "config">("all");
+    const [filterType, setFilterType] = useState<"all" | "secret" | "code_scan" | "config">("all");
     const [filterSev, setFilterSev] = useState("all");
     const [expandedRepos, setExpandedRepos] = useState<Set<string>>(new Set());
 
@@ -303,21 +303,27 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
         return result;
     }, [installations, repos]);
 
+    // SCM Security excludes dependabot — those live in Supply Chain Security
+    const scmFindings = useMemo(
+        () => findings.filter(f => f.type !== "dependabot"),
+        [findings]
+    );
+
     const stats = useMemo(() => {
-        const allF = [...findings, ...configFindings];
+        const allF = [...scmFindings, ...configFindings];
         return {
             total: allF.length,
-            secrets: findings.filter(f => f.type === "secret").length,
-            dependabot: findings.filter(f => f.type === "dependabot").length,
-            codeScan: findings.filter(f => f.type === "code_scan").length,
+            secrets: scmFindings.filter(f => f.type === "secret").length,
+            codeScan: scmFindings.filter(f => f.type === "code_scan").length,
             configs: configFindings.length,
             critical: allF.filter(f => f.severity === "critical").length,
             high: allF.filter(f => f.severity === "high").length,
+            repos: repos.length,
         };
-    }, [findings, configFindings]);
+    }, [scmFindings, configFindings, repos]);
 
     const filtered = useMemo(() => {
-        const allF = [...findings, ...configFindings];
+        const allF = [...scmFindings, ...configFindings];
         return allF.filter(f => {
             if (filterType !== "all" && f.type !== filterType) return false;
             if (filterSev !== "all" && f.severity !== filterSev) return false;
@@ -337,7 +343,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
     }, [repos]);
 
     const ghDashboardData = useMemo(() => {
-        const allF = [...findings, ...configFindings];
+        const allF = [...scmFindings, ...configFindings];
 
         const sevCounts = { critical: 0, high: 0, medium: 0, low: 0 };
         for (const f of allF) {
@@ -345,15 +351,15 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
             if (s in sevCounts) sevCounts[s]++;
         }
 
-        const typeCounts = { secret: 0, dependabot: 0, code_scan: 0, config: 0 };
+        const typeCounts = { secret: 0, code_scan: 0, config: 0 };
         for (const f of allF) {
             if (f.type in typeCounts) typeCounts[f.type as keyof typeof typeCounts]++;
         }
 
         // Per-repo finding breakdown
-        const repoMap = new Map<string, { secret: number; dependabot: number; code_scan: number; config: number; critical: number; high: number; total: number }>();
+        const repoMap = new Map<string, { secret: number; code_scan: number; config: number; critical: number; high: number; total: number }>();
         for (const f of allF) {
-            if (!repoMap.has(f.repository)) repoMap.set(f.repository, { secret: 0, dependabot: 0, code_scan: 0, config: 0, critical: 0, high: 0, total: 0 });
+            if (!repoMap.has(f.repository)) repoMap.set(f.repository, { secret: 0, code_scan: 0, config: 0, critical: 0, high: 0, total: 0 });
             const e = repoMap.get(f.repository)!;
             if (f.type in e) (e as Record<string, number>)[f.type]++;
             e.total++;
@@ -387,7 +393,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
             .slice(0, 5);
 
         return { sevCounts, typeCounts, topRepos, heatmapRepos, instScores, topFindings };
-    }, [findings, configFindings, installations]);
+    }, [scmFindings, configFindings, installations]);
 
     const handleSync = async (installationId: string) => {
         setSyncing(installationId);
@@ -476,9 +482,9 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                 <div>
                     <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
                         <GitBranch className="w-8 h-8 mr-3 text-violet-400" />
-                        GitHub Security
+                        SCM Security
                     </h1>
-                    <p className="text-sm text-slate-400 mt-1">Monitor Dependabot alerts, secret scanning, and code vulnerabilities.</p>
+                    <p className="text-sm text-slate-400 mt-1">Branch protection, secret scanning, code scan findings, and repository misconfigurations.</p>
                 </div>
                 <button
                     onClick={() => setShowConnect(true)}
@@ -489,11 +495,10 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-2 lg:grid-cols-7 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
                 {[
                     { label: "Total Findings", value: stats.total, color: "text-slate-100" },
-                    { label: "Secrets", value: stats.secrets, color: "text-red-400" },
-                    { label: "Dependabot", value: stats.dependabot, color: "text-amber-400" },
+                    { label: "Secrets Exposed", value: stats.secrets, color: "text-red-400" },
                     { label: "Code Scan", value: stats.codeScan, color: "text-purple-400" },
                     { label: "Misconfig", value: stats.configs, color: "text-orange-400" },
                     { label: "Critical", value: stats.critical, color: "text-red-400" },
@@ -587,20 +592,19 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                         <thead>
                                             <tr>
                                                 <th className="text-left pr-4 pb-2 text-slate-500 font-medium">Repository</th>
-                                                {["Secret", "Dep", "Code", "Config"].map(h => <th key={h} className="text-center pb-2 text-slate-500 font-medium w-12">{h}</th>)}
+                                                {["Secret", "Code", "Config"].map(h => <th key={h} className="text-center pb-2 text-slate-500 font-medium w-12">{h}</th>)}
                                             </tr>
                                         </thead>
                                         <tbody className="divide-y divide-slate-800/30">
                                             {ghDashboardData.heatmapRepos.map(([repo, v]) => {
-                                                const maxV = Math.max(v.secret, v.dependabot, v.code_scan, v.config, 1);
+                                                const maxV = Math.max(v.secret, v.code_scan, v.config, 1);
                                                 return (
                                                     <tr key={repo}>
                                                         <td className="pr-4 py-1.5 text-slate-300 font-mono truncate max-w-[120px]">{repo.split("/").pop() ?? repo}</td>
                                                         {([
-                                                            { count: v.secret,     fill: "#ef4444" },
-                                                            { count: v.dependabot, fill: "#f59e0b" },
-                                                            { count: v.code_scan,  fill: "#a855f7" },
-                                                            { count: v.config,     fill: "#f97316" },
+                                                            { count: v.secret,    fill: "#ef4444" },
+                                                            { count: v.code_scan, fill: "#a855f7" },
+                                                            { count: v.config,    fill: "#f97316" },
                                                         ] as { count: number; fill: string }[]).map((cell, ci) => (
                                                             <td key={ci} className="text-center py-1.5">
                                                                 <div
@@ -626,10 +630,9 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                             <div className="flex-1 flex items-center justify-center min-h-[180px]">
                                 {(() => {
                                     const typeRows: { label: string; count: number; color: string; Icon: React.ComponentType<{ className?: string }> }[] = [
-                                        { label: "Secrets",    count: ghDashboardData.typeCounts.secret,     color: "#ef4444", Icon: Key },
-                                        { label: "Dependabot", count: ghDashboardData.typeCounts.dependabot, color: "#f59e0b", Icon: Package },
-                                        { label: "Code Scan",  count: ghDashboardData.typeCounts.code_scan,  color: "#a855f7", Icon: Code2 },
-                                        { label: "Misconfig",  count: ghDashboardData.typeCounts.config,     color: "#f97316", Icon: ShieldAlert },
+                                        { label: "Secrets",   count: ghDashboardData.typeCounts.secret,    color: "#ef4444", Icon: Key },
+                                        { label: "Code Scan", count: ghDashboardData.typeCounts.code_scan, color: "#a855f7", Icon: Code2 },
+                                        { label: "Misconfig", count: ghDashboardData.typeCounts.config,    color: "#f97316", Icon: ShieldAlert },
                                     ];
                                     const typeTotal = typeRows.reduce((s, t) => s + t.count, 0);
                                     const circ = 2 * Math.PI * 30;
@@ -717,10 +720,9 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                             <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Type</h3>
                             <div className="flex-1 flex flex-col justify-center gap-4">
                                 {([
-                                    { label: "Secrets",    count: ghDashboardData.typeCounts.secret,     color: "bg-red-500",    textColor: "text-red-400" },
-                                    { label: "Dependabot", count: ghDashboardData.typeCounts.dependabot, color: "bg-amber-500",  textColor: "text-amber-400" },
-                                    { label: "Code Scan",  count: ghDashboardData.typeCounts.code_scan,  color: "bg-purple-500", textColor: "text-purple-400" },
-                                    { label: "Misconfig",  count: ghDashboardData.typeCounts.config,     color: "bg-orange-500", textColor: "text-orange-400" },
+                                    { label: "Secrets",   count: ghDashboardData.typeCounts.secret,    color: "bg-red-500",    textColor: "text-red-400" },
+                                    { label: "Code Scan", count: ghDashboardData.typeCounts.code_scan, color: "bg-purple-500", textColor: "text-purple-400" },
+                                    { label: "Misconfig", count: ghDashboardData.typeCounts.config,    color: "bg-orange-500", textColor: "text-orange-400" },
                                 ] as { label: string; count: number; color: string; textColor: string }[]).map(row => (
                                     <div key={row.label}>
                                         <div className="flex items-center justify-between text-xs mb-1.5">
@@ -773,10 +775,9 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                             <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Type</h3>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {([
-                                    { label: "Secrets",    count: ghDashboardData.typeCounts.secret,     color: "#ef4444", border: "border-red-500/20",    Icon: Key        },
-                                    { label: "Dependabot", count: ghDashboardData.typeCounts.dependabot, color: "#f59e0b", border: "border-amber-500/20",  Icon: Package    },
-                                    { label: "Code Scan",  count: ghDashboardData.typeCounts.code_scan,  color: "#a855f7", border: "border-purple-500/20", Icon: Code2      },
-                                    { label: "Misconfig",  count: ghDashboardData.typeCounts.config,     color: "#f97316", border: "border-orange-500/20", Icon: ShieldAlert },
+                                    { label: "Secrets",   count: ghDashboardData.typeCounts.secret,    color: "#ef4444", border: "border-red-500/20",    Icon: Key        },
+                                    { label: "Code Scan", count: ghDashboardData.typeCounts.code_scan, color: "#a855f7", border: "border-purple-500/20", Icon: Code2      },
+                                    { label: "Misconfig", count: ghDashboardData.typeCounts.config,    color: "#f97316", border: "border-orange-500/20", Icon: ShieldAlert },
                                 ] as { label: string; count: number; color: string; border: string; Icon: React.ComponentType<{ className?: string }> }[]).map((t, idx) => {
                                     const pct = stats.total > 0 ? (t.count / stats.total) * 100 : 0;
                                     const r = 22;
@@ -1090,7 +1091,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
 
                         {/* Type filter */}
                         <div className="flex items-center gap-1 bg-slate-900/60 border border-slate-800/60 rounded-xl p-1">
-                            {(["all", "secret", "dependabot", "code_scan", "config"] as const).map(t => (
+                            {(["all", "secret", "code_scan", "config"] as const).map(t => (
                                 <button
                                     key={t}
                                     onClick={() => setFilterType(t)}
@@ -1099,7 +1100,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                         filterType === t ? "bg-violet-600 text-white" : "text-slate-400 hover:text-slate-200"
                                     )}
                                 >
-                                    {t === "all" ? "All Types" : t === "code_scan" ? "Code Scan" : t === "config" ? "Misconfig" : t.charAt(0).toUpperCase() + t.slice(1)}
+                                    {t === "all" ? "All Types" : t === "code_scan" ? "Code Scan" : t === "config" ? "Misconfig" : "Secrets"}
                                 </button>
                             ))}
                         </div>

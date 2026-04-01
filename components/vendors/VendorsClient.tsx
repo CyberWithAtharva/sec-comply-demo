@@ -233,7 +233,7 @@ function VendorModal({ orgId, editing, onClose, onSaved }: VendorModalProps) {
 
                     <div>
                         <label className="block text-xs font-medium text-slate-400 mb-1.5">Website</label>
-                        <input type="url" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+                        <input type="text" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
                             placeholder="https://vendor.com" className={inputCls} />
                     </div>
 
@@ -473,17 +473,14 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                     { label: "High / Critical",  count: stats.highRisk,           color: stats.highRisk > 0 ? "text-red-400" : "text-slate-400" },
                     { label: "Tier 1",           count: stats.tier1,              color: "text-orange-400" },
                     { label: "Open Assessments", count: stats.pendingAssessments, color: stats.pendingAssessments > 0 ? "text-amber-400" : "text-slate-400" },
-                ].map((s, i) => (
-                    <motion.div
+                ].map((s) => (
+                    <div
                         key={s.label}
-                        initial={{ opacity: 0, y: 12 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: i * 0.07 }}
                         className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col"
                     >
                         <span className="text-[10px] text-slate-500 mb-1">{s.label}</span>
                         <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
-                    </motion.div>
+                    </div>
                 ))}
             </div>
 
