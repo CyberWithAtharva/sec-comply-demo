@@ -514,6 +514,7 @@ function buildIsoControls(
     artifacts: EvidenceArtifact[],
     policies: PolicySummary[],
     policyLinks: PolicyControlLink[],
+    statuses: ControlStatus[],
 ) {
     const controlByCode = new Map(controls.map((control) => [control.control_id, control]));
     const artifactsByControlId = new Map<string, EvidenceArtifact[]>();
@@ -534,7 +535,7 @@ function buildIsoControls(
 
     const policyById = new Map(policies.map((policy) => [policy.id, policy]));
 
-    return ISO_27001_VAULT_SEED.map((seed) => {
+    const seededControls = ISO_27001_VAULT_SEED.map((seed) => {
         const actual = controlByCode.get(seed.controlId);
         const linkedPolicies = (policyIdsByControlId.get(actual?.id ?? "") ?? [])
             .map((policyId) => policyById.get(policyId))
@@ -611,6 +612,12 @@ function buildIsoControls(
             auditTrail: buildAuditTrail(requirements),
         } satisfies VaultControl;
     });
+
+    const seededIds = new Set(seededControls.map((control) => control.control_id));
+    const remainingControls = controls.filter((control) => !seededIds.has(control.control_id));
+    const genericControls = buildGenericControls(framework, remainingControls, artifacts, policies, policyLinks, statuses);
+
+    return [...seededControls, ...genericControls].sort((left, right) => left.control_id.localeCompare(right.control_id));
 }
 
 function buildGenericControls(
@@ -638,7 +645,7 @@ function buildGenericControls(
     });
     const policyById = new Map(policies.map((policy) => [policy.id, policy]));
 
-    return controls.slice(0, 10).map((control) => {
+    return controls.map((control) => {
         const controlPolicies = (linkedPolicyIds.get(control.id) ?? [])
             .map((policyId) => policyById.get(policyId))
             .filter((policy): policy is PolicySummary => Boolean(policy));
@@ -715,7 +722,7 @@ function buildInitialControlState({
     return frameworks.reduce<Record<string, VaultControl[]>>((accumulator, framework) => {
         const frameworkControls = controls.filter((control) => control.framework_id === framework.id);
         accumulator[framework.id] = framework.name.toLowerCase().includes("iso")
-            ? buildIsoControls(framework, frameworkControls, artifacts, policies, policyLinks)
+            ? buildIsoControls(framework, frameworkControls, artifacts, policies, policyLinks, statuses)
             : buildGenericControls(framework, frameworkControls, artifacts, policies, policyLinks, statuses);
         return accumulator;
     }, {});

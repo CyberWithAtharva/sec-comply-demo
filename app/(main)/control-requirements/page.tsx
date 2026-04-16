@@ -59,58 +59,61 @@ export default async function ControlRequirementsPage() {
         (controlStatuses ?? []).map(s => [s.control_id, s])
     );
 
-    // Build per-domain stats
-    const domainMap = new Map<string, { total: number; fulfilled: number; label: string }>();
-    let totalControls = 0;
-    let fulfilledControls = 0;
-    let autoFulfilled = 0;
-    let criticalPending = 0;
-    let notStarted = 0;
-    let evidencePending = 0;
-
-    for (const control of controls ?? []) {
-        const cs = statusMap.get(control.id);
-        const domain = control.domain ?? "General";
-        if (!domainMap.has(domain)) domainMap.set(domain, { total: 0, fulfilled: 0, label: domain });
-        const d = domainMap.get(domain)!;
-        d.total++;
-        totalControls++;
-
-        if (cs?.status === "verified" || cs?.status === "not_applicable") {
-            fulfilledControls++;
-            d.fulfilled++;
-            if (cs.status === "not_applicable") autoFulfilled++;
-        } else if (!cs || cs.status === "not_started") {
-            notStarted++;
-        } else if (cs.status === "in_progress") {
-            if ((cs.evidence_count ?? 0) === 0) evidencePending++;
-            else criticalPending++;
-        } else {
-            criticalPending++;
-        }
-    }
-
-    const overallScore = totalControls > 0 ? Math.round((fulfilledControls / totalControls) * 100) : 0;
-
     const frameworkList = orgFrameworks.map(of => {
         const fw = of.frameworks as { id: string; name: string; version: string; controls_count: number } | null;
         return { id: of.framework_id, name: fw?.name ?? "Unknown", version: fw?.version ?? "" };
     });
 
-    const domainSections = Array.from(domainMap.values()).sort((a, b) => b.total - a.total);
+    const frameworkStats = frameworkList.map((framework) => {
+        const frameworkControls = (controls ?? []).filter((control) => control.framework_id === framework.id);
+        const domainMap = new Map<string, { total: number; fulfilled: number; label: string }>();
+        let totalControls = 0;
+        let fulfilledControls = 0;
+        let autoFulfilled = 0;
+        let criticalPending = 0;
+        let notStarted = 0;
+        let evidencePending = 0;
+
+        for (const control of frameworkControls) {
+            const cs = statusMap.get(control.id);
+            const domain = control.domain ?? "General";
+            if (!domainMap.has(domain)) domainMap.set(domain, { total: 0, fulfilled: 0, label: domain });
+            const domainEntry = domainMap.get(domain)!;
+            domainEntry.total++;
+            totalControls++;
+
+            if (cs?.status === "verified" || cs?.status === "not_applicable") {
+                fulfilledControls++;
+                domainEntry.fulfilled++;
+                if (cs.status === "not_applicable") autoFulfilled++;
+            } else if (!cs || cs.status === "not_started") {
+                notStarted++;
+            } else if (cs.status === "in_progress") {
+                if ((cs.evidence_count ?? 0) === 0) evidencePending++;
+                else criticalPending++;
+            } else {
+                criticalPending++;
+            }
+        }
+
+        return {
+            frameworkId: framework.id,
+            totalControls,
+            fulfilledControls,
+            overallScore: totalControls > 0 ? Math.round((fulfilledControls / totalControls) * 100) : 0,
+            autoFulfilled,
+            criticalPending,
+            notStarted,
+            evidencePending,
+            domainSections: Array.from(domainMap.values()).sort((a, b) => b.total - a.total),
+        };
+    });
 
     return (
         <ControlRequirementsClient
             orgId={orgId}
-            totalControls={totalControls}
-            fulfilledControls={fulfilledControls}
-            overallScore={overallScore}
-            autoFulfilled={autoFulfilled}
-            criticalPending={criticalPending}
-            notStarted={notStarted}
-            evidencePending={evidencePending}
             frameworks={frameworkList}
-            domainSections={domainSections}
+            frameworkStats={frameworkStats}
         />
     );
 }

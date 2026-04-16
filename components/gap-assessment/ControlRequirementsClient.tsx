@@ -19,8 +19,8 @@ interface Framework {
     version: string;
 }
 
-interface ControlRequirementsClientProps {
-    orgId: string;
+interface FrameworkStat {
+    frameworkId: string;
     totalControls: number;
     fulfilledControls: number;
     overallScore: number;
@@ -28,25 +28,36 @@ interface ControlRequirementsClientProps {
     criticalPending: number;
     notStarted: number;
     evidencePending: number;
-    frameworks: Framework[];
     domainSections: DomainSection[];
+}
+
+interface ControlRequirementsClientProps {
+    orgId: string;
+    frameworks: Framework[];
+    frameworkStats: FrameworkStat[];
 }
 
 const TABS = ["Overview", "Questions", "All Controls"] as const;
 
 export function ControlRequirementsClient({
-    totalControls,
-    fulfilledControls,
-    overallScore,
-    autoFulfilled,
-    criticalPending,
-    notStarted,
-    evidencePending,
     frameworks,
-    domainSections,
+    frameworkStats,
 }: ControlRequirementsClientProps) {
     const [activeTab, setActiveTab] = useState<typeof TABS[number]>("Overview");
+    const [activeFrameworkId, setActiveFrameworkId] = useState(frameworks[0]?.id ?? "");
     const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set());
+
+    const activeFramework = frameworks.find((framework) => framework.id === activeFrameworkId) ?? frameworks[0];
+    const activeStats = frameworkStats.find((stat) => stat.frameworkId === activeFramework?.id);
+
+    const totalControls = activeStats?.totalControls ?? 0;
+    const fulfilledControls = activeStats?.fulfilledControls ?? 0;
+    const overallScore = activeStats?.overallScore ?? 0;
+    const autoFulfilled = activeStats?.autoFulfilled ?? 0;
+    const criticalPending = activeStats?.criticalPending ?? 0;
+    const notStarted = activeStats?.notStarted ?? 0;
+    const evidencePending = activeStats?.evidencePending ?? 0;
+    const domainSections = activeStats?.domainSections ?? [];
 
     const toggleDomain = (label: string) => {
         setExpandedDomains(prev => {
@@ -94,6 +105,25 @@ export function ControlRequirementsClient({
                 ))}
             </div>
 
+            {frameworks.length > 1 && (
+                <div className="flex flex-wrap items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-fit">
+                    {frameworks.map((framework) => (
+                        <button
+                            key={framework.id}
+                            onClick={() => setActiveFrameworkId(framework.id)}
+                            className={cn(
+                                "px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                                framework.id === activeFrameworkId
+                                    ? "bg-orange-600 text-white shadow-sm"
+                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                            )}
+                        >
+                            {framework.name} {framework.version ? `v${framework.version}` : ""}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {activeTab === "Overview" && (
                 <div className="space-y-5">
                     {/* Overall compliance hero card */}
@@ -122,6 +152,11 @@ export function ControlRequirementsClient({
                                 <p className="text-2xl font-bold text-white mb-1">
                                     {fulfilledControls} of {totalControls} controls fulfilled
                                 </p>
+                                {activeFramework && (
+                                    <p className="text-sm text-slate-500">
+                                        {activeFramework.name} {activeFramework.version ? `v${activeFramework.version}` : ""}
+                                    </p>
+                                )}
                                 <div className="flex flex-wrap gap-3 mt-3">
                                     <span className="flex items-center gap-1.5 text-xs text-red-400">
                                         <span className="w-2 h-2 rounded-full bg-red-500" />
@@ -249,7 +284,9 @@ export function ControlRequirementsClient({
             {activeTab === "All Controls" && (
                 <div className="flex flex-col items-center justify-center py-24 text-center">
                     <Layers className="w-12 h-12 text-slate-700 mb-4" />
-                    <p className="text-slate-300 font-medium">All {totalControls} controls</p>
+                    <p className="text-slate-300 font-medium">
+                        All {totalControls} controls{activeFramework ? ` in ${activeFramework.name}` : ""}
+                    </p>
                     <p className="text-slate-500 text-sm mt-1">Full control list view coming soon</p>
                 </div>
             )}
