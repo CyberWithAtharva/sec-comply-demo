@@ -24,7 +24,7 @@ interface EvidenceTabProps {
     evidenceCount?: number;
 }
 
-export function EvidenceTab({ frameworkId: _frameworkId, controls = [], evidenceCount = 0 }: EvidenceTabProps) {
+export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabProps) {
     // Derive evidence coverage from control statuses
     const verified = controls.filter(c => c.status === "verified").length;
     const inProgress = controls.filter(c => c.status === "in_progress").length;
@@ -89,7 +89,7 @@ export function EvidenceTab({ frameworkId: _frameworkId, controls = [], evidence
             {/* ─── Upload + Vault Link Row ─── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Upload CTA */}
-                <Link href="/evidence" className="glass-panel border-dashed border-2 border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800/20 p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all group min-h-[120px]">
+                <Link href="/evidences" className="glass-panel border-dashed border-2 border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800/20 p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all group min-h-[120px]">
                     <div className="p-3 bg-slate-800/50 rounded-full group-hover:scale-110 group-hover:bg-blue-500/10 transition-all mb-3">
                         <UploadCloud className="w-6 h-6 text-slate-400 group-hover:text-blue-400" />
                     </div>
@@ -98,7 +98,7 @@ export function EvidenceTab({ frameworkId: _frameworkId, controls = [], evidence
                 </Link>
 
                 {/* Evidence Vault link */}
-                <Link href="/evidence" className="glass-panel p-6 rounded-2xl border border-slate-800/50 hover:border-blue-500/30 transition-all group flex flex-col justify-between min-h-[120px]">
+                <Link href="/evidences" className="glass-panel p-6 rounded-2xl border border-slate-800/50 hover:border-blue-500/30 transition-all group flex flex-col justify-between min-h-[120px]">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-blue-400" />
@@ -155,7 +155,7 @@ export function EvidenceTab({ frameworkId: _frameworkId, controls = [], evidence
                     </div>
                     {notStarted > 10 && (
                         <div className="mt-3 pt-3 border-t border-slate-800/50">
-                            <Link href="/evidence" className="text-xs text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1">
+                            <Link href="/evidences" className="text-xs text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1">
                                 View all {notStarted} controls needing evidence in Evidence Vault <ArrowRight className="w-3 h-3" />
                             </Link>
                         </div>
@@ -208,7 +208,7 @@ export function EvidenceTab({ frameworkId: _frameworkId, controls = [], evidence
                     <p className="text-slate-500 text-sm">
                         {evidenceCount} artifact{evidenceCount !== 1 ? "s" : ""} collected across {total} controls.
                     </p>
-                    <Link href="/evidence" className="mt-4 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
+                    <Link href="/evidences" className="mt-4 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">
                         Manage in Evidence Vault <ArrowRight className="w-3 h-3" />
                     </Link>
                 </div>

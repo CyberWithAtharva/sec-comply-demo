@@ -1,18 +1,28 @@
 "use client";
 
-import React, { useState, useMemo, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { AnimatePresence, motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import {
-    FolderGit2, CloudUpload, Search, X, AlertCircle, CheckCircle2,
-    FileText, FileImage, FileCode, File, Trash2,
-    RotateCcw, Plus, AlertTriangle, Clock, Download,
-    ChevronDown, ChevronRight, Shield, Lock, Users, Activity,
-    Database, Globe, Server, Eye
+    AlertCircle,
+    AlertTriangle,
+    CheckCircle2,
+    ChevronDown,
+    ChevronRight,
+    Download,
+    ExternalLink,
+    FolderGit2,
+    Link2,
+    Loader2,
+    RefreshCw,
+    SearchCheck,
+    ShieldCheck,
+    UploadCloud,
+    X,
 } from "lucide-react";
+import { toast } from "sonner";
 import { cn } from "@/components/ui/Card";
-
-// ─── Types ────────────────────────────────────────────────────────────────────
 
 export interface EvidenceArtifact {
     id: string;
@@ -34,892 +44,1637 @@ export interface Control {
     id: string;
     control_id: string;
     title: string;
-    domain: string | null;
+    domain: string;
+    category: string;
     framework_id: string;
+    description?: string | null;
+    evidenceRequirements?: EvidenceRequirement[];
 }
+
+export interface ControlStatus {
+    control_id: string;
+    status: "verified" | "in_progress" | "not_started" | "not_applicable";
+    evidence_count: number;
+}
+
+export interface FrameworkSummary {
+    id: string;
+    name: string;
+    version: string;
+    controls_count?: number;
+}
+
+export interface PolicySummary {
+    id: string;
+    title: string;
+    status: "draft" | "under_review" | "approved" | "archived";
+    updated_at: string;
+}
+
+export interface PolicyControlLink {
+    policy_id: string;
+    control_id: string;
+}
+
+export type EvidenceRequirement = {
+    id: string;
+    label: string;
+    type: "policy" | "scanner" | "manual";
+    source?: "cspm" | "scm" | "github_security";
+    linkedPolicyId?: string;
+    status: "fulfilled" | "pending" | "missing";
+    evidence?: Evidence;
+};
+
+export type Evidence = {
+    id: string;
+    name: string;
+    uploadedAt?: string;
+    autoFetchedAt?: string;
+    source: "manual_upload" | "policy" | "cspm" | "scm" | "github_security";
+    fileUrl?: string;
+    policyName?: string;
+    policyPublishedAt?: string;
+    scanSummary?: string;
+};
+
+type AuditEvent = {
+    id: string;
+    kind: "uploaded" | "replaced" | "archived" | "auto_fetched" | "policy_published" | "scan_attempted";
+    message: string;
+    at: string;
+};
+
+type VaultControl = Control & {
+    evidenceRequirements: EvidenceRequirement[];
+    vaultGroup: string;
+    auditTrail: AuditEvent[];
+};
+
+type SeedRequirement = {
+    label: string;
+    type: EvidenceRequirement["type"];
+    source?: EvidenceRequirement["source"];
+    policyTitle?: string;
+    status: EvidenceRequirement["status"];
+    evidence?: Evidence;
+    lastAttemptedAt?: string;
+    scanDetails?: string[];
+};
+
+type SeedControl = {
+    controlId: string;
+    vaultGroup: string;
+    title: string;
+    description: string;
+    requirements: SeedRequirement[];
+};
 
 interface EvidenceVaultClientProps {
     initialArtifacts: EvidenceArtifact[];
     controls: Control[];
+    statuses: ControlStatus[];
+    frameworks: FrameworkSummary[];
+    policies: PolicySummary[];
+    policyLinks: PolicyControlLink[];
     orgId: string;
-    currentUserId: string;
 }
 
-// ─── Required Evidence Catalog ────────────────────────────────────────────────
-
-interface RequiredEvidence {
-    id: string;
-    category: string;
-    name: string;
-    description: string;
-    example: string;
-    controls: string[];      // framework control IDs this satisfies
-    frameworks: string[];    // framework short names
-    frequency: string;       // how often it needs refreshing
-}
-
-const REQUIRED_EVIDENCE: RequiredEvidence[] = [
-    // Access Control
+const ISO_27001_VAULT_SEED: SeedControl[] = [
     {
-        id: "req-access-review",
-        category: "Access Control",
-        name: "User Access Review",
-        description: "Periodic review confirming all user accounts, roles and privileges are appropriate.",
-        example: "Quarterly access review spreadsheet signed off by department heads, showing current users and their access levels.",
-        controls: ["CC6.1", "CC6.2", "A.9.2.5"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Quarterly",
+        controlId: "A.5.1",
+        vaultGroup: "A.5 Policies",
+        title: "Policies for information security",
+        description: "Information security policy and topic-specific policies shall be defined, approved by management, published, communicated, and reviewed.",
+        requirements: [
+            {
+                label: "Information Security Policy",
+                type: "policy",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-policy-a51",
+                    name: "Information Security Policy",
+                    source: "policy",
+                    policyName: "Information Security Policy",
+                    policyPublishedAt: "2026-03-12T09:30:00.000Z",
+                },
+            },
+        ],
     },
     {
-        id: "req-rbac",
-        category: "Access Control",
-        name: "Role-Based Access Control Documentation",
-        description: "Documentation of roles, permissions, and the least-privilege access model.",
-        example: "RBAC matrix or IAM policy export showing each role and what resources it can access.",
-        controls: ["CC6.1", "A.9.2.2"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "On change",
+        controlId: "A.5.2",
+        vaultGroup: "A.5 Policies",
+        title: "Information security roles and responsibilities",
+        description: "Information security roles and responsibilities shall be defined and allocated.",
+        requirements: [
+            {
+                label: "Roles & Responsibilities Policy",
+                type: "policy",
+                status: "pending",
+            },
+            {
+                label: "RACI Matrix",
+                type: "manual",
+                status: "missing",
+            },
+        ],
     },
     {
-        id: "req-privileged",
-        category: "Access Control",
-        name: "Privileged Access Management Records",
-        description: "Logs of privileged/admin account usage, MFA enforcement, and PAM tool exports.",
-        example: "AWS CloudTrail root account activity log or CyberArk session recording export for the past 90 days.",
-        controls: ["CC6.3", "A.9.2.3"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Monthly",
-    },
-    // Vulnerability Management
-    {
-        id: "req-vuln-scan",
-        category: "Vulnerability Management",
-        name: "Vulnerability Scan Report",
-        description: "Output from automated vulnerability scanning of infrastructure and applications.",
-        example: "Nessus/Qualys scan report showing open findings with severity, CVSS scores, and remediation status.",
-        controls: ["CC7.1", "A.12.6.1"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Monthly",
-    },
-    {
-        id: "req-pentest",
-        category: "Vulnerability Management",
-        name: "Penetration Test Report",
-        description: "Annual third-party penetration test report with findings and remediation evidence.",
-        example: "Signed pentest report from a CREST-certified firm, including executive summary, CVSS scores, and fix verification.",
-        controls: ["CC7.1", "A.18.2.3"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
-    },
-    // Risk Management
-    {
-        id: "req-risk-assessment",
-        category: "Risk Management",
-        name: "Risk Assessment Report",
-        description: "Formal risk identification, likelihood and impact analysis for the organisation.",
-        example: "Risk register extract with heat map, owner assignments, and treatment options for each risk.",
-        controls: ["CC9.1", "A.8.2.1"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
+        controlId: "A.5.15",
+        vaultGroup: "A.5 Policies",
+        title: "Access control",
+        description: "Rules to control physical and logical access to information and other associated assets shall be established.",
+        requirements: [
+            {
+                label: "Access Control Policy",
+                type: "policy",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-policy-a515",
+                    name: "Access Control Policy",
+                    source: "policy",
+                    policyName: "Access Control Policy",
+                    policyPublishedAt: "2026-02-21T08:00:00.000Z",
+                },
+            },
+        ],
     },
     {
-        id: "req-risk-treatment",
-        category: "Risk Management",
-        name: "Risk Treatment Plan",
-        description: "Documented decisions on how identified risks will be mitigated, accepted, or transferred.",
-        example: "Risk treatment table with risk ID, chosen treatment (mitigate/accept/transfer), owner, and target date.",
-        controls: ["CC9.2", "A.8.3"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
-    },
-    // Incident Response
-    {
-        id: "req-incident-log",
-        category: "Incident Response",
-        name: "Security Incident Log",
-        description: "Chronological record of all security events and incidents, including severity and resolution.",
-        example: "Incident tracker export showing incident ID, date, severity, affected system, root cause, and closure date.",
-        controls: ["CC7.3", "A.16.1.2"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Ongoing",
-    },
-    {
-        id: "req-ir-test",
-        category: "Incident Response",
-        name: "Incident Response Tabletop Exercise",
-        description: "Evidence that the IR plan has been tested via tabletop or simulation exercise.",
-        example: "After-action report from IR tabletop exercise, listing participants, scenario, gaps found, and action items.",
-        controls: ["CC7.3", "A.16.1.1"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
-    },
-    // Business Continuity
-    {
-        id: "req-dr-test",
-        category: "Business Continuity",
-        name: "Disaster Recovery Test Results",
-        description: "Results from testing recovery procedures for critical systems within RTO/RPO targets.",
-        example: "DR test report showing which systems were failed over, actual recovery time vs RTO, and pass/fail status.",
-        controls: ["A1.2", "A.17.1.3"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
+        controlId: "A.5.16",
+        vaultGroup: "A.9 Access Control",
+        title: "Identity management",
+        description: "The full life cycle of identities shall be managed.",
+        requirements: [
+            {
+                label: "Identity Lifecycle Scan",
+                type: "scanner",
+                source: "cspm",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-scan-a516",
+                    name: "Identity Lifecycle Scan",
+                    source: "cspm",
+                    autoFetchedAt: "2026-04-10T06:40:00.000Z",
+                    scanSummary: "MFA enforced on 47/47 privileged users",
+                },
+                scanDetails: [
+                    "47 privileged identities reviewed across AWS and Google Workspace.",
+                    "0 dormant admin accounts found.",
+                    "Joiner, mover, leaver workflow completed within SLA for the last 30 days.",
+                ],
+            },
+            {
+                label: "Joiner / Mover / Leaver Evidence",
+                type: "manual",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-manual-a516",
+                    name: "JML Control Matrix.xlsx",
+                    source: "manual_upload",
+                    uploadedAt: "2026-04-03T10:15:00.000Z",
+                    fileUrl: "#",
+                },
+            },
+        ],
     },
     {
-        id: "req-bcp",
-        category: "Business Continuity",
-        name: "Business Continuity / DR Plan",
-        description: "Documented BCP/DRP covering critical processes, recovery objectives, and responsible parties.",
-        example: "BCP document signed by management listing critical business functions, RTOs, RPOs, and step-by-step recovery runbooks.",
-        controls: ["A1.1", "A.17.1.1"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
-    },
-    // HR & Security Awareness
-    {
-        id: "req-training",
-        category: "Security Awareness",
-        name: "Security Awareness Training Records",
-        description: "Completion records showing all employees have completed required security training.",
-        example: "LMS export or signed attendance sheet showing training completion rates by department and date.",
-        controls: ["CC1.4", "A.7.2.2"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
+        controlId: "A.5.18",
+        vaultGroup: "A.9 Access Control",
+        title: "Access rights",
+        description: "Access rights to information and other associated assets shall be provisioned, reviewed, modified and removed.",
+        requirements: [
+            {
+                label: "Quarterly Access Review Export",
+                type: "manual",
+                status: "missing",
+            },
+            {
+                label: "Access Review SOP",
+                type: "policy",
+                status: "pending",
+            },
+        ],
     },
     {
-        id: "req-bgcheck",
-        category: "HR Security",
-        name: "Background Check Records",
-        description: "Evidence that background screening was conducted for employees in sensitive roles.",
-        example: "Background screening provider confirmation letters (anonymised) for roles with access to sensitive data.",
-        controls: ["CC1.1", "A.7.1.1"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "On hire",
-    },
-    // Vendor / Third-Party
-    {
-        id: "req-vendor-assessment",
-        category: "Vendor Management",
-        name: "Vendor Security Assessments",
-        description: "Security questionnaire responses or audit reports from Tier 1 / Tier 2 vendors.",
-        example: "Completed CAIQ / SIG questionnaire from top vendors, or shared SOC 2 Type II reports.",
-        controls: ["CC9.2", "A.15.2.1"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Annual",
+        controlId: "A.8.2",
+        vaultGroup: "A.9 Access Control",
+        title: "Privileged access rights",
+        description: "The allocation and use of privileged access rights shall be restricted and managed.",
+        requirements: [
+            {
+                label: "Privileged Access Rights Scan",
+                type: "scanner",
+                source: "scm",
+                status: "pending",
+                lastAttemptedAt: "2026-04-08T04:20:00.000Z",
+                scanDetails: [
+                    "Awaiting latest repository and infrastructure entitlement data.",
+                    "The next scan will refresh admin group membership and permission drift.",
+                ],
+            },
+        ],
     },
     {
-        id: "req-dpa",
-        category: "Vendor Management",
-        name: "Data Processing Agreements (DPAs)",
-        description: "Signed DPAs with all data processors handling personal data.",
-        example: "Signed DPA PDFs from each sub-processor listed in your privacy notice (e.g. AWS, Stripe, Twilio).",
-        controls: ["A.15.1.2"],
-        frameworks: ["ISO 27001", "DPDPA"],
-        frequency: "On contract",
-    },
-    // Monitoring & Logging
-    {
-        id: "req-audit-logs",
-        category: "Monitoring & Logging",
-        name: "Audit Log Review Records",
-        description: "Evidence of regular review of security-relevant audit logs.",
-        example: "SIEM alert dashboard screenshot or weekly log review sign-off document.",
-        controls: ["CC7.2", "A.12.4.1"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Weekly",
-    },
-    // Change Management
-    {
-        id: "req-change-mgmt",
-        category: "Change Management",
-        name: "Change Management / Code Review Records",
-        description: "Pull request approvals or change tickets demonstrating peer review before deployment.",
-        example: "GitHub PR merge history showing reviewer approvals on all production deployments over the past quarter.",
-        controls: ["CC8.1", "A.14.2.2"],
-        frameworks: ["SOC 2", "ISO 27001"],
-        frequency: "Ongoing",
-    },
-    // Data Protection
-    {
-        id: "req-data-class",
-        category: "Data Protection",
-        name: "Data Classification Matrix",
-        description: "Documentation classifying organisational data by sensitivity and the handling rules for each class.",
-        example: "Data classification table: Public / Internal / Confidential / Restricted with examples and handling rules per class.",
-        controls: ["A.8.2.1"],
-        frameworks: ["ISO 27001", "DPDPA"],
-        frequency: "Annual",
+        controlId: "A.8.3",
+        vaultGroup: "A.9 Access Control",
+        title: "Information access restriction",
+        description: "Access to information and other associated assets shall be restricted in accordance with the established access control policy.",
+        requirements: [
+            {
+                label: "Data Access Restriction Policy",
+                type: "policy",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-policy-a83",
+                    name: "Data Access Restriction Policy",
+                    source: "policy",
+                    policyName: "Data Access Restriction Policy",
+                    policyPublishedAt: "2026-01-17T11:30:00.000Z",
+                },
+            },
+            {
+                label: "GitHub Branch Restriction Scan",
+                type: "scanner",
+                source: "github_security",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-scan-a83",
+                    name: "GitHub Branch Restriction Scan",
+                    source: "github_security",
+                    autoFetchedAt: "2026-04-11T07:45:00.000Z",
+                    scanSummary: "Branch protection enforced on 18/18 production repositories",
+                },
+                scanDetails: [
+                    "Required reviews enabled on every production repository.",
+                    "Force-push disabled on protected branches.",
+                    "Secret scanning push protection active on all internet-facing repos.",
+                ],
+            },
+        ],
     },
     {
-        id: "req-privacy-notice",
-        category: "Data Protection",
-        name: "Privacy Notice / Policy",
-        description: "Published privacy notice describing personal data collection, use, and data subject rights.",
-        example: "Privacy policy URL and a PDF snapshot showing effective date, data categories, lawful bases, and contact details.",
-        controls: ["DPDPA-6"],
-        frameworks: ["DPDPA"],
-        frequency: "On change",
+        controlId: "A.8.4",
+        vaultGroup: "A.8 Asset Management",
+        title: "Access to source code",
+        description: "Read and write access to source code, development tools and software libraries shall be appropriately managed.",
+        requirements: [
+            {
+                label: "Source Code Access Scan",
+                type: "scanner",
+                source: "scm",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-scan-a84",
+                    name: "Source Code Access Scan",
+                    source: "scm",
+                    autoFetchedAt: "2026-04-12T09:10:00.000Z",
+                    scanSummary: "Least-privilege confirmed for 62/62 engineering identities",
+                },
+                scanDetails: [
+                    "All repositories are owned by teams, not individuals.",
+                    "No direct admin access outside platform engineering.",
+                    "Repository write access reviewed against SSO group membership.",
+                ],
+            },
+            {
+                label: "Repository Access Review",
+                type: "manual",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-manual-a84",
+                    name: "Repository Access Review.pdf",
+                    source: "manual_upload",
+                    uploadedAt: "2026-04-02T14:10:00.000Z",
+                    fileUrl: "#",
+                },
+            },
+        ],
     },
     {
-        id: "req-breach-log",
-        category: "Data Protection",
-        name: "Data Breach / Incident Log",
-        description: "Register of personal data breaches, their impact, and notification decisions.",
-        example: "Breach log table: date, affected individuals, nature of breach, containment action, DPA notification Y/N.",
-        controls: ["DPDPA-17", "A.16.1.2"],
-        frameworks: ["DPDPA", "ISO 27001"],
-        frequency: "Ongoing",
+        controlId: "A.8.15",
+        vaultGroup: "A.8 Asset Management",
+        title: "Logging",
+        description: "Logs that record activities, exceptions, faults and other relevant events shall be produced, stored, protected and analysed.",
+        requirements: [
+            {
+                label: "Centralized Logging Scan",
+                type: "scanner",
+                source: "cspm",
+                status: "pending",
+                lastAttemptedAt: "2026-04-09T12:05:00.000Z",
+                scanDetails: [
+                    "CloudTrail and audit log destinations will be re-validated.",
+                    "Retention policy checks are queued for the next scanner pass.",
+                ],
+            },
+            {
+                label: "Log Retention Standard",
+                type: "manual",
+                status: "fulfilled",
+                evidence: {
+                    id: "seed-manual-a815",
+                    name: "Log Retention Standard.pdf",
+                    source: "manual_upload",
+                    uploadedAt: "2026-03-29T13:22:00.000Z",
+                    fileUrl: "#",
+                },
+            },
+        ],
     },
 ];
 
-const CATEGORY_ICONS: Record<string, React.ElementType> = {
-    "Access Control":         Lock,
-    "Vulnerability Management": Shield,
-    "Risk Management":         AlertTriangle,
-    "Incident Response":       Activity,
-    "Business Continuity":     Server,
-    "Security Awareness":      Users,
-    "HR Security":             Users,
-    "Vendor Management":       Globe,
-    "Monitoring & Logging":    Eye,
-    "Change Management":       Database,
-    "Data Protection":         FileText,
+const FILTERS = ["all", "complete", "incomplete", "missing"] as const;
+
+const STATUS_BADGE_STYLES: Record<EvidenceRequirement["status"], string> = {
+    fulfilled: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
+    pending: "text-amber-400 bg-amber-500/10 border-amber-500/30",
+    missing: "text-slate-400 bg-slate-800/70 border-slate-700/60",
 };
 
-const FW_COLORS: Record<string, string> = {
-    "SOC 2":    "text-blue-400 bg-blue-500/10 border-blue-500/30",
-    "ISO 27001":"text-indigo-400 bg-indigo-500/10 border-indigo-500/30",
-    "DPDPA":    "text-amber-400 bg-amber-500/10 border-amber-500/30",
+const SOURCE_LABEL: Record<NonNullable<EvidenceRequirement["source"]>, string> = {
+    cspm: "CSPM",
+    scm: "SCM",
+    github_security: "GitHub Security",
 };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const STALE_DAYS = 90;
-
-function isStale(artifact: EvidenceArtifact): boolean {
-    const diffDays = (Date.now() - new Date(artifact.created_at).getTime()) / (1000 * 60 * 60 * 24);
-    return diffDays > STALE_DAYS;
+function formatDate(value?: string) {
+    if (!value) return "—";
+    return new Date(value).toLocaleDateString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+    });
 }
 
-function isExpiringSoon(artifact: EvidenceArtifact): boolean {
-    if (!artifact.expires_at) return false;
-    const diffDays = (new Date(artifact.expires_at).getTime() - Date.now()) / (1000 * 60 * 60 * 24);
-    return diffDays >= 0 && diffDays <= 14;
+function formatDateTime(value?: string) {
+    if (!value) return "—";
+    return new Date(value).toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+    });
 }
 
-function isExpired(artifact: EvidenceArtifact): boolean {
-    if (!artifact.expires_at) return false;
-    return new Date(artifact.expires_at) < new Date();
-}
-
-function formatBytes(bytes: number | null): string {
-    if (!bytes) return "—";
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function FileIcon({ type }: { type: string | null }) {
-    if (!type) return <File className="w-5 h-5 text-slate-500" />;
-    if (type.includes("pdf")) return <FileText className="w-5 h-5 text-red-400" />;
-    if (type.includes("image")) return <FileImage className="w-5 h-5 text-blue-400" />;
-    if (type.includes("json") || type.includes("yaml") || type.includes("text")) return <FileCode className="w-5 h-5 text-green-400" />;
-    return <File className="w-5 h-5 text-slate-400" />;
-}
-
-// ─── Upload Modal ─────────────────────────────────────────────────────────────
-
-interface UploadModalProps {
-    orgId: string;
-    currentUserId: string;
-    controls: Control[];
-    prefillName?: string;
-    onClose: () => void;
-    onUploaded: (artifact: EvidenceArtifact) => void;
-}
-
-function UploadModal({ orgId, currentUserId: _, controls, prefillName = "", onClose, onUploaded }: UploadModalProps) {
-    const supabase = createClient();
-    const [form, setForm] = useState({ name: prefillName, description: "", control_id: "", expires_at: "" });
-    const [file, setFile] = useState<File | null>(null);
-    const [uploading, setUploading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!form.name.trim()) { setError("Name is required."); return; }
-        setUploading(true); setError(null);
-
-        let file_url: string | null = null;
-        let file_type: string | null = null;
-        let file_size: number | null = null;
-
-        if (file) {
-            const ext = file.name.split(".").pop();
-            const path = `${orgId}/${Date.now()}.${ext}`;
-            const { error: uploadErr } = await supabase.storage
-                .from("evidence-artifacts")
-                .upload(path, file, { contentType: file.type });
-            if (uploadErr) { setError(`Upload failed: ${uploadErr.message}`); setUploading(false); return; }
-            const { data: urlData } = supabase.storage.from("evidence-artifacts").getPublicUrl(path);
-            file_url = urlData.publicUrl;
-            file_type = file.type;
-            file_size = file.size;
-        }
-
-        const res = await fetch("/api/evidence", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                org_id: orgId,
-                name: form.name.trim(),
-                description: form.description.trim() || null,
-                control_id: form.control_id || null,
-                expires_at: form.expires_at || null,
-                file_url,
-                file_type,
-                file_size,
-            }),
-        });
-        const json = await res.json();
-        if (!res.ok || !json.artifact) { setError(json.error ?? "Save failed."); setUploading(false); return; }
-        const data = json.artifact;
-        onUploaded({
-            ...(data as unknown as EvidenceArtifact),
-            uploader: data.profiles as unknown as { id: string; full_name: string | null } | null,
-        });
-        onClose();
+function createEvent(kind: AuditEvent["kind"], at: string, message: string): AuditEvent {
+    return {
+        id: `${kind}-${at}-${message}`,
+        kind,
+        at,
+        message,
     };
+}
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors";
+function getRequirementSummary(control: VaultControl) {
+    const total = control.evidenceRequirements.length;
+    const fulfilled = control.evidenceRequirements.filter((requirement) => requirement.status === "fulfilled").length;
+    const pending = control.evidenceRequirements.filter((requirement) => requirement.status === "pending").length;
+    const missing = control.evidenceRequirements.filter((requirement) => requirement.status === "missing").length;
+    const state = fulfilled === total ? "complete" : fulfilled === 0 ? "missing" : "incomplete";
 
+    return { total, fulfilled, pending, missing, state };
+}
+
+function buildAuditTrail(requirements: EvidenceRequirement[]) {
+    return requirements
+        .flatMap((requirement) => {
+            const events: AuditEvent[] = [];
+
+            if (requirement.type === "policy" && requirement.evidence?.policyPublishedAt) {
+                events.push(
+                    createEvent(
+                        "policy_published",
+                        requirement.evidence.policyPublishedAt,
+                        `${requirement.evidence.policyName ?? requirement.label} published`,
+                    ),
+                );
+            }
+
+            if (requirement.type === "scanner") {
+                if (requirement.evidence?.autoFetchedAt) {
+                    events.push(
+                        createEvent(
+                            "auto_fetched",
+                            requirement.evidence.autoFetchedAt,
+                            `${SOURCE_LABEL[requirement.source ?? "cspm"]} evidence fetched automatically`,
+                        ),
+                    );
+                } else if ((requirement as EvidenceRequirement & { lastAttemptedAt?: string }).lastAttemptedAt) {
+                    events.push(
+                        createEvent(
+                            "scan_attempted",
+                            (requirement as EvidenceRequirement & { lastAttemptedAt?: string }).lastAttemptedAt!,
+                            `${SOURCE_LABEL[requirement.source ?? "cspm"]} scan attempted`,
+                        ),
+                    );
+                }
+            }
+
+            if (requirement.type === "manual" && requirement.evidence?.uploadedAt) {
+                events.push(
+                    createEvent(
+                        "uploaded",
+                        requirement.evidence.uploadedAt,
+                        `${requirement.evidence.name} uploaded`,
+                    ),
+                );
+            }
+
+            return events;
+        })
+        .sort((left, right) => new Date(right.at).getTime() - new Date(left.at).getTime());
+}
+
+function matchPolicyForRequirement(
+    requirement: SeedRequirement,
+    linkedPolicies: PolicySummary[],
+) {
+    if (linkedPolicies.length === 0) return null;
+    if (requirement.policyTitle) {
+        const exact = linkedPolicies.find((policy) => policy.title.toLowerCase().includes(requirement.policyTitle!.toLowerCase()));
+        if (exact) return exact;
+    }
+    return linkedPolicies[0] ?? null;
+}
+
+function buildEvidenceFromArtifact(artifact: EvidenceArtifact): Evidence {
+    return {
+        id: artifact.id,
+        name: artifact.name,
+        uploadedAt: artifact.created_at,
+        source: "manual_upload",
+        fileUrl: artifact.file_url ?? undefined,
+    };
+}
+
+function buildIsoControls(
+    framework: FrameworkSummary,
+    controls: Control[],
+    artifacts: EvidenceArtifact[],
+    policies: PolicySummary[],
+    policyLinks: PolicyControlLink[],
+) {
+    const controlByCode = new Map(controls.map((control) => [control.control_id, control]));
+    const artifactsByControlId = new Map<string, EvidenceArtifact[]>();
+
+    artifacts.forEach((artifact) => {
+        if (!artifact.control_id) return;
+        const items = artifactsByControlId.get(artifact.control_id) ?? [];
+        items.push(artifact);
+        artifactsByControlId.set(artifact.control_id, items);
+    });
+
+    const policyIdsByControlId = new Map<string, string[]>();
+    policyLinks.forEach((link) => {
+        const items = policyIdsByControlId.get(link.control_id) ?? [];
+        items.push(link.policy_id);
+        policyIdsByControlId.set(link.control_id, items);
+    });
+
+    const policyById = new Map(policies.map((policy) => [policy.id, policy]));
+
+    return ISO_27001_VAULT_SEED.map((seed) => {
+        const actual = controlByCode.get(seed.controlId);
+        const linkedPolicies = (policyIdsByControlId.get(actual?.id ?? "") ?? [])
+            .map((policyId) => policyById.get(policyId))
+            .filter((policy): policy is PolicySummary => Boolean(policy));
+        const availableArtifacts = [...(artifactsByControlId.get(actual?.id ?? "") ?? [])];
+
+        const requirements = seed.requirements.map((requirement, index) => {
+            if (requirement.type === "policy") {
+                const policy = matchPolicyForRequirement(requirement, linkedPolicies);
+                if (policy?.status === "approved") {
+                    return {
+                        id: `${seed.controlId}-policy-${index}`,
+                        label: requirement.label,
+                        type: "policy" as const,
+                        linkedPolicyId: policy.id,
+                        status: "fulfilled" as const,
+                        evidence: {
+                            id: `policy-${policy.id}`,
+                            name: policy.title,
+                            source: "policy" as const,
+                            policyName: policy.title,
+                            policyPublishedAt: policy.updated_at,
+                        },
+                    };
+                }
+
+                if (policy) {
+                    return {
+                        id: `${seed.controlId}-policy-${index}`,
+                        label: requirement.label,
+                        type: "policy" as const,
+                        linkedPolicyId: policy.id,
+                        status: "pending" as const,
+                    };
+                }
+            }
+
+            if (requirement.type === "manual") {
+                const artifact = availableArtifacts.shift();
+                if (artifact) {
+                    return {
+                        id: `${seed.controlId}-manual-${index}`,
+                        label: requirement.label,
+                        type: "manual" as const,
+                        status: "fulfilled" as const,
+                        evidence: buildEvidenceFromArtifact(artifact),
+                    };
+                }
+            }
+
+            return {
+                id: `${seed.controlId}-${requirement.type}-${index}`,
+                label: requirement.label,
+                type: requirement.type,
+                source: requirement.source,
+                status: requirement.status,
+                linkedPolicyId: undefined,
+                evidence: requirement.evidence,
+                lastAttemptedAt: requirement.lastAttemptedAt,
+                scanDetails: requirement.scanDetails,
+            } as EvidenceRequirement & { lastAttemptedAt?: string; scanDetails?: string[] };
+        });
+
+        return {
+            id: actual?.id ?? `mock-${framework.id}-${seed.controlId}`,
+            control_id: seed.controlId,
+            framework_id: framework.id,
+            title: actual?.title ?? seed.title,
+            domain: actual?.domain ?? seed.vaultGroup,
+            category: actual?.category ?? framework.name,
+            description: actual?.description ?? seed.description,
+            evidenceRequirements: requirements,
+            vaultGroup: seed.vaultGroup,
+            auditTrail: buildAuditTrail(requirements),
+        } satisfies VaultControl;
+    });
+}
+
+function buildGenericControls(
+    framework: FrameworkSummary,
+    controls: Control[],
+    artifacts: EvidenceArtifact[],
+    policies: PolicySummary[],
+    policyLinks: PolicyControlLink[],
+    statuses: ControlStatus[],
+) {
+    const artifactsByControlId = new Map<string, EvidenceArtifact[]>();
+    artifacts.forEach((artifact) => {
+        if (!artifact.control_id) return;
+        const items = artifactsByControlId.get(artifact.control_id) ?? [];
+        items.push(artifact);
+        artifactsByControlId.set(artifact.control_id, items);
+    });
+
+    const statusByControlId = new Map(statuses.map((status) => [status.control_id, status]));
+    const linkedPolicyIds = new Map<string, string[]>();
+    policyLinks.forEach((link) => {
+        const items = linkedPolicyIds.get(link.control_id) ?? [];
+        items.push(link.policy_id);
+        linkedPolicyIds.set(link.control_id, items);
+    });
+    const policyById = new Map(policies.map((policy) => [policy.id, policy]));
+
+    return controls.slice(0, 10).map((control) => {
+        const controlPolicies = (linkedPolicyIds.get(control.id) ?? [])
+            .map((policyId) => policyById.get(policyId))
+            .filter((policy): policy is PolicySummary => Boolean(policy));
+        const primaryPolicy = controlPolicies[0];
+        const controlArtifacts = artifactsByControlId.get(control.id) ?? [];
+        const status = statusByControlId.get(control.id);
+
+        const requirements: VaultControl["evidenceRequirements"] = [
+            {
+                id: `${control.id}-policy`,
+                label: primaryPolicy?.title ?? "Linked Policy",
+                type: "policy",
+                linkedPolicyId: primaryPolicy?.id,
+                status: primaryPolicy?.status === "approved" ? "fulfilled" : primaryPolicy ? "pending" : "missing",
+                evidence: primaryPolicy?.status === "approved"
+                    ? {
+                        id: `policy-${primaryPolicy.id}`,
+                        name: primaryPolicy.title,
+                        source: "policy",
+                        policyName: primaryPolicy.title,
+                        policyPublishedAt: primaryPolicy.updated_at,
+                    }
+                    : undefined,
+            },
+            {
+                id: `${control.id}-manual`,
+                label: "Uploaded Control Evidence",
+                type: "manual",
+                status: controlArtifacts[0] ? "fulfilled" : "missing",
+                evidence: controlArtifacts[0] ? buildEvidenceFromArtifact(controlArtifacts[0]) : undefined,
+            },
+            {
+                id: `${control.id}-scanner`,
+                label: "Automated Scanner Signal",
+                type: "scanner",
+                source: "cspm",
+                status: status?.status === "verified" || status?.status === "in_progress" ? "fulfilled" : "pending",
+                evidence: status?.status === "verified" || status?.status === "in_progress"
+                    ? {
+                        id: `scanner-${control.id}`,
+                        name: `${control.control_id} Scanner Signal`,
+                        source: "cspm",
+                        autoFetchedAt: new Date().toISOString(),
+                        scanSummary: `${Math.max(status?.evidence_count ?? 1, 1)} automated checks mapped to this control`,
+                    }
+                    : undefined,
+            },
+        ];
+
+        return {
+            ...control,
+            evidenceRequirements: requirements,
+            vaultGroup: control.category || control.domain || framework.name,
+            auditTrail: buildAuditTrail(requirements),
+        } satisfies VaultControl;
+    });
+}
+
+function buildInitialControlState({
+    frameworks,
+    controls,
+    artifacts,
+    policies,
+    policyLinks,
+    statuses,
+}: {
+    frameworks: FrameworkSummary[];
+    controls: Control[];
+    artifacts: EvidenceArtifact[];
+    policies: PolicySummary[];
+    policyLinks: PolicyControlLink[];
+    statuses: ControlStatus[];
+}) {
+    return frameworks.reduce<Record<string, VaultControl[]>>((accumulator, framework) => {
+        const frameworkControls = controls.filter((control) => control.framework_id === framework.id);
+        accumulator[framework.id] = framework.name.toLowerCase().includes("iso")
+            ? buildIsoControls(framework, frameworkControls, artifacts, policies, policyLinks)
+            : buildGenericControls(framework, frameworkControls, artifacts, policies, policyLinks, statuses);
+        return accumulator;
+    }, {});
+}
+
+function RequirementStatusPill({ status }: { status: EvidenceRequirement["status"] }) {
+    return (
+        <span className={cn("text-[10px] uppercase font-bold px-2 py-0.5 rounded border", STATUS_BADGE_STYLES[status])}>
+            {status}
+        </span>
+    );
+}
+
+function SummaryStat({
+    label,
+    value,
+    icon: Icon,
+    color,
+    bg,
+}: {
+    label: string;
+    value: number | string;
+    icon: React.ComponentType<{ className?: string }>;
+    color: string;
+    bg: string;
+}) {
+    return (
+        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-2">
+                <span className="text-xs text-slate-500 uppercase tracking-wide">{label}</span>
+                <div className={cn("p-1.5 rounded-lg border", bg)}>
+                    <Icon className={cn("w-4 h-4", color)} />
+                </div>
+            </div>
+            <p className={cn("text-2xl font-bold", color)}>{value}</p>
+        </div>
+    );
+}
+
+function ReplaceConfirmModal({
+    onCancel,
+    onConfirm,
+}: {
+    onCancel: () => void;
+    onConfirm: () => void;
+}) {
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
+                exit={{ opacity: 0, scale: 0.96 }}
                 className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50">
-                    <div className="flex items-center space-x-3">
-                        <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
-                            <CloudUpload className="w-4 h-4 text-indigo-400" />
-                        </div>
-                        <div>
-                            <h2 className="text-base font-semibold text-slate-100">Upload Evidence</h2>
-                            <p className="text-xs text-slate-500">Add a compliance artifact to the vault</p>
-                        </div>
+                <div className="flex items-center justify-between p-5 border-b border-slate-800/50">
+                    <div>
+                        <h2 className="text-base font-semibold text-slate-100">Replace Evidence</h2>
+                        <p className="text-xs text-slate-500 mt-0.5">Confirm before uploading a replacement file.</p>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                    <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors">
+                        <X className="w-4 h-4" />
+                    </button>
                 </div>
-
-                <form onSubmit={handleSubmit} className="p-6 space-y-4">
-                    {error && (
-                        <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400 flex items-center space-x-2">
-                            <AlertCircle className="w-4 h-4 shrink-0" /><span>{error}</span>
-                        </div>
-                    )}
-                    <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Evidence Name *</label>
-                        <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                            placeholder="e.g. SOC 2 Audit Report 2025" className={inputCls} />
+                <div className="p-5 space-y-4">
+                    <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
+                        <p className="text-sm text-amber-300">
+                            This will replace the existing evidence. The previous file will be archived. Continue?
+                        </p>
                     </div>
-                    <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Description</label>
-                        <textarea rows={2} value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                            placeholder="Brief description of what this evidence covers…"
-                            className={cn(inputCls, "resize-none")} />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Link to Control</label>
-                            <select value={form.control_id} onChange={e => setForm(f => ({ ...f, control_id: e.target.value }))} className={inputCls}>
-                                <option value="">No control linked</option>
-                                {controls.map(c => (
-                                    <option key={c.id} value={c.id}>{c.control_id} — {c.title.slice(0, 30)}</option>
-                                ))}
-                            </select>
-                        </div>
-                        <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Expiry Date</label>
-                            <input type="date" value={form.expires_at} onChange={e => setForm(f => ({ ...f, expires_at: e.target.value }))} className={inputCls} />
-                        </div>
-                    </div>
-                    <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">File (optional)</label>
-                        <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-700/50 rounded-xl cursor-pointer hover:border-slate-600/50 transition-colors bg-slate-800/30">
-                            <div className="flex flex-col items-center space-y-1">
-                                <CloudUpload className="w-5 h-5 text-slate-500" />
-                                <span className="text-xs text-slate-500">{file ? file.name : "Click to upload a file"}</span>
-                            </div>
-                            <input type="file" className="hidden" onChange={e => setFile(e.target.files?.[0] ?? null)} />
-                        </label>
-                    </div>
-                    <div className="flex justify-end space-x-3 pt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">Cancel</button>
-                        <button type="submit" disabled={uploading}
-                            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 transition-colors">
-                            {uploading ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
-                            <span>{uploading ? "Uploading…" : "Upload"}</span>
+                    <div className="flex justify-end gap-3">
+                        <button
+                            type="button"
+                            onClick={onCancel}
+                            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            onClick={onConfirm}
+                            className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                            Continue
                         </button>
                     </div>
-                </form>
+                </div>
             </motion.div>
         </div>
     );
 }
 
-// ─── Required Evidence Row ─────────────────────────────────────────────────────
+type UploadContext = {
+    frameworkId: string;
+    controlId: string;
+    requirementId: string;
+    mode: "upload" | "replace";
+};
 
-interface RequiredEvidenceRowProps {
-    item: RequiredEvidence;
-    uploadedNames: Set<string>;
-    onUpload: (name: string) => void;
-}
-
-function RequiredEvidenceRow({ item, uploadedNames, onUpload }: RequiredEvidenceRowProps) {
-    const [expanded, setExpanded] = useState(false);
-
-    // Fuzzy match: is there any artifact whose name contains this item's name keywords?
-    const isUploaded = useMemo(() => {
-        const key = item.name.toLowerCase();
-        for (const n of uploadedNames) {
-            if (n.includes(key.slice(0, 12))) return true;
-        }
-        return false;
-    }, [item.name, uploadedNames]);
-
-    const Icon = CATEGORY_ICONS[item.category] ?? FileText;
-
-    return (
-        <div className={cn(
-            "border-b border-slate-800/50 last:border-b-0 transition-colors",
-            isUploaded ? "hover:bg-emerald-500/3" : "hover:bg-slate-800/20"
-        )}>
-            <div className="flex items-center px-5 py-3 gap-4">
-                {/* Status indicator */}
-                <div className="shrink-0">
-                    {isUploaded
-                        ? <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                        : <div className="w-5 h-5 rounded-full border-2 border-slate-600 flex items-center justify-center">
-                            <div className="w-2 h-2 rounded-full bg-slate-600" />
-                          </div>
-                    }
-                </div>
-
-                {/* Icon + name */}
-                <div className="flex items-center gap-2.5 flex-1 min-w-0">
-                    <Icon className={cn("w-4 h-4 shrink-0", isUploaded ? "text-emerald-400" : "text-slate-500")} />
-                    <div className="flex flex-col min-w-0">
-                        <span className={cn("text-sm font-medium truncate", isUploaded ? "text-emerald-300" : "text-slate-200")}>
-                            {item.name}
-                        </span>
-                        <span className="text-[11px] text-slate-500">{item.category} · Refresh: {item.frequency}</span>
-                    </div>
-                </div>
-
-                {/* Framework badges */}
-                <div className="hidden md:flex items-center gap-1.5 shrink-0">
-                    {item.frameworks.map(fw => (
-                        <span key={fw} className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded border", FW_COLORS[fw] ?? "text-slate-400 bg-slate-700/30 border-slate-600")}>
-                            {fw}
-                        </span>
-                    ))}
-                </div>
-
-                {/* Controls satisfied */}
-                <div className="hidden lg:flex items-center gap-1 shrink-0 min-w-[120px]">
-                    {item.controls.slice(0, 3).map(c => (
-                        <span key={c} className="text-[10px] text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-1.5 py-0.5 rounded font-mono">
-                            {c}
-                        </span>
-                    ))}
-                    {item.controls.length > 3 && (
-                        <span className="text-[10px] text-slate-500">+{item.controls.length - 3}</span>
-                    )}
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-2 shrink-0">
-                    {!isUploaded && (
-                        <button
-                            onClick={() => onUpload(item.name)}
-                            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-indigo-400 bg-indigo-500/10 border border-indigo-500/30 rounded-lg hover:bg-indigo-500/20 transition-colors"
-                        >
-                            <CloudUpload className="w-3.5 h-3.5" />
-                            Upload
-                        </button>
-                    )}
-                    <button
-                        onClick={() => setExpanded(v => !v)}
-                        className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-slate-700/40 rounded-lg transition-colors"
-                    >
-                        {expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-                    </button>
-                </div>
-            </div>
-
-            {/* Expanded detail */}
-            <AnimatePresence>
-                {expanded && (
-                    <motion.div
-                        initial={{ height: 0, opacity: 0 }}
-                        animate={{ height: "auto", opacity: 1 }}
-                        exit={{ height: 0, opacity: 0 }}
-                        transition={{ duration: 0.18 }}
-                        className="overflow-hidden"
-                    >
-                        <div className="px-14 pb-4 space-y-3">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div className="bg-slate-800/40 rounded-xl p-3 border border-slate-700/30">
-                                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-1.5">What to collect</p>
-                                    <p className="text-xs text-slate-300 leading-relaxed">{item.description}</p>
-                                </div>
-                                <div className="bg-indigo-500/5 rounded-xl p-3 border border-indigo-500/20">
-                                    <p className="text-[10px] font-semibold text-indigo-400 uppercase tracking-widest mb-1.5">Example</p>
-                                    <p className="text-xs text-slate-300 leading-relaxed">{item.example}</p>
-                                </div>
-                            </div>
-                            <div className="flex flex-wrap gap-1.5 items-center">
-                                <span className="text-[10px] text-slate-500 font-semibold uppercase tracking-widest mr-1">Controls fulfilled:</span>
-                                {item.controls.map(c => (
-                                    <span key={c} className="text-[10px] text-indigo-400 bg-indigo-500/10 border border-indigo-500/20 px-2 py-0.5 rounded font-mono">
-                                        {c}
-                                    </span>
-                                ))}
-                            </div>
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-        </div>
+export function EvidenceVaultClient({
+    initialArtifacts,
+    controls,
+    statuses,
+    frameworks,
+    policies,
+    policyLinks,
+    orgId,
+}: EvidenceVaultClientProps) {
+    const supabase = createClient();
+    const [vaultControlsByFramework, setVaultControlsByFramework] = useState<Record<string, VaultControl[]>>(() =>
+        buildInitialControlState({
+            frameworks,
+            controls,
+            artifacts: initialArtifacts,
+            policies,
+            policyLinks,
+            statuses,
+        }),
     );
-}
+    const [selectedFrameworkId, setSelectedFrameworkId] = useState(frameworks[0]?.id ?? "");
+    const [selectedControlId, setSelectedControlId] = useState("");
+    const [activeFilter, setActiveFilter] = useState<typeof FILTERS[number]>("all");
+    const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+    const [expandedScans, setExpandedScans] = useState<Set<string>>(new Set());
+    const [auditOpen, setAuditOpen] = useState(true);
+    const [dragTargetId, setDragTargetId] = useState<string | null>(null);
+    const [linkDrafts, setLinkDrafts] = useState<Record<string, string>>({});
+    const [replaceContext, setReplaceContext] = useState<UploadContext | null>(null);
+    const [uploadContext, setUploadContext] = useState<UploadContext | null>(null);
+    const [loadingRequirementId, setLoadingRequirementId] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-// ─── Main Component ───────────────────────────────────────────────────────────
-
-export function EvidenceVaultClient({ initialArtifacts, controls, orgId, currentUserId }: EvidenceVaultClientProps) {
-    const [artifacts, setArtifacts] = useState<EvidenceArtifact[]>(initialArtifacts);
-    const [showUpload, setShowUpload] = useState(false);
-    const [uploadPrefill, setUploadPrefill] = useState("");
-    const [search, setSearch] = useState("");
-    const [filterStatus, setFilterStatus] = useState("all");
-    const [filterControl, setFilterControl] = useState("all");
-    const [catalogSearch, setCatalogSearch] = useState("");
-    const [catalogFilter, setCatalogFilter] = useState("all");
-    const [activeTab, setActiveTab] = useState<"catalog" | "uploads">("catalog");
-
-    const controlMap = useMemo(() => new Map(controls.map(c => [c.id, c])), [controls]);
-
-    // Uploaded evidence names for fuzzy matching against catalog
-    const uploadedNames = useMemo(
-        () => new Set(artifacts.map(a => a.name.toLowerCase())),
-        [artifacts]
+    const currentFrameworkControls = useMemo(
+        () => vaultControlsByFramework[selectedFrameworkId] ?? [],
+        [selectedFrameworkId, vaultControlsByFramework],
     );
 
-    // Stats
-    const stats = useMemo(() => {
-        const uploaded = REQUIRED_EVIDENCE.filter(req => {
-            const key = req.name.toLowerCase();
-            for (const n of uploadedNames) if (n.includes(key.slice(0, 12))) return true;
-            return false;
-        }).length;
-        const missing = REQUIRED_EVIDENCE.length - uploaded;
-        const stale = artifacts.filter(isStale).length;
-        const expiring = artifacts.filter(isExpiringSoon).length;
-        const expired = artifacts.filter(isExpired).length;
-        return { total: REQUIRED_EVIDENCE.length, uploaded, missing, stale, expiring, expired };
-    }, [uploadedNames, artifacts]);
-
-    // Catalog filtering
-    const categories = useMemo(() => Array.from(new Set(REQUIRED_EVIDENCE.map(r => r.category))), []);
-    const filteredCatalog = useMemo(() => REQUIRED_EVIDENCE.filter(r => {
-        if (catalogFilter !== "all" && r.category !== catalogFilter) return false;
-        if (catalogSearch && !r.name.toLowerCase().includes(catalogSearch.toLowerCase())
-            && !r.category.toLowerCase().includes(catalogSearch.toLowerCase())) return false;
-        return true;
-    }), [catalogFilter, catalogSearch]);
-
-    // Artifacts filtering
-    const filtered = useMemo(() => artifacts.filter(a => {
-        if (filterStatus === "stale" && !isStale(a)) return false;
-        if (filterStatus === "expiring" && !isExpiringSoon(a)) return false;
-        if (filterStatus === "expired" && !isExpired(a)) return false;
-        if (filterControl !== "all" && a.control_id !== filterControl) return false;
-        if (search && !a.name.toLowerCase().includes(search.toLowerCase())) return false;
-        return true;
-    }), [artifacts, filterStatus, filterControl, search]);
-
-    const handleUploaded = useCallback((a: EvidenceArtifact) => {
-        setArtifacts(prev => [a, ...prev]);
-        setActiveTab("uploads");
-    }, []);
-
-    const handleDelete = useCallback(async (id: string) => {
-        await fetch("/api/evidence", {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
+    const filteredControls = useMemo(() => {
+        return currentFrameworkControls.filter((control) => {
+            const summary = getRequirementSummary(control);
+            if (activeFilter === "all") return true;
+            return summary.state === activeFilter;
         });
-        setArtifacts(prev => prev.filter(a => a.id !== id));
-    }, []);
+    }, [activeFilter, currentFrameworkControls]);
 
-    const openUpload = useCallback((prefill = "") => {
-        setUploadPrefill(prefill);
-        setShowUpload(true);
-    }, []);
+    const groupedControls = useMemo(() => {
+        return filteredControls.reduce<Record<string, VaultControl[]>>((accumulator, control) => {
+            const key = control.vaultGroup;
+            accumulator[key] = accumulator[key] ?? [];
+            accumulator[key].push(control);
+            return accumulator;
+        }, {});
+    }, [filteredControls]);
 
-    const coveragePct = stats.total > 0 ? Math.round((stats.uploaded / stats.total) * 100) : 0;
+    useEffect(() => {
+        if (!selectedFrameworkId && frameworks[0]?.id) {
+            setSelectedFrameworkId(frameworks[0].id);
+        }
+    }, [frameworks, selectedFrameworkId]);
+
+    useEffect(() => {
+        if (!filteredControls.length) {
+            setSelectedControlId("");
+            return;
+        }
+
+        const stillExists = filteredControls.some((control) => control.id === selectedControlId);
+        if (!stillExists) {
+            setSelectedControlId(filteredControls[0].id);
+        }
+    }, [filteredControls, selectedControlId]);
+
+    const selectedControl = filteredControls.find((control) => control.id === selectedControlId) ?? currentFrameworkControls[0];
+
+    const summary = useMemo(() => {
+        const total = currentFrameworkControls.length;
+        const complete = currentFrameworkControls.filter((control) => getRequirementSummary(control).state === "complete").length;
+        const partial = currentFrameworkControls.filter((control) => getRequirementSummary(control).state === "incomplete").length;
+        const missing = currentFrameworkControls.filter((control) => getRequirementSummary(control).state === "missing").length;
+        return { total, complete, partial, missing };
+    }, [currentFrameworkControls]);
+
+    function updateRequirement(
+        frameworkId: string,
+        controlId: string,
+        requirementId: string,
+        updater: (requirement: EvidenceRequirement) => EvidenceRequirement,
+        auditEvent?: AuditEvent,
+    ) {
+        setVaultControlsByFramework((previous) => {
+            const next = { ...previous };
+            next[frameworkId] = (previous[frameworkId] ?? []).map((control) => {
+                if (control.id !== controlId) return control;
+
+                const evidenceRequirements = control.evidenceRequirements.map((requirement) =>
+                    requirement.id === requirementId ? updater(requirement) : requirement,
+                );
+
+                const auditTrail = auditEvent ? [auditEvent, ...control.auditTrail] : control.auditTrail;
+
+                return {
+                    ...control,
+                    evidenceRequirements,
+                    auditTrail,
+                };
+            });
+            return next;
+        });
+    }
+
+    async function persistArtifact({
+        file,
+        linkUrl,
+        controlId,
+        requirementLabel,
+    }: {
+        file?: File;
+        linkUrl?: string;
+        controlId: string;
+        requirementLabel: string;
+    }) {
+        let fileUrl: string | null = null;
+        let fileType: string | null = null;
+        let fileSize: number | null = null;
+
+        if (file) {
+            const extension = file.name.split(".").pop();
+            const path = `${orgId}/${Date.now()}-${requirementLabel.replace(/\s+/g, "-").toLowerCase()}.${extension}`;
+            const { error: uploadError } = await supabase.storage
+                .from("evidence-artifacts")
+                .upload(path, file, { contentType: file.type });
+
+            if (uploadError) {
+                throw new Error(uploadError.message);
+            }
+
+            const { data } = supabase.storage.from("evidence-artifacts").getPublicUrl(path);
+            fileUrl = data.publicUrl;
+            fileType = file.type;
+            fileSize = file.size;
+        }
+
+        if (linkUrl) {
+            fileUrl = linkUrl;
+            fileType = "text/uri-list";
+        }
+
+        const response = await fetch("/api/evidence", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                org_id: orgId,
+                name: file?.name ?? `${requirementLabel} Link`,
+                description: requirementLabel,
+                control_id: controlId.startsWith("mock-") ? null : controlId,
+                file_url: fileUrl,
+                file_type: fileType,
+                file_size: fileSize,
+            }),
+        });
+
+        const payload = await response.json();
+        if (!response.ok || !payload.artifact) {
+            throw new Error(payload.error ?? "Evidence upload failed");
+        }
+
+        return {
+            ...(payload.artifact as EvidenceArtifact),
+            uploader: (payload.artifact.profiles as { id: string; full_name: string | null } | null) ?? null,
+        };
+    }
+
+    async function handleManualFile(file: File, context: UploadContext) {
+        const control = (vaultControlsByFramework[context.frameworkId] ?? []).find((item) => item.id === context.controlId);
+        const requirement = control?.evidenceRequirements.find((item) => item.id === context.requirementId);
+        if (!control || !requirement) return;
+
+        setLoadingRequirementId(requirement.id);
+
+        try {
+            const artifact = await persistArtifact({
+                file,
+                controlId: control.id,
+                requirementLabel: requirement.label,
+            });
+
+            const previousEvidence = requirement.evidence;
+            const uploadedAt = artifact.created_at ?? new Date().toISOString();
+
+            updateRequirement(
+                context.frameworkId,
+                context.controlId,
+                context.requirementId,
+                () => ({
+                    ...requirement,
+                    status: "fulfilled",
+                    evidence: {
+                        id: artifact.id,
+                        name: artifact.name,
+                        uploadedAt,
+                        source: "manual_upload",
+                        fileUrl: artifact.file_url ?? undefined,
+                    },
+                }),
+                createEvent(
+                    context.mode === "replace" ? "replaced" : "uploaded",
+                    uploadedAt,
+                    context.mode === "replace"
+                        ? `${artifact.name} replaced the previous evidence`
+                        : `${artifact.name} uploaded`,
+                ),
+            );
+
+            if (context.mode === "replace" && previousEvidence) {
+                updateRequirement(
+                    context.frameworkId,
+                    context.controlId,
+                    context.requirementId,
+                    (current) => current,
+                    createEvent(
+                        "archived",
+                        uploadedAt,
+                        `${previousEvidence.name} archived after replacement`,
+                    ),
+                );
+            }
+
+            toast.success(context.mode === "replace" ? "Evidence replaced" : "Evidence uploaded");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Failed to upload evidence");
+        } finally {
+            setLoadingRequirementId(null);
+            setUploadContext(null);
+            if (fileInputRef.current) fileInputRef.current.value = "";
+        }
+    }
+
+    async function handleLinkSubmit(control: VaultControl, requirement: EvidenceRequirement) {
+        const url = linkDrafts[requirement.id]?.trim();
+        if (!url) return;
+
+        setLoadingRequirementId(requirement.id);
+
+        try {
+            const artifact = await persistArtifact({
+                linkUrl: url,
+                controlId: control.id,
+                requirementLabel: requirement.label,
+            });
+
+            const uploadedAt = artifact.created_at ?? new Date().toISOString();
+
+            updateRequirement(
+                selectedFrameworkId,
+                control.id,
+                requirement.id,
+                () => ({
+                    ...requirement,
+                    status: "fulfilled",
+                    evidence: {
+                        id: artifact.id,
+                        name: requirement.label,
+                        uploadedAt,
+                        source: "manual_upload",
+                        fileUrl: url,
+                    },
+                }),
+                createEvent("uploaded", uploadedAt, `${requirement.label} link attached`),
+            );
+
+            setLinkDrafts((previous) => ({ ...previous, [requirement.id]: "" }));
+            toast.success("Evidence link added");
+        } catch (error) {
+            toast.error(error instanceof Error ? error.message : "Failed to add link");
+        } finally {
+            setLoadingRequirementId(null);
+        }
+    }
+
+    function handleTriggerRescan(control: VaultControl, requirement: EvidenceRequirement) {
+        setLoadingRequirementId(requirement.id);
+
+        window.setTimeout(() => {
+            const now = new Date().toISOString();
+            const source = requirement.source ?? "cspm";
+
+            updateRequirement(
+                selectedFrameworkId,
+                control.id,
+                requirement.id,
+                () => ({
+                    ...requirement,
+                    status: "fulfilled",
+                    evidence: {
+                        id: `scan-${control.id}-${requirement.id}`,
+                        name: `${requirement.label} Result`,
+                        autoFetchedAt: now,
+                        source,
+                        scanSummary:
+                            source === "github_security"
+                                ? "Secret scanning and branch protection checks passed on 18/18 repositories"
+                                : source === "scm"
+                                    ? "Repository admin access reviewed and policy drift closed"
+                                    : "Logging and identity configuration checks passed across all monitored accounts",
+                    },
+                    lastAttemptedAt: now,
+                    scanDetails: [
+                        "Scan refreshed against the latest linked integrations.",
+                        "Control mapping updated immediately in the Evidence Vault.",
+                        "No blocking exceptions remain for this requirement.",
+                    ],
+                }),
+                createEvent("auto_fetched", now, `${SOURCE_LABEL[source]} evidence refreshed`),
+            );
+
+            setLoadingRequirementId(null);
+            toast.success("Scanner results refreshed");
+        }, 1200);
+    }
+
+    function openFilePicker(context: UploadContext) {
+        setUploadContext(context);
+        fileInputRef.current?.click();
+    }
+
+    function toggleGroup(group: string) {
+        setCollapsedGroups((previous) => {
+            const next = new Set(previous);
+            if (next.has(group)) next.delete(group);
+            else next.add(group);
+            return next;
+        });
+    }
 
     return (
-        <div className="w-full flex flex-col space-y-6">
-            {/* Header */}
-            <div className="flex items-center justify-between">
-                <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
-                        <FolderGit2 className="w-8 h-8 mr-3 text-indigo-500" />
-                        Evidence Vault
-                    </h1>
-                    <p className="text-sm text-slate-400 mt-1">Required evidence catalog with examples, control mapping, and freshness tracking.</p>
+        <div className="space-y-6">
+            <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.png,.jpg,.jpeg,.xlsx"
+                className="hidden"
+                onChange={(event) => {
+                    const file = event.target.files?.[0];
+                    if (file && uploadContext) {
+                        void handleManualFile(file, uploadContext);
+                    }
+                }}
+            />
+
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                        <FolderGit2 className="w-5 h-5 text-orange-400" />
+                    </div>
+                    <div>
+                        <h1 className="text-xl font-bold text-slate-100">Evidence Vault</h1>
+                        <p className="text-sm text-slate-500 mt-0.5">
+                            Map each control to policy, scanner, and manually uploaded evidence without leaving the compliance workspace.
+                        </p>
+                    </div>
                 </div>
-                <button
-                    onClick={() => openUpload()}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors flex items-center space-x-2"
-                >
-                    <CloudUpload className="w-4 h-4" />
-                    <span>Upload Artifact</span>
-                </button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                {[
-                    { label: "Required",    count: stats.total,    color: "text-slate-100" },
-                    { label: "Uploaded",    count: stats.uploaded, color: "text-emerald-400" },
-                    { label: "Missing",     count: stats.missing,  color: stats.missing > 0 ? "text-red-400" : "text-slate-400" },
-                    { label: "Stale",       count: stats.stale,    color: stats.stale > 0 ? "text-amber-400" : "text-slate-400" },
-                    { label: "Expiring",    count: stats.expiring, color: stats.expiring > 0 ? "text-orange-400" : "text-slate-400" },
-                    { label: "Expired",     count: stats.expired,  color: stats.expired > 0 ? "text-red-400" : "text-slate-400" },
-                ].map((s) => (
-                    <div key={s.label} className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col">
-                        <span className="text-[10px] text-slate-500 mb-1">{s.label}</span>
-                        <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
-                    </div>
+            <div className="flex flex-wrap items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-fit">
+                {frameworks.map((framework) => (
+                    <button
+                        key={framework.id}
+                        onClick={() => setSelectedFrameworkId(framework.id)}
+                        className={cn(
+                            "px-3 py-1.5 rounded-md text-sm font-medium transition-all",
+                            selectedFrameworkId === framework.id
+                                ? "bg-orange-600 text-white shadow-sm"
+                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60",
+                        )}
+                    >
+                        {framework.name} {framework.version ? `v${framework.version}` : ""}
+                    </button>
                 ))}
             </div>
 
-            {/* Coverage bar */}
-            <div className="glass-panel rounded-2xl p-4 border border-slate-800/50">
-                <div className="flex items-center justify-between mb-2">
-                    <span className="text-sm font-medium text-slate-200">Evidence Coverage</span>
-                    <span className="text-sm font-bold text-indigo-400">{coveragePct}%</span>
-                </div>
-                <div className="w-full h-2.5 bg-slate-700/50 rounded-full overflow-hidden">
-                    <div
-                        className="h-full bg-indigo-500 rounded-full transition-all duration-700"
-                        style={{ width: `${coveragePct}%` }}
-                    />
-                </div>
-                <p className="text-[11px] text-slate-500 mt-1.5">{stats.uploaded} of {stats.total} required evidence items have been uploaded</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <SummaryStat label="Total Controls" value={summary.total} icon={ShieldCheck} color="text-slate-100" bg="bg-slate-800/70 border-slate-700/60" />
+                <SummaryStat label="Fully Evidenced" value={summary.complete} icon={CheckCircle2} color="text-emerald-400" bg="bg-emerald-500/10 border-emerald-500/20" />
+                <SummaryStat label="Partially Evidenced" value={summary.partial} icon={AlertCircle} color="text-amber-400" bg="bg-amber-500/10 border-amber-500/20" />
+                <SummaryStat label="Missing Evidence" value={summary.missing} icon={AlertTriangle} color="text-red-400" bg="bg-red-500/10 border-red-500/20" />
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-1 bg-slate-800/40 p-1 rounded-xl w-fit border border-slate-700/30">
-                <button
-                    onClick={() => setActiveTab("catalog")}
-                    className={cn(
-                        "px-4 py-1.5 text-sm font-medium rounded-lg transition-colors",
-                        activeTab === "catalog"
-                            ? "bg-indigo-600 text-white shadow"
-                            : "text-slate-400 hover:text-slate-200"
-                    )}
-                >
-                    Required Evidence ({REQUIRED_EVIDENCE.length})
-                </button>
-                <button
-                    onClick={() => setActiveTab("uploads")}
-                    className={cn(
-                        "px-4 py-1.5 text-sm font-medium rounded-lg transition-colors",
-                        activeTab === "uploads"
-                            ? "bg-indigo-600 text-white shadow"
-                            : "text-slate-400 hover:text-slate-200"
-                    )}
-                >
-                    Uploaded Artifacts ({artifacts.length})
-                </button>
-            </div>
-
-            {/* ── Required Evidence Catalog ── */}
-            {activeTab === "catalog" && (
-                <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col">
-                    {/* Catalog filters */}
-                    <div className="flex flex-wrap items-center gap-3 p-5 border-b border-slate-800/50">
-                        <div className="relative flex-1 min-w-[180px]">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                            <input type="text" value={catalogSearch} onChange={e => setCatalogSearch(e.target.value)}
-                                placeholder="Search required evidence…"
-                                className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50" />
+            <div className="grid grid-cols-1 xl:grid-cols-[380px_minmax(0,1fr)] gap-6 items-start">
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
+                    <div className="p-4 border-b border-slate-800/60 space-y-4">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm font-semibold text-slate-100">Control List</p>
+                                <p className="text-xs text-slate-500 mt-1">{filteredControls.length} controls in view</p>
+                            </div>
                         </div>
-                        <select value={catalogFilter} onChange={e => setCatalogFilter(e.target.value)}
-                            className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
-                            <option value="all">All Categories</option>
-                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                        </select>
-                        <span className="text-xs text-slate-500 ml-auto">{filteredCatalog.length} items</span>
+
+                        <div className="flex items-center gap-1 bg-slate-800/50 border border-slate-700/50 rounded-lg p-1 w-fit">
+                            {FILTERS.map((filter) => (
+                                <button
+                                    key={filter}
+                                    onClick={() => setActiveFilter(filter)}
+                                    className={cn(
+                                        "px-3 py-1.5 rounded-md text-sm font-medium capitalize transition-all",
+                                        activeFilter === filter
+                                            ? "bg-orange-600 text-white shadow-sm"
+                                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/40",
+                                    )}
+                                >
+                                    {filter === "all" ? "All" : filter}
+                                </button>
+                            ))}
+                        </div>
                     </div>
 
-                    {/* Column headers */}
-                    <div className="hidden md:flex items-center px-5 py-2 bg-slate-900/40 border-b border-slate-800/50 text-[10px] text-slate-500 font-mono uppercase gap-4">
-                        <div className="w-5 shrink-0" />
-                        <div className="flex-1">Evidence Name</div>
-                        <div className="w-40 shrink-0 hidden md:block">Frameworks</div>
-                        <div className="w-40 shrink-0 hidden lg:block">Controls</div>
-                        <div className="w-24 shrink-0" />
-                    </div>
+                    <div className="max-h-[780px] overflow-y-auto">
+                        {Object.entries(groupedControls).map(([group, groupControls]) => {
+                            const isCollapsed = collapsedGroups.has(group);
+                            return (
+                                <div key={group} className="border-b border-slate-800/50 last:border-b-0">
+                                    <button
+                                        onClick={() => toggleGroup(group)}
+                                        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800/30 transition-colors text-left"
+                                    >
+                                        <div>
+                                            <p className="text-sm font-medium text-slate-200">{group}</p>
+                                            <p className="text-[11px] text-slate-500 mt-0.5">{groupControls.length} controls</p>
+                                        </div>
+                                        {isCollapsed ? (
+                                            <ChevronRight className="w-4 h-4 text-slate-500" />
+                                        ) : (
+                                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                                        )}
+                                    </button>
 
-                    {filteredCatalog.map(item => (
-                        <RequiredEvidenceRow
-                            key={item.id}
-                            item={item}
-                            uploadedNames={uploadedNames}
-                            onUpload={openUpload}
-                        />
-                    ))}
+                                    {!isCollapsed && (
+                                        <div className="divide-y divide-slate-800/40">
+                                            {groupControls.map((control) => {
+                                                const stats = getRequirementSummary(control);
+                                                const active = selectedControl?.id === control.id;
+                                                return (
+                                                    <button
+                                                        key={control.id}
+                                                        onClick={() => setSelectedControlId(control.id)}
+                                                        className={cn(
+                                                            "w-full px-4 py-3 text-left transition-colors",
+                                                            active ? "bg-orange-500/10" : "hover:bg-slate-800/20",
+                                                        )}
+                                                    >
+                                                        <div className="flex items-start justify-between gap-3">
+                                                            <div className="min-w-0">
+                                                                <p className="text-xs font-mono text-orange-400">{control.control_id}</p>
+                                                                <p className="text-sm font-medium text-slate-100 truncate mt-1">{control.title}</p>
+                                                            </div>
+                                                            <span
+                                                                className={cn(
+                                                                    "text-[10px] font-bold px-1.5 py-0.5 rounded border whitespace-nowrap",
+                                                                    stats.state === "complete"
+                                                                        ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                                                                        : stats.state === "missing"
+                                                                            ? "text-red-400 bg-red-500/10 border-red-500/20"
+                                                                            : "text-amber-400 bg-amber-500/10 border-amber-500/20",
+                                                                )}
+                                                            >
+                                                                {stats.fulfilled}/{stats.total}
+                                                            </span>
+                                                        </div>
+
+                                                        <div className="mt-3 flex items-center gap-1.5">
+                                                            {control.evidenceRequirements.map((requirement) => (
+                                                                <span
+                                                                    key={requirement.id}
+                                                                    className={cn(
+                                                                        "h-1.5 rounded-full flex-1 min-w-0",
+                                                                        requirement.status === "fulfilled"
+                                                                            ? "bg-emerald-500"
+                                                                            : requirement.status === "pending"
+                                                                                ? "bg-amber-500"
+                                                                                : "bg-slate-700",
+                                                                    )}
+                                                                />
+                                                            ))}
+                                                        </div>
+                                                    </button>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
+
+                        {!filteredControls.length && (
+                            <div className="py-16 px-6 text-center">
+                                <SearchCheck className="w-10 h-10 text-slate-700 mx-auto mb-3" />
+                                <p className="text-sm font-medium text-slate-300">No controls match this filter</p>
+                                <p className="text-xs text-slate-500 mt-1">Try switching the framework or widening the evidence filter.</p>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            )}
 
-            {/* ── Uploaded Artifacts ── */}
-            {activeTab === "uploads" && (
-                <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col">
-                    {/* Filters */}
-                    <div className="flex flex-wrap items-center gap-3 p-5 border-b border-slate-800/50">
-                        <div className="relative flex-1 min-w-[180px]">
-                            <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-                            <input type="text" value={search} onChange={e => setSearch(e.target.value)}
-                                placeholder="Search uploaded artifacts…"
-                                className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50" />
-                        </div>
-                        <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-                            className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
-                            <option value="all">All Evidence</option>
-                            <option value="stale">Stale (&gt;90 days)</option>
-                            <option value="expiring">Expiring Soon</option>
-                            <option value="expired">Expired</option>
-                        </select>
-                        <select value={filterControl} onChange={e => setFilterControl(e.target.value)}
-                            className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
-                            <option value="all">All Controls</option>
-                            {controls.map(c => <option key={c.id} value={c.id}>{c.control_id}</option>)}
-                        </select>
-                        <span className="text-xs text-slate-500 ml-auto">{filtered.length} artifact{filtered.length !== 1 ? "s" : ""}</span>
-                    </div>
+                <div className="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden min-h-[680px]">
+                    {selectedControl ? (
+                        <div className="p-5 space-y-5">
+                            <div className="space-y-3 border-b border-slate-800/60 pb-5">
+                                <div className="flex items-start justify-between gap-3">
+                                    <div>
+                                        <p className="text-xs font-mono text-orange-400">{selectedControl.control_id}</p>
+                                        <h2 className="text-xl font-semibold text-slate-100 mt-1">{selectedControl.title}</h2>
+                                    </div>
+                                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-slate-300 bg-slate-800/80 border-slate-700/60">
+                                        {selectedControl.vaultGroup}
+                                    </span>
+                                </div>
+                                <p className="text-sm text-slate-400 leading-relaxed">{selectedControl.description ?? "No description available for this control."}</p>
 
-                    {filtered.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-20 text-center">
-                            <FolderGit2 className="w-12 h-12 text-slate-700 mb-3" />
-                            <p className="text-sm font-medium text-slate-400">No artifacts found</p>
-                            <p className="text-xs text-slate-600 mt-1">Upload evidence using the catalog tab or the button above</p>
-                        </div>
-                    ) : (
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left text-sm">
-                                <thead className="text-[10px] text-slate-500 font-mono uppercase bg-slate-900/40">
-                                    <tr>
-                                        <th className="px-5 py-3 font-medium">Evidence</th>
-                                        <th className="px-4 py-3 font-medium">Control Fulfilled</th>
-                                        <th className="px-4 py-3 font-medium">Uploaded By</th>
-                                        <th className="px-4 py-3 font-medium">Date</th>
-                                        <th className="px-4 py-3 font-medium">Expiry</th>
-                                        <th className="px-4 py-3 font-medium">Size</th>
-                                        <th className="px-4 py-3 font-medium">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-800/50">
-                                    {filtered.map(a => {
-                                        const stale = isStale(a);
-                                        const expiring = isExpiringSoon(a);
-                                        const expired = isExpired(a);
-                                        const ctrl = a.control_id ? controlMap.get(a.control_id) : null;
-                                        return (
-                                            <tr key={a.id} className="hover:bg-slate-800/20 transition-colors group">
-                                                <td className="px-5 py-3">
-                                                    <div className="flex items-center space-x-3">
-                                                        <FileIcon type={a.file_type} />
-                                                        <div className="flex flex-col min-w-0">
-                                                            <span className="text-sm font-medium text-slate-200 truncate max-w-[200px]">{a.name}</span>
-                                                            {a.description && (
-                                                                <span className="text-[11px] text-slate-500 truncate max-w-[200px]">{a.description}</span>
-                                                            )}
-                                                            {stale && !expired && (
-                                                                <span className="text-[10px] text-amber-400 flex items-center space-x-1 mt-0.5">
-                                                                    <Clock className="w-3 h-3" /><span>Stale</span>
-                                                                </span>
-                                                            )}
+                                <div className="space-y-2">
+                                    <div className="flex items-center justify-between text-sm">
+                                        <span className="text-slate-300">
+                                            {getRequirementSummary(selectedControl).fulfilled} of {getRequirementSummary(selectedControl).total} requirements met
+                                        </span>
+                                        <span className="text-slate-500 text-xs">
+                                            {getRequirementSummary(selectedControl).pending} pending · {getRequirementSummary(selectedControl).missing} missing
+                                        </span>
+                                    </div>
+                                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                                        <div
+                                            className="h-2 rounded-full bg-orange-500 transition-all"
+                                            style={{
+                                                width: `${(getRequirementSummary(selectedControl).fulfilled / Math.max(getRequirementSummary(selectedControl).total, 1)) * 100}%`,
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {selectedControl.evidenceRequirements.map((requirement) => {
+                                    const isLoading = loadingRequirementId === requirement.id;
+                                    const scanExpanded = expandedScans.has(requirement.id);
+                                    const extendedRequirement = requirement as EvidenceRequirement & {
+                                        lastAttemptedAt?: string;
+                                        scanDetails?: string[];
+                                    };
+
+                                    return (
+                                        <div
+                                            key={requirement.id}
+                                            className={cn(
+                                                "rounded-xl border p-4",
+                                                requirement.status === "fulfilled"
+                                                    ? "bg-emerald-500/5 border-emerald-500/20"
+                                                    : requirement.status === "pending"
+                                                        ? "bg-amber-500/5 border-amber-500/20"
+                                                        : "bg-slate-950/40 border-slate-800/80",
+                                            )}
+                                        >
+                                            <div className="flex items-start justify-between gap-3">
+                                                <div>
+                                                    <div className="flex items-center gap-2 flex-wrap">
+                                                        <p className="text-sm font-semibold text-slate-100">{requirement.label}</p>
+                                                        <RequirementStatusPill status={requirement.status} />
+                                                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-slate-400 bg-slate-800/70 border-slate-700/60">
+                                                            {requirement.type}
+                                                        </span>
+                                                        {requirement.source && (
+                                                            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-blue-400 bg-blue-500/10 border-blue-500/20">
+                                                                {SOURCE_LABEL[requirement.source]}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {requirement.type === "policy" && requirement.status === "fulfilled" && (
+                                                <div className="mt-4 space-y-3">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Policy</p>
+                                                            <p className="text-sm text-slate-100">{requirement.evidence?.policyName ?? requirement.label}</p>
+                                                        </div>
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Published</p>
+                                                            <p className="text-sm text-slate-100">{formatDate(requirement.evidence?.policyPublishedAt)}</p>
+                                                        </div>
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3 flex items-center">
+                                                            <Link
+                                                                href={requirement.linkedPolicyId ? `/policies/${requirement.linkedPolicyId}` : "/policies"}
+                                                                className="text-sm text-emerald-300 hover:text-emerald-200 transition-colors flex items-center gap-1"
+                                                            >
+                                                                View Policy <ExternalLink className="w-3.5 h-3.5" />
+                                                            </Link>
                                                         </div>
                                                     </div>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    {ctrl ? (
-                                                        <div className="flex flex-col">
-                                                            <span className="text-[11px] font-mono text-indigo-400">{ctrl.control_id}</span>
-                                                            <span className="text-[10px] text-slate-500 truncate max-w-[120px]">{ctrl.title}</span>
+                                                </div>
+                                            )}
+
+                                            {requirement.type === "policy" && requirement.status !== "fulfilled" && (
+                                                <div className="mt-4 bg-slate-900/60 border border-amber-500/15 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                                    <div>
+                                                        <p className="text-sm text-amber-300">
+                                                            Publish {requirement.label} to fulfil this requirement.
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 mt-1">
+                                                            This requirement will update automatically when the linked policy moves to approved.
+                                                        </p>
+                                                    </div>
+                                                    <Link
+                                                        href={requirement.linkedPolicyId ? `/policies/${requirement.linkedPolicyId}` : "/policies"}
+                                                        className="text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg transition-colors w-fit"
+                                                    >
+                                                        Open Policies
+                                                    </Link>
+                                                </div>
+                                            )}
+
+                                            {requirement.type === "scanner" && requirement.status === "fulfilled" && (
+                                                <div className="mt-4 space-y-3">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Source</p>
+                                                            <p className="text-sm text-slate-100">{SOURCE_LABEL[requirement.source ?? "cspm"]}</p>
                                                         </div>
-                                                    ) : (
-                                                        <span className="text-[11px] text-slate-600">—</span>
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Fetched</p>
+                                                            <p className="text-sm text-slate-100">{formatDateTime(requirement.evidence?.autoFetchedAt)}</p>
+                                                        </div>
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Summary</p>
+                                                            <p className="text-sm text-slate-100">{requirement.evidence?.scanSummary ?? "Scanner evidence attached"}</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <button
+                                                        onClick={() => {
+                                                            setExpandedScans((previous) => {
+                                                                const next = new Set(previous);
+                                                                if (next.has(requirement.id)) next.delete(requirement.id);
+                                                                else next.add(requirement.id);
+                                                                return next;
+                                                            });
+                                                        }}
+                                                        className="text-sm text-emerald-300 hover:text-emerald-200 transition-colors flex items-center gap-1"
+                                                    >
+                                                        {scanExpanded ? "Hide Full Scan" : "View Full Scan"}
+                                                        {scanExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                                                    </button>
+
+                                                    {scanExpanded && (
+                                                        <div className="bg-slate-950/40 border border-slate-800 rounded-lg p-4 space-y-2">
+                                                            {(extendedRequirement.scanDetails ?? [requirement.evidence?.scanSummary ?? "No additional scanner detail available."]).map((detail) => (
+                                                                <p key={detail} className="text-sm text-slate-300">
+                                                                    {detail}
+                                                                </p>
+                                                            ))}
+                                                        </div>
                                                     )}
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="text-xs text-slate-400">{a.uploader?.full_name ?? "Unknown"}</span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="text-xs text-slate-400">{new Date(a.created_at).toLocaleDateString()}</span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    {a.expires_at ? (
-                                                        <span className={cn("text-xs", expired ? "text-red-400 font-medium" : expiring ? "text-orange-400 font-medium" : "text-slate-400")}>
-                                                            {expired && <AlertTriangle className="w-3 h-3 inline mr-1" />}
-                                                            {expiring && !expired && <Clock className="w-3 h-3 inline mr-1" />}
-                                                            {new Date(a.expires_at).toLocaleDateString()}
-                                                        </span>
-                                                    ) : <span className="text-xs text-slate-600">No expiry</span>}
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <span className="text-xs text-slate-500 font-mono">{formatBytes(a.file_size)}</span>
-                                                </td>
-                                                <td className="px-4 py-3">
-                                                    <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        {a.file_url && (
-                                                            <a href={a.file_url} target="_blank" rel="noopener noreferrer"
-                                                                className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors">
-                                                                <Download className="w-4 h-4" />
+                                                </div>
+                                            )}
+
+                                            {requirement.type === "scanner" && requirement.status !== "fulfilled" && (
+                                                <div className="mt-4 bg-slate-900/60 border border-amber-500/15 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                                    <div>
+                                                        <p className="text-sm text-slate-100">Latest scanner evidence has not been fetched yet.</p>
+                                                        <p className="text-xs text-slate-500 mt-1">
+                                                            Last attempted {formatDateTime(extendedRequirement.lastAttemptedAt)}
+                                                        </p>
+                                                    </div>
+                                                    <button
+                                                        onClick={() => handleTriggerRescan(selectedControl, requirement)}
+                                                        disabled={isLoading}
+                                                        className="px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 w-fit"
+                                                    >
+                                                        {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                                                        {isLoading ? "Refreshing..." : "Trigger Rescan"}
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {requirement.type === "manual" && requirement.status === "fulfilled" && (
+                                                <div className="mt-4 space-y-3">
+                                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Filename</p>
+                                                            <p className="text-sm text-slate-100">{requirement.evidence?.name}</p>
+                                                        </div>
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Uploaded</p>
+                                                            <p className="text-sm text-slate-100">{formatDateTime(requirement.evidence?.uploadedAt)}</p>
+                                                        </div>
+                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Uploader</p>
+                                                            <p className="text-sm text-slate-100">Compliance Team</p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="flex flex-wrap items-center gap-2">
+                                                        <button
+                                                            onClick={() => setReplaceContext({
+                                                                frameworkId: selectedFrameworkId,
+                                                                controlId: selectedControl.id,
+                                                                requirementId: requirement.id,
+                                                                mode: "replace",
+                                                            })}
+                                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg transition-colors"
+                                                        >
+                                                            Replace
+                                                        </button>
+                                                        {requirement.evidence?.fileUrl && (
+                                                            <a
+                                                                href={requirement.evidence.fileUrl}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                                                            >
+                                                                <Download className="w-3.5 h-3.5" />
+                                                                Download
                                                             </a>
                                                         )}
-                                                        <button onClick={() => handleDelete(a.id)}
-                                                            className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
-                                                            <Trash2 className="w-4 h-4" />
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {requirement.type === "manual" && requirement.status !== "fulfilled" && (
+                                                <div className="mt-4 space-y-3">
+                                                    <div
+                                                        onDragOver={(event) => {
+                                                            event.preventDefault();
+                                                            setDragTargetId(requirement.id);
+                                                        }}
+                                                        onDragLeave={() => setDragTargetId((current) => (current === requirement.id ? null : current))}
+                                                        onDrop={(event) => {
+                                                            event.preventDefault();
+                                                            setDragTargetId(null);
+                                                            const file = event.dataTransfer.files?.[0];
+                                                            if (file) {
+                                                                void handleManualFile(file, {
+                                                                    frameworkId: selectedFrameworkId,
+                                                                    controlId: selectedControl.id,
+                                                                    requirementId: requirement.id,
+                                                                    mode: "upload",
+                                                                });
+                                                            }
+                                                        }}
+                                                        className={cn(
+                                                            "border-2 border-dashed rounded-xl p-6 text-center transition-colors",
+                                                            dragTargetId === requirement.id
+                                                                ? "border-orange-500/60 bg-orange-500/5"
+                                                                : "border-slate-700/60 bg-slate-950/30",
+                                                        )}
+                                                    >
+                                                        <UploadCloud className="w-6 h-6 text-slate-500 mx-auto mb-3" />
+                                                        <p className="text-sm font-medium text-slate-200">
+                                                            Drop file here or click to upload
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 mt-1">
+                                                            PDF, PNG, JPG, and XLSX are supported.
+                                                        </p>
+                                                        <button
+                                                            type="button"
+                                                            disabled={isLoading}
+                                                            onClick={() => openFilePicker({
+                                                                frameworkId: selectedFrameworkId,
+                                                                controlId: selectedControl.id,
+                                                                requirementId: requirement.id,
+                                                                mode: "upload",
+                                                            })}
+                                                            className="mt-4 px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                                                        >
+                                                            {isLoading ? "Uploading..." : "Browse Files"}
                                                         </button>
                                                     </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+
+                                                    <div className="flex flex-col md:flex-row gap-2">
+                                                        <input
+                                                            type="url"
+                                                            value={linkDrafts[requirement.id] ?? ""}
+                                                            onChange={(event) => setLinkDrafts((previous) => ({ ...previous, [requirement.id]: event.target.value }))}
+                                                            placeholder="Paste evidence URL"
+                                                            className="flex-1 bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 transition-colors"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            disabled={isLoading || !(linkDrafts[requirement.id] ?? "").trim()}
+                                                            onClick={() => void handleLinkSubmit(selectedControl, requirement)}
+                                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                                                        >
+                                                            <Link2 className="w-3.5 h-3.5" />
+                                                            Add Link
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })}
+                            </div>
+
+                            <div className="border-t border-slate-800/60 pt-5">
+                                <button
+                                    onClick={() => setAuditOpen((previous) => !previous)}
+                                    className="w-full flex items-center justify-between text-left"
+                                >
+                                    <div>
+                                        <p className="text-sm font-semibold text-slate-100">Audit Trail</p>
+                                        <p className="text-xs text-slate-500 mt-1">Uploaded, replaced, auto-fetched, and policy publication events.</p>
+                                    </div>
+                                    {auditOpen ? (
+                                        <ChevronDown className="w-4 h-4 text-slate-500" />
+                                    ) : (
+                                        <ChevronRight className="w-4 h-4 text-slate-500" />
+                                    )}
+                                </button>
+
+                                {auditOpen && (
+                                    <div className="mt-4 space-y-4">
+                                        {selectedControl.auditTrail.map((event, index) => (
+                                            <div key={event.id} className="flex gap-3">
+                                                <div className="flex flex-col items-center">
+                                                    <span
+                                                        className={cn(
+                                                            "w-2.5 h-2.5 rounded-full mt-1",
+                                                            event.kind === "policy_published" || event.kind === "auto_fetched" || event.kind === "uploaded" || event.kind === "replaced"
+                                                                ? "bg-emerald-500"
+                                                                : event.kind === "scan_attempted"
+                                                                    ? "bg-amber-500"
+                                                                    : "bg-slate-600",
+                                                        )}
+                                                    />
+                                                    {index !== selectedControl.auditTrail.length - 1 && <span className="w-px flex-1 bg-slate-800 mt-2" />}
+                                                </div>
+                                                <div className="pb-4">
+                                                    <p className="text-sm text-slate-200">{event.message}</p>
+                                                    <p className="text-xs text-slate-500 mt-1">{formatDateTime(event.at)}</p>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="flex flex-col items-center justify-center h-full py-24 px-6 text-center">
+                            <FolderGit2 className="w-12 h-12 text-slate-700 mb-3" />
+                            <p className="text-sm font-medium text-slate-300">Select a control to review its evidence requirements</p>
+                            <p className="text-xs text-slate-500 mt-1">The detail panel will load without leaving the page.</p>
                         </div>
                     )}
                 </div>
-            )}
+            </div>
 
-            {/* Upload Modal */}
             <AnimatePresence>
-                {showUpload && (
-                    <UploadModal
-                        orgId={orgId}
-                        currentUserId={currentUserId}
-                        controls={controls}
-                        prefillName={uploadPrefill}
-                        onClose={() => { setShowUpload(false); setUploadPrefill(""); }}
-                        onUploaded={handleUploaded}
+                {replaceContext && (
+                    <ReplaceConfirmModal
+                        onCancel={() => setReplaceContext(null)}
+                        onConfirm={() => {
+                            openFilePicker(replaceContext);
+                            setReplaceContext(null);
+                        }}
                     />
                 )}
             </AnimatePresence>

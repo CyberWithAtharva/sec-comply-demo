@@ -28,6 +28,7 @@ import {
     Brain,
     BrainCircuit,
     Fingerprint,
+    FolderGit2,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
@@ -59,6 +60,7 @@ const navSections: NavSection[] = [
         items: [
             { name: "Compliance Readiness", href: "/gap-assessment", icon: AlertTriangle, caption: "Compliance gaps & remediation" },
             { name: "Control Requirements", href: "/control-requirements", icon: ClipboardList, caption: "Track your compliance posture" },
+            { name: "Evidence Vault", href: "/evidences", icon: FolderGit2, caption: "Map controls to supporting evidence" },
             { name: "Vendor Management", href: "/vendors", icon: Building2, caption: "Third-party risk assessments" },
             { name: "Document Control", href: "/policies", icon: BookOpen, caption: "Governing documents & SOPs" },
         ],
@@ -112,8 +114,6 @@ export function Sidebar() {
     const { profile } = useAuth();
 
     if (pathname === "/questionnaire") return null;
-
-    const allNavItems = navSections.flatMap(s => s.items);
 
     return (
         <>
