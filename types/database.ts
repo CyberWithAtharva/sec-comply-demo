@@ -94,13 +94,22 @@ export type Database = {
         ];
       };
       risks: {
-        Row: { id: string; org_id: string; title: string; category: string; description: string | null; likelihood: number; impact: number; risk_score: number; status: string; owner_id: string | null; mitigation: string | null; due_date: string | null; source: string; source_ref: string | null; control_id: string | null; created_at: string; updated_at: string };
-        Insert: { id?: string; org_id: string; title: string; category?: string; description?: string | null; likelihood?: number; impact?: number; status?: string; owner_id?: string | null; mitigation?: string | null; due_date?: string | null; source?: string; source_ref?: string | null; control_id?: string | null };
-        Update: { title?: string; category?: string; description?: string | null; likelihood?: number; impact?: number; status?: string; owner_id?: string | null; mitigation?: string | null; due_date?: string | null; control_id?: string | null };
+        Row: { id: string; org_id: string; title: string; category: string; description: string | null; likelihood: number; impact: number; risk_score: number; status: string; owner_id: string | null; mitigation: string | null; due_date: string | null; source: string; source_ref: string | null; control_id: string | null; display_id: string | null; library_risk_id: string | null; treatment: 'mitigate' | 'accept' | 'transfer' | 'avoid' | null; residual_likelihood: number | null; residual_impact: number | null; residual_score: number | null; framework_mappings: Json; recommendation: string | null; notes: string | null; created_at: string; updated_at: string };
+        Insert: { id?: string; org_id: string; title: string; category?: string; description?: string | null; likelihood?: number; impact?: number; status?: string; owner_id?: string | null; mitigation?: string | null; due_date?: string | null; source?: string; source_ref?: string | null; control_id?: string | null; display_id?: string | null; library_risk_id?: string | null; treatment?: 'mitigate' | 'accept' | 'transfer' | 'avoid' | null; residual_likelihood?: number | null; residual_impact?: number | null; framework_mappings?: Json; recommendation?: string | null; notes?: string | null };
+        Update: { title?: string; category?: string; description?: string | null; likelihood?: number; impact?: number; status?: string; owner_id?: string | null; mitigation?: string | null; due_date?: string | null; control_id?: string | null; display_id?: string | null; library_risk_id?: string | null; treatment?: 'mitigate' | 'accept' | 'transfer' | 'avoid' | null; residual_likelihood?: number | null; residual_impact?: number | null; framework_mappings?: Json; recommendation?: string | null; notes?: string | null };
         Relationships: [
           { foreignKeyName: "risks_org_id_fkey"; columns: ["org_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] },
           { foreignKeyName: "risks_owner_id_fkey"; columns: ["owner_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
           { foreignKeyName: "risks_control_id_fkey"; columns: ["control_id"]; isOneToOne: false; referencedRelation: "controls"; referencedColumns: ["id"] }
+        ];
+      };
+      risk_status_history: {
+        Row: { id: string; risk_id: string; field: string; from_value: string | null; to_value: string | null; changed_by: string | null; changed_at: string; note: string | null };
+        Insert: { id?: string; risk_id: string; field: string; from_value?: string | null; to_value?: string | null; changed_by?: string | null; note?: string | null };
+        Update: { note?: string | null };
+        Relationships: [
+          { foreignKeyName: "risk_status_history_risk_id_fkey"; columns: ["risk_id"]; isOneToOne: false; referencedRelation: "risks"; referencedColumns: ["id"] },
+          { foreignKeyName: "risk_status_history_changed_by_fkey"; columns: ["changed_by"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }
         ];
       };
       vendors: {

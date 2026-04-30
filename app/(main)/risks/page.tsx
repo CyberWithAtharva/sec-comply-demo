@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { RiskRegisterClient } from "@/components/risks/RiskRegisterClient";
+import { RiskManagementClient } from "@/components/risks/RiskManagementClient";
 
 export default async function RisksPage() {
     const supabase = await createClient();
@@ -18,8 +18,7 @@ export default async function RisksPage() {
 
     const orgId = membership.org_id;
 
-    // Fetch risks and org members in parallel (both only need orgId)
-    const [{ data: risks }, { data: members }] = await Promise.all([
+    const [{ data: risks }, { data: members }, { data: history }] = await Promise.all([
         supabase
             .from("risks")
             .select("*, profiles(id, full_name, avatar_url)")
@@ -30,6 +29,12 @@ export default async function RisksPage() {
             .from("organization_members")
             .select("user_id, profiles(id, full_name)")
             .eq("org_id", orgId),
+        // Recent history is scoped via RLS — selecting all visible rows is fine.
+        supabase
+            .from("risk_status_history")
+            .select("*, profiles:changed_by(id, full_name)")
+            .order("changed_at", { ascending: false })
+            .limit(100),
     ]);
 
     const owners = (members ?? [])
@@ -39,11 +44,18 @@ export default async function RisksPage() {
         })
         .filter(Boolean) as { id: string; name: string }[];
 
+    // Server component: Date.now() evaluated per-request and passed to the client
+    // so client renders stay pure (react/purity lint rule).
+    // eslint-disable-next-line react-hooks/purity
+    const serverNowMs = Date.now();
+
     return (
-        <RiskRegisterClient
+        <RiskManagementClient
             initialRisks={risks ?? []}
+            initialHistory={history ?? []}
             orgId={orgId}
             owners={owners}
+            serverNowMs={serverNowMs}
         />
     );
 }

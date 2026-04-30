@@ -150,6 +150,12 @@ const navSections: NavSection[] = [
     label: "OPERATIONS",
     items: [
       {
+        name: "Risk Management",
+        href: "/risks",
+        icon: Shield,
+        caption: "Risk library, register & posture overview",
+      },
+      {
         name: "Incident Management",
         href: "/incident-management",
         icon: Siren,
@@ -171,7 +177,6 @@ const navSections: NavSection[] = [
 ];
 
 const comingSoonItems: NavItem[] = [
-  // { name: "Risk Management",    href: "/risks",         icon: Shield,       caption: "Organizational risk management",  badge: "soon"    },
   {
     name: "AI Identity",
     href: "/ai-identity",
