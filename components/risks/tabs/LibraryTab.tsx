@@ -170,7 +170,7 @@ export function LibraryTab({ risks, orgId, onRiskAdded }: Props) {
                                                     </span>
                                                     <div className="flex items-center gap-1">
                                                         {risk.frameworkMappings.slice(0, 3).map((m, i) => (
-                                                            <span key={i} className={`px-1.5 py-0.5 text-[9px] uppercase font-bold rounded border ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
+                                                            <span key={`${risk.id}-${m.framework}-${m.clause}-${i}`} className={`px-1.5 py-0.5 text-[9px] uppercase font-bold rounded border ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
                                                                 {FRAMEWORK_LABELS[m.framework].replace(" ", "")}
                                                             </span>
                                                         ))}

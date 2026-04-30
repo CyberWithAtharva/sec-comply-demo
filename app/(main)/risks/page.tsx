@@ -37,12 +37,17 @@ export default async function RisksPage() {
             .limit(100),
     ]);
 
-    const owners = (members ?? [])
-        .map(m => {
-            const p = m.profiles as { id: string; full_name: string | null } | null;
-            return p ? { id: p.id, name: p.full_name ?? "Unknown" } : null;
-        })
-        .filter(Boolean) as { id: string; name: string }[];
+    // Build owners list, filter out empty IDs, and dedupe by id (defensive — a
+    // user with multiple membership rows would otherwise produce duplicate keys
+    // in the owner-filter dropdown).
+    const ownersById = new Map<string, { id: string; name: string }>();
+    for (const m of members ?? []) {
+        const p = m.profiles as { id: string; full_name: string | null } | null;
+        if (p && p.id && !ownersById.has(p.id)) {
+            ownersById.set(p.id, { id: p.id, name: p.full_name ?? "Unknown" });
+        }
+    }
+    const owners = Array.from(ownersById.values());
 
     // Server component: Date.now() evaluated per-request and passed to the client
     // so client renders stay pure (react/purity lint rule).

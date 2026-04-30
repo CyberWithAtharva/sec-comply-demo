@@ -471,7 +471,7 @@ export function RegisterRiskDetailPanel({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {frameworkMappings.map((m, idx) => (
                   <div
-                    key={idx}
+                    key={`${m.framework}-${m.clause}-${idx}`}
                     className={`px-3 py-2 rounded-lg border text-xs ${FRAMEWORK_BADGE_COLORS[m.framework]}`}
                   >
                     <p className="font-mono font-bold">

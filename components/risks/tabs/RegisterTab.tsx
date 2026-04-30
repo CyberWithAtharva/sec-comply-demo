@@ -241,7 +241,7 @@ export function RegisterTab({
                                             <td className="px-5 py-3.5">
                                                 <div className="flex flex-wrap gap-1">
                                                     {mappings.slice(0, 3).map((m, i) => (
-                                                        <span key={i} className={`px-1.5 py-0.5 text-[9px] uppercase font-bold rounded border ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
+                                                        <span key={`${risk.id}-${m.framework}-${m.clause}-${i}`} className={`px-1.5 py-0.5 text-[9px] uppercase font-bold rounded border ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
                                                             {FRAMEWORK_LABELS[m.framework]}
                                                         </span>
                                                     ))}
@@ -301,7 +301,9 @@ function SmallSelect({
             onChange={e => onChange(e.target.value)}
             className="px-2 py-2 bg-slate-900/50 border border-slate-700 rounded-xl text-xs text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
         >
-            {options.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+            {options.map((o, idx) => (
+                <option key={`${o.value}-${idx}`} value={o.value}>{o.label}</option>
+            ))}
         </select>
     );
 }

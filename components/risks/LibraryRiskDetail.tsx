@@ -72,7 +72,7 @@ export function LibraryRiskDetail({ libraryRisk, alreadyInRegister, onClose, onA
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                             {libraryRisk.frameworkMappings.map((m, idx) => (
-                                <div key={idx} className={`px-3 py-2 rounded-lg border text-xs ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
+                                <div key={`${m.framework}-${m.clause}-${idx}`} className={`px-3 py-2 rounded-lg border text-xs ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
                                     <p className="font-mono font-bold">
                                         {FRAMEWORK_LABELS[m.framework]} · {m.clause}
                                     </p>
