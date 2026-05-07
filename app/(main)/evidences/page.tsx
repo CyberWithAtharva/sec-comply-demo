@@ -64,10 +64,14 @@ export default async function EvidencesPage() {
                 ...a,
                 uploader: (a.profiles as unknown as { id: string; full_name: string | null } | null),
             }))}
-            controls={controls ?? []}
+            controls={(controls ?? []).map(c => ({
+                ...c,
+                domain: c.domain ?? "",
+                category: c.category ?? "",
+            }))}
             statuses={controlStatuses ?? []}
             frameworks={(orgFrameworks ?? []).map((item) => {
-                const framework = item.frameworks as { id: string; name: string; version: string; controls_count: number } | null;
+                const framework = item.frameworks as { id: string; name: string; version: string | null; controls_count: number } | null;
                 return {
                     id: item.framework_id,
                     name: framework?.name ?? "Framework",

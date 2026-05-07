@@ -27,6 +27,7 @@ const navItems = [
     { name: "Dashboard", href: "/admin", icon: LayoutDashboard, caption: "Overview of all clients" },
     { name: "Organizations", href: "/admin/organizations", icon: Building2, caption: "Manage client organizations" },
     { name: "Users", href: "/admin/users", icon: Users, caption: "All users across orgs" },
+    { name: "Frameworks", href: "/admin/frameworks", icon: ShieldCheck, caption: "Compliance framework catalog" },
     { name: "Settings", href: "/admin/settings", icon: Settings, caption: "Platform configuration" },
 ];
 

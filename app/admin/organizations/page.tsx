@@ -12,5 +12,10 @@ export default async function OrganizationsPage() {
         supabase.from("frameworks").select("id, name, version"),
     ]);
 
-    return <OrganizationsClient orgs={orgs ?? []} frameworks={frameworks ?? []} />;
+    return (
+        <OrganizationsClient
+            orgs={orgs ?? []}
+            frameworks={(frameworks ?? []).map(f => ({ id: f.id, name: f.name, version: f.version ?? "" }))}
+        />
+    );
 }

@@ -15,5 +15,30 @@ export default async function OrgDetailPage({ params }: { params: Promise<{ id: 
 
     if (!org) notFound();
 
-    return <OrgDetailClient org={org} members={members ?? []} orgFrameworks={orgFrameworks ?? []} allFrameworks={frameworks ?? []} />;
+    type OFRow = NonNullable<typeof orgFrameworks>[number];
+    type OFFramework = { id: string; name: string; version: string; controls_count: number };
+
+    const normalizedOrgFrameworks = (orgFrameworks ?? []).map((row): OFRow & { frameworks: OFFramework } => {
+        const fw = row.frameworks as { id: string; name: string; version: string | null; controls_count: number } | null;
+        return {
+            ...row,
+            frameworks: {
+                id: fw?.id ?? row.framework_id,
+                name: fw?.name ?? "Framework",
+                version: fw?.version ?? "",
+                controls_count: fw?.controls_count ?? 0,
+            },
+        };
+    });
+
+    const normalizedFrameworks = (frameworks ?? []).map(f => ({ id: f.id, name: f.name, version: f.version ?? "" }));
+
+    return (
+        <OrgDetailClient
+            org={org}
+            members={members ?? []}
+            orgFrameworks={normalizedOrgFrameworks}
+            allFrameworks={normalizedFrameworks}
+        />
+    );
 }

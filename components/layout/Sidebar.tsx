@@ -29,6 +29,7 @@ import {
   BrainCircuit,
   Fingerprint,
   FolderGit2,
+  Library,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
@@ -84,6 +85,12 @@ const navSections: NavSection[] = [
         href: "/control-requirements",
         icon: ClipboardList,
         caption: "Track your compliance posture",
+      },
+      {
+        name: "Frameworks Catalog",
+        href: "/frameworks-catalog",
+        icon: Library,
+        caption: "Browse all available frameworks",
       },
       {
         name: "Policy Management",

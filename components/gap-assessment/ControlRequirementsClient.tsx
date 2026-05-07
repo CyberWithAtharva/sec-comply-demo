@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
     ClipboardList, Target, CheckCircle2, AlertTriangle, XCircle,
-    ChevronRight, ChevronDown, BarChart3, Layers,
+    ChevronRight, ChevronDown, BarChart3, Layers, Search, FileText, MinusCircle,
+    X, Info, Calendar, Hash,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 
@@ -31,21 +33,69 @@ interface FrameworkStat {
     domainSections: DomainSection[];
 }
 
+interface ControlListItem {
+    id: string;
+    frameworkId: string;
+    code: string;
+    title: string;
+    description?: string | null;
+    domain: string;
+    category: string;
+    sortOrder?: number;
+}
+
+interface ControlStatusItem {
+    controlId: string;
+    status: "verified" | "in_progress" | "not_started" | "not_applicable";
+    evidenceCount: number;
+    notes?: string | null;
+    lastUpdated?: string | null;
+}
+
+type StatusKey = ControlStatusItem["status"];
+
 interface ControlRequirementsClientProps {
     orgId: string;
     frameworks: Framework[];
     frameworkStats: FrameworkStat[];
+    controls?: ControlListItem[];
+    controlStatuses?: ControlStatusItem[];
 }
 
-const TABS = ["Overview", "Questions", "All Controls"] as const;
+const TABS = ["Overview", "All Controls"] as const;
 
 export function ControlRequirementsClient({
     frameworks,
     frameworkStats,
+    controls = [],
+    controlStatuses = [],
 }: ControlRequirementsClientProps) {
     const [activeTab, setActiveTab] = useState<typeof TABS[number]>("Overview");
     const [activeFrameworkId, setActiveFrameworkId] = useState(frameworks[0]?.id ?? "");
     const [expandedDomains, setExpandedDomains] = useState<Set<string>>(new Set());
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState<"all" | StatusKey>("all");
+    const [detailControlId, setDetailControlId] = useState<string | null>(null);
+
+    const statusMap = useMemo(() => {
+        const m = new Map<string, ControlStatusItem>();
+        for (const s of controlStatuses) m.set(s.controlId, s);
+        return m;
+    }, [controlStatuses]);
+
+    const controlsByFramework = useMemo(() => {
+        const m = new Map<string, ControlListItem[]>();
+        for (const c of controls) {
+            const arr = m.get(c.frameworkId) ?? [];
+            arr.push(c);
+            m.set(c.frameworkId, arr);
+        }
+        return m;
+    }, [controls]);
+
+    const detailControl = detailControlId ? controls.find(c => c.id === detailControlId) ?? null : null;
+    const detailStatus = detailControl ? statusMap.get(detailControl.id) ?? null : null;
+    const detailFramework = detailControl ? frameworks.find(f => f.id === detailControl.frameworkId) ?? null : null;
 
     const activeFramework = frameworks.find((framework) => framework.id === activeFrameworkId) ?? frameworks[0];
     const activeStats = frameworkStats.find((stat) => stat.frameworkId === activeFramework?.id);
@@ -219,6 +269,14 @@ export function ControlRequirementsClient({
                                 {domainSections.map(domain => {
                                     const pct = domain.total > 0 ? Math.round((domain.fulfilled / domain.total) * 100) : 0;
                                     const isExpanded = expandedDomains.has(domain.label);
+                                    const domainControls = (controlsByFramework.get(activeFrameworkId) ?? [])
+                                        .filter(c => (c.domain || "General") === domain.label)
+                                        .sort((a, b) => {
+                                            const aSort = a.sortOrder ?? 0;
+                                            const bSort = b.sortOrder ?? 0;
+                                            if (aSort !== bSort) return aSort - bSort;
+                                            return a.code.localeCompare(b.code, undefined, { numeric: true });
+                                        });
                                     return (
                                         <div key={domain.label}>
                                             <button
@@ -238,9 +296,9 @@ export function ControlRequirementsClient({
                                                             style={{ width: `${pct}%` }}
                                                         />
                                                     </div>
-                                                    <span className="text-xs text-slate-400 w-12 text-right">{domain.fulfilled}/{domain.total}</span>
+                                                    <span className="text-xs text-slate-400 w-12 text-right tabular-nums">{domain.fulfilled}/{domain.total}</span>
                                                     <span className={cn(
-                                                        "text-xs font-semibold w-10 text-right",
+                                                        "text-xs font-semibold w-10 text-right tabular-nums",
                                                         pct >= 80 ? "text-emerald-400" : pct >= 40 ? "text-amber-400" : "text-red-400"
                                                     )}>{pct}%</span>
                                                     {isExpanded ? (
@@ -250,6 +308,58 @@ export function ControlRequirementsClient({
                                                     )}
                                                 </div>
                                             </button>
+                                            <AnimatePresence initial={false}>
+                                                {isExpanded && (
+                                                    <motion.div
+                                                        key="content"
+                                                        initial={{ height: 0, opacity: 0 }}
+                                                        animate={{ height: "auto", opacity: 1 }}
+                                                        exit={{ height: 0, opacity: 0 }}
+                                                        transition={{ duration: 0.18, ease: "easeOut" }}
+                                                        className="overflow-hidden bg-slate-950/40 border-t border-slate-800/60"
+                                                    >
+                                                        {domainControls.length === 0 ? (
+                                                            <div className="px-5 py-4 text-xs text-slate-500">No controls in this section.</div>
+                                                        ) : (
+                                                            <div className="divide-y divide-slate-800/40">
+                                                                {domainControls.map(c => {
+                                                                    const s = statusMap.get(c.id);
+                                                                    const statusKey: StatusKey = (s?.status ?? "not_started") as StatusKey;
+                                                                    const meta = STATUS_META[statusKey];
+                                                                    const StatusIcon = meta.icon;
+                                                                    return (
+                                                                        <button
+                                                                            key={c.id}
+                                                                            type="button"
+                                                                            onClick={() => setDetailControlId(c.id)}
+                                                                            className="w-full flex items-center gap-4 px-5 py-2.5 hover:bg-slate-800/30 transition-colors text-left"
+                                                                        >
+                                                                            <span className="inline-block min-w-[64px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 font-mono text-[11px] text-slate-200 text-center">
+                                                                                {c.code}
+                                                                            </span>
+                                                                            <span className="flex-1 text-sm text-slate-300 leading-tight truncate" title={c.title}>
+                                                                                {c.title}
+                                                                            </span>
+                                                                            <span className="hidden md:inline-flex items-center gap-1 text-xs text-slate-500 tabular-nums">
+                                                                                <FileText className="w-3 h-3" />
+                                                                                {s?.evidenceCount ?? 0}
+                                                                            </span>
+                                                                            <span className={cn(
+                                                                                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium",
+                                                                                meta.cls
+                                                                            )}>
+                                                                                <StatusIcon className="w-3 h-3" />
+                                                                                {meta.label}
+                                                                            </span>
+                                                                            <ChevronRight className="w-3 h-3 text-slate-600" />
+                                                                        </button>
+                                                                    );
+                                                                })}
+                                                            </div>
+                                                        )}
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
                                         </div>
                                     );
                                 })}
@@ -273,23 +383,355 @@ export function ControlRequirementsClient({
                 </div>
             )}
 
-            {activeTab === "Questions" && (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <ClipboardList className="w-12 h-12 text-slate-700 mb-4" />
-                    <p className="text-slate-300 font-medium">Gap assessment questionnaire</p>
-                    <p className="text-slate-500 text-sm mt-1">Answer control questions to improve your compliance score</p>
-                </div>
+            {activeTab === "All Controls" && (
+                <AllControlsTab
+                    activeFrameworkId={activeFrameworkId}
+                    activeFrameworkName={activeFramework?.name}
+                    controls={controls}
+                    statusMap={statusMap}
+                    search={search}
+                    onSearchChange={setSearch}
+                    statusFilter={statusFilter}
+                    onStatusFilterChange={setStatusFilter}
+                    onView={setDetailControlId}
+                />
             )}
 
-            {activeTab === "All Controls" && (
-                <div className="flex flex-col items-center justify-center py-24 text-center">
-                    <Layers className="w-12 h-12 text-slate-700 mb-4" />
-                    <p className="text-slate-300 font-medium">
-                        All {totalControls} controls{activeFramework ? ` in ${activeFramework.name}` : ""}
-                    </p>
-                    <p className="text-slate-500 text-sm mt-1">Full control list view coming soon</p>
+            <ControlDetailDialog
+                control={detailControl}
+                status={detailStatus}
+                framework={detailFramework}
+                onClose={() => setDetailControlId(null)}
+            />
+        </div>
+    );
+}
+
+interface AllControlsTabProps {
+    activeFrameworkId: string;
+    activeFrameworkName?: string;
+    controls: ControlListItem[];
+    statusMap: Map<string, ControlStatusItem>;
+    search: string;
+    onSearchChange: (v: string) => void;
+    statusFilter: "all" | StatusKey;
+    onStatusFilterChange: (v: "all" | StatusKey) => void;
+    onView: (controlId: string) => void;
+}
+
+const STATUS_META: Record<StatusKey, { label: string; cls: string; icon: React.ComponentType<{ className?: string }> }> = {
+    verified:        { label: "Verified",       cls: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30", icon: CheckCircle2 },
+    in_progress:     { label: "In Progress",    cls: "bg-amber-500/10 text-amber-300 border-amber-500/30",       icon: AlertTriangle },
+    not_started:     { label: "Not Started",    cls: "bg-slate-700/40 text-slate-300 border-slate-600/40",        icon: XCircle },
+    not_applicable:  { label: "Not Applicable", cls: "bg-blue-500/10 text-blue-300 border-blue-500/30",           icon: MinusCircle },
+};
+
+const STATUS_FILTERS: Array<{ value: "all" | StatusKey; label: string }> = [
+    { value: "all",            label: "All" },
+    { value: "verified",       label: "Verified" },
+    { value: "in_progress",    label: "In Progress" },
+    { value: "not_started",    label: "Not Started" },
+    { value: "not_applicable", label: "Not Applicable" },
+];
+
+function AllControlsTab({
+    activeFrameworkId,
+    activeFrameworkName,
+    controls,
+    statusMap,
+    search,
+    onSearchChange,
+    statusFilter,
+    onStatusFilterChange,
+    onView,
+}: AllControlsTabProps) {
+    const scoped = useMemo(
+        () => controls.filter(c => c.frameworkId === activeFrameworkId),
+        [controls, activeFrameworkId]
+    );
+
+    const filtered = useMemo(() => {
+        const q = search.trim().toLowerCase();
+        return scoped.filter(c => {
+            if (statusFilter !== "all") {
+                const s = statusMap.get(c.id)?.status ?? "not_started";
+                if (s !== statusFilter) return false;
+            }
+            if (!q) return true;
+            return (
+                c.code.toLowerCase().includes(q) ||
+                c.title.toLowerCase().includes(q) ||
+                c.domain.toLowerCase().includes(q)
+            );
+        });
+    }, [scoped, search, statusFilter, statusMap]);
+
+    // Group by domain
+    const grouped = useMemo(() => {
+        const map = new Map<string, ControlListItem[]>();
+        for (const c of filtered) {
+            const arr = map.get(c.domain) ?? [];
+            arr.push(c);
+            map.set(c.domain, arr);
+        }
+        return Array.from(map.entries())
+            .sort((a, b) => a[0].localeCompare(b[0]))
+            .map(([domain, items]) => ({
+                domain,
+                items: items.sort((a, b) => a.code.localeCompare(b.code, undefined, { numeric: true })),
+            }));
+    }, [filtered]);
+
+    if (scoped.length === 0) {
+        return (
+            <div className="flex flex-col items-center justify-center py-24 text-center bg-slate-900/40 border border-slate-800 rounded-xl">
+                <Layers className="w-12 h-12 text-slate-700 mb-4" />
+                <p className="text-slate-300 font-medium">
+                    No controls found{activeFrameworkName ? ` for ${activeFrameworkName}` : ""}
+                </p>
+                <p className="text-slate-500 text-sm mt-1">Ask your admin to seed controls for this framework.</p>
+            </div>
+        );
+    }
+
+    return (
+        <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-3">
+                <div className="relative flex-1 min-w-[240px] max-w-md">
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <input
+                        value={search}
+                        onChange={e => onSearchChange(e.target.value)}
+                        placeholder="Search by code, name, domain…"
+                        className="w-full bg-slate-950/50 border border-slate-700 rounded-lg pl-9 pr-4 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+                    />
+                </div>
+                <div className="flex items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-lg p-1">
+                    {STATUS_FILTERS.map(f => (
+                        <button
+                            key={f.value}
+                            type="button"
+                            onClick={() => onStatusFilterChange(f.value)}
+                            className={cn(
+                                "px-3 py-1 rounded-md text-xs font-medium transition-colors",
+                                statusFilter === f.value
+                                    ? "bg-orange-600 text-white"
+                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                            )}
+                        >
+                            {f.label}
+                        </button>
+                    ))}
+                </div>
+                <span className="ml-auto text-xs text-slate-500 tabular-nums">
+                    {filtered.length} of {scoped.length} controls
+                </span>
+            </div>
+
+            {filtered.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-16 text-center bg-slate-900/40 border border-slate-800 rounded-xl">
+                    <Search className="w-10 h-10 text-slate-700 mb-3" />
+                    <p className="text-slate-400 text-sm">No controls match your filters.</p>
+                </div>
+            ) : (
+                <div className="space-y-4">
+                    {grouped.map(g => (
+                        <div key={g.domain} className="bg-slate-900/40 border border-slate-800 rounded-xl overflow-hidden">
+                            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800/60 bg-slate-900/60">
+                                <div className="flex items-center gap-2">
+                                    <Layers className="w-4 h-4 text-slate-500" />
+                                    <span className="text-sm font-semibold text-slate-200">{g.domain}</span>
+                                </div>
+                                <span className="text-xs text-slate-500 tabular-nums">{g.items.length}</span>
+                            </div>
+                            <div className="divide-y divide-slate-800/40">
+                                {g.items.map(c => {
+                                    const s = statusMap.get(c.id);
+                                    const statusKey: StatusKey = (s?.status ?? "not_started") as StatusKey;
+                                    const meta = STATUS_META[statusKey];
+                                    const StatusIcon = meta.icon;
+                                    return (
+                                        <button
+                                            key={c.id}
+                                            type="button"
+                                            onClick={() => onView(c.id)}
+                                            className="w-full flex items-center gap-4 px-5 py-3 hover:bg-slate-800/30 transition-colors text-left group"
+                                        >
+                                            <span className="inline-block min-w-[64px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 font-mono text-xs text-slate-200 text-center">
+                                                {c.code}
+                                            </span>
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-sm text-slate-200 leading-tight truncate" title={c.title}>
+                                                    {c.title}
+                                                </p>
+                                                {c.description && (
+                                                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{c.description}</p>
+                                                )}
+                                            </div>
+                                            <span className="hidden md:inline-flex items-center gap-1 text-xs text-slate-500 tabular-nums">
+                                                <FileText className="w-3 h-3" />
+                                                {s?.evidenceCount ?? 0}
+                                            </span>
+                                            <span className={cn(
+                                                "inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium",
+                                                meta.cls
+                                            )}>
+                                                <StatusIcon className="w-3 h-3" />
+                                                {meta.label}
+                                            </span>
+                                            <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors" />
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    ))}
                 </div>
             )}
+        </div>
+    );
+}
+
+interface ControlDetailDialogProps {
+    control: ControlListItem | null;
+    status: ControlStatusItem | null;
+    framework: Framework | null;
+    onClose: () => void;
+}
+
+function ControlDetailDialog({ control, status, framework, onClose }: ControlDetailDialogProps) {
+    const open = !!control;
+    const meta = control ? STATUS_META[(status?.status ?? "not_started") as StatusKey] : null;
+    const StatusIcon = meta?.icon ?? Info;
+
+    return (
+        <AnimatePresence>
+            {open && control && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+                        onClick={onClose}
+                    />
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                        className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/60 rounded-2xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto"
+                    >
+                        <div className="px-6 pt-6 pb-4 border-b border-slate-800/60 flex items-start justify-between gap-4">
+                            <div className="min-w-0 flex-1">
+                                <div className="flex items-center gap-2 mb-2">
+                                    <span className="inline-block px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 font-mono text-xs text-slate-200">
+                                        {control.code}
+                                    </span>
+                                    {meta && (
+                                        <span className={cn(
+                                            "inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[11px] font-medium",
+                                            meta.cls
+                                        )}>
+                                            <StatusIcon className="w-3 h-3" />
+                                            {meta.label}
+                                        </span>
+                                    )}
+                                </div>
+                                <h2 className="text-lg font-bold text-slate-100 leading-tight">{control.title}</h2>
+                                {framework && (
+                                    <p className="text-xs text-slate-500 mt-1">
+                                        {framework.name}{framework.version ? ` v${framework.version}` : ""}
+                                    </p>
+                                )}
+                            </div>
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors flex-shrink-0"
+                            >
+                                <X className="w-4 h-4" />
+                            </button>
+                        </div>
+
+                        <div className="px-6 py-5 space-y-5">
+                            {control.description ? (
+                                <section>
+                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Requirement</h3>
+                                    <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{control.description}</p>
+                                </section>
+                            ) : (
+                                <section>
+                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Requirement</h3>
+                                    <p className="text-sm text-slate-500 italic">No description provided.</p>
+                                </section>
+                            )}
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <DetailCell icon={Layers} label="Domain" value={control.domain || "—"} />
+                                <DetailCell icon={Hash} label="Sort order" value={String(control.sortOrder ?? 0)} mono />
+                                <DetailCell
+                                    icon={FileText}
+                                    label="Evidence linked"
+                                    value={String(status?.evidenceCount ?? 0)}
+                                    mono
+                                />
+                                <DetailCell
+                                    icon={Calendar}
+                                    label="Last updated"
+                                    value={status?.lastUpdated ? new Date(status.lastUpdated).toLocaleDateString(undefined, { year: "numeric", month: "short", day: "numeric" }) : "—"}
+                                />
+                            </div>
+
+                            {status?.notes && (
+                                <section>
+                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Notes</h3>
+                                    <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line bg-slate-950/40 border border-slate-800 rounded-lg px-3 py-2">
+                                        {status.notes}
+                                    </p>
+                                </section>
+                            )}
+
+                            {control.category && (
+                                <section className="text-xs text-slate-500">
+                                    Category: <span className="text-slate-400">{control.category}</span>
+                                </section>
+                            )}
+                        </div>
+
+                        <div className="px-6 pb-6 pt-2 flex justify-end">
+                            <button
+                                type="button"
+                                onClick={onClose}
+                                className="px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm text-slate-300 transition-colors"
+                            >
+                                Close
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+        </AnimatePresence>
+    );
+}
+
+function DetailCell({
+    icon: Icon,
+    label,
+    value,
+    mono,
+}: {
+    icon: React.ComponentType<{ className?: string }>;
+    label: string;
+    value: string;
+    mono?: boolean;
+}) {
+    return (
+        <div className="rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                <Icon className="w-3 h-3" />
+                {label}
+            </div>
+            <p className={cn("text-sm text-slate-200", mono && "font-mono tabular-nums")}>{value}</p>
         </div>
     );
 }

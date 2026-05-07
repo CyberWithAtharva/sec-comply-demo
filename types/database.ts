@@ -27,15 +27,15 @@ export type Database = {
         ];
       };
       frameworks: {
-        Row: { id: string; name: string; version: string; description: string | null; controls_count: number; created_at: string };
-        Insert: { id?: string; name: string; version: string; description?: string | null; controls_count?: number };
-        Update: { name?: string; version?: string; description?: string | null; controls_count?: number };
+        Row: { id: string; name: string; version: string | null; description: string | null; controls_count: number; created_at: string; slug: string; category: string | null; icon_name: string | null; color: string | null; status: 'active' | 'archived'; metadata: Json; created_by: string | null; updated_by: string | null; updated_at: string };
+        Insert: { id?: string; name: string; version?: string | null; description?: string | null; controls_count?: number; slug: string; category?: string | null; icon_name?: string | null; color?: string | null; status?: 'active' | 'archived'; metadata?: Json; created_by?: string | null; updated_by?: string | null; updated_at?: string };
+        Update: { name?: string; version?: string | null; description?: string | null; controls_count?: number; slug?: string; category?: string | null; icon_name?: string | null; color?: string | null; status?: 'active' | 'archived'; metadata?: Json; created_by?: string | null; updated_by?: string | null; updated_at?: string };
         Relationships: [];
       };
       controls: {
-        Row: { id: string; framework_id: string; control_id: string; domain: string; category: string; title: string; description: string | null; type: 'automated' | 'manual'; created_at: string };
-        Insert: { id?: string; framework_id: string; control_id: string; domain: string; category: string; title: string; description?: string | null; type?: 'automated' | 'manual' };
-        Update: { domain?: string; category?: string; title?: string; description?: string | null; type?: 'automated' | 'manual' };
+        Row: { id: string; framework_id: string; control_id: string; domain: string | null; category: string | null; title: string; description: string | null; type: 'automated' | 'manual'; created_at: string; sort_order: number; metadata: Json; updated_at: string };
+        Insert: { id?: string; framework_id: string; control_id: string; domain?: string | null; category?: string | null; title: string; description?: string | null; type?: 'automated' | 'manual'; sort_order?: number; metadata?: Json; updated_at?: string };
+        Update: { domain?: string | null; category?: string | null; title?: string; description?: string | null; type?: 'automated' | 'manual'; sort_order?: number; metadata?: Json; updated_at?: string };
         Relationships: [
           { foreignKeyName: "controls_framework_id_fkey"; columns: ["framework_id"]; isOneToOne: false; referencedRelation: "frameworks"; referencedColumns: ["id"] }
         ];

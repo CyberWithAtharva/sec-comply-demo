@@ -47,8 +47,8 @@ export default async function ActionItemsPage() {
 
     // Build framework list
     const frameworks = orgFrameworks.map(f => {
-        const fw = f.frameworks as { id: string; name: string; version: string } | null;
-        return fw ? { id: fw.id, name: `${fw.name} ${fw.version}` } : null;
+        const fw = f.frameworks as { id: string; name: string; version: string | null } | null;
+        return fw ? { id: fw.id, name: fw.version ? `${fw.name} ${fw.version}` : fw.name } : null;
     }).filter((fw): fw is { id: string; name: string } => fw !== null);
 
     // Fetch all controls for org's frameworks
@@ -61,8 +61,8 @@ export default async function ActionItemsPage() {
         id: c.id,
         control_id: c.control_id,
         title: c.title,
-        domain: c.domain,
-        category: c.category,
+        domain: c.domain ?? "",
+        category: c.category ?? "",
         framework_id: c.framework_id,
     }));
 

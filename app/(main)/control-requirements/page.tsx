@@ -47,11 +47,13 @@ export default async function ControlRequirementsPage() {
     const [{ data: controls }, { data: controlStatuses }] = await Promise.all([
         supabase
             .from("controls")
-            .select("id, framework_id, control_id, title, domain, category")
-            .in("framework_id", frameworkIds),
+            .select("id, framework_id, control_id, title, domain, category, description, sort_order")
+            .in("framework_id", frameworkIds)
+            .order("sort_order", { ascending: true })
+            .order("control_id", { ascending: true }),
         supabase
             .from("control_status")
-            .select("control_id, status, evidence_count")
+            .select("control_id, status, evidence_count, notes, last_updated")
             .eq("org_id", orgId),
     ]);
 
@@ -109,11 +111,32 @@ export default async function ControlRequirementsPage() {
         };
     });
 
+    const controlList = (controls ?? []).map(c => ({
+        id: c.id,
+        frameworkId: c.framework_id,
+        code: c.control_id,
+        title: c.title,
+        description: c.description ?? null,
+        domain: c.domain ?? "General",
+        category: c.category ?? "",
+        sortOrder: c.sort_order ?? 0,
+    }));
+
+    const controlStatusList = (controlStatuses ?? []).map(s => ({
+        controlId: s.control_id,
+        status: s.status,
+        evidenceCount: s.evidence_count ?? 0,
+        notes: s.notes ?? null,
+        lastUpdated: s.last_updated ?? null,
+    }));
+
     return (
         <ControlRequirementsClient
             orgId={orgId}
             frameworks={frameworkList}
             frameworkStats={frameworkStats}
+            controls={controlList}
+            controlStatuses={controlStatusList}
         />
     );
 }
