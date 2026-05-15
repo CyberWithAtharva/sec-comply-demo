@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo } from "react";
+import { Button } from "@/components/ui/button";
 
 interface MatrixRisk {
     id: string;
@@ -54,19 +55,19 @@ export function RiskMatrix<T extends MatrixRisk>({
             <div className="flex flex-col items-center gap-0 pt-1 pb-7 self-stretch justify-between">
                 <div
                     style={{ writingMode: "vertical-rl", transform: "rotate(180deg)" }}
-                    className="text-[9px] text-slate-600 uppercase tracking-widest select-none mb-2"
+                    className="text-[9px] text-muted-foreground/70 uppercase tracking-widest select-none mb-2"
                 >
                     Likelihood
                 </div>
                 {[5, 4, 3, 2, 1].map(n => (
-                    <span key={n} className="text-[11px] font-mono text-slate-500">{n}</span>
+                    <span key={n} className="text-[11px] font-mono text-muted-foreground">{n}</span>
                 ))}
             </div>
 
             <div className="flex-1 flex flex-col gap-2">
                 {/* Matrix canvas */}
                 <div
-                    className="relative rounded-2xl overflow-hidden border border-slate-700/30"
+                    className="relative rounded-2xl overflow-hidden border border-border/30"
                     style={{ height }}
                 >
                     {/* Diagonal gradient */}
@@ -86,7 +87,7 @@ export function RiskMatrix<T extends MatrixRisk>({
                     {/* Grid lines */}
                     <div className="absolute inset-0 grid grid-cols-5 grid-rows-5">
                         {Array.from({ length: 25 }).map((_, idx) => (
-                            <div key={idx} className="border border-slate-700/15" />
+                            <div key={idx} className="border border-border/15" />
                         ))}
                     </div>
 
@@ -118,7 +119,7 @@ export function RiskMatrix<T extends MatrixRisk>({
 
                             const clickable = !!onCellClick;
                             return (
-                                <button
+                                <Button variant="plain"
                                     type="button"
                                     key={`${l}-${i}`}
                                     onClick={
@@ -145,14 +146,14 @@ export function RiskMatrix<T extends MatrixRisk>({
                                     title={`${count} risk${count > 1 ? "s" : ""} — Likelihood ${l} × Impact ${i} = Score ${score}`}
                                 >
                                     {count}
-                                </button>
+                                </Button>
                             );
                         })}
 
                     {/* Empty state */}
                     {isEmpty && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                            <span className="text-slate-700 text-sm">No active risks</span>
+                            <span className="text-muted-foreground/50 text-sm">No active risks</span>
                         </div>
                     )}
                 </div>
@@ -160,10 +161,10 @@ export function RiskMatrix<T extends MatrixRisk>({
                 {/* X-axis ticks */}
                 <div className="grid grid-cols-5 px-0">
                     {[1, 2, 3, 4, 5].map(n => (
-                        <div key={n} className="text-center text-[11px] font-mono text-slate-500">{n}</div>
+                        <div key={n} className="text-center text-[11px] font-mono text-muted-foreground">{n}</div>
                     ))}
                 </div>
-                <p className="text-center text-[9px] text-slate-600 uppercase tracking-widest -mt-1 select-none">
+                <p className="text-center text-[9px] text-muted-foreground/70 uppercase tracking-widest -mt-1 select-none">
                     Impact →
                 </p>
             </div>

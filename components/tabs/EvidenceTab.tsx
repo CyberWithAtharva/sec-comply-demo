@@ -73,15 +73,15 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="glass-panel p-4 rounded-xl border border-slate-800/50 flex flex-col"
+                        className="glass-panel p-4 rounded-xl border border-border/50 flex flex-col"
                     >
                         <div className="flex items-center justify-between mb-2">
                             <div className={cn("p-1.5 rounded-lg", `bg-${stat.color}-500/10`)}>
                                 <stat.icon className={cn("w-3.5 h-3.5", `text-${stat.color}-400`)} />
                             </div>
                         </div>
-                        <span className="text-xl font-bold text-slate-100">{stat.value}</span>
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium mt-1">{stat.label}</span>
+                        <span className="text-xl font-bold text-foreground">{stat.value}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mt-1">{stat.label}</span>
                     </motion.div>
                 ))}
             </div>
@@ -89,24 +89,24 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
             {/* ─── Upload + Vault Link Row ─── */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {/* Upload CTA */}
-                <Link href="/evidences" className="glass-panel border-dashed border-2 border-slate-700/50 hover:border-blue-500/50 hover:bg-slate-800/20 p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all group min-h-[120px]">
-                    <div className="p-3 bg-slate-800/50 rounded-full group-hover:scale-110 group-hover:bg-blue-500/10 transition-all mb-3">
-                        <UploadCloud className="w-6 h-6 text-slate-400 group-hover:text-blue-400" />
+                <Link href="/evidences" className="glass-panel border-dashed border-2 border-border/50 hover:border-blue-500/50 hover:bg-secondary/20 p-6 rounded-2xl flex flex-col items-center justify-center cursor-pointer transition-all group min-h-[120px]">
+                    <div className="p-3 bg-secondary/50 rounded-full group-hover:scale-110 group-hover:bg-blue-500/10 transition-all mb-3">
+                        <UploadCloud className="w-6 h-6 text-muted-foreground group-hover:text-blue-400" />
                     </div>
-                    <span className="text-sm font-semibold text-slate-300 group-hover:text-blue-300 transition-colors">Upload Evidence</span>
-                    <span className="text-[10px] text-slate-500 mt-1">Opens Evidence Vault</span>
+                    <span className="text-sm font-semibold text-muted-foreground group-hover:text-blue-300 transition-colors">Upload Evidence</span>
+                    <span className="text-[10px] text-muted-foreground mt-1">Opens Evidence Vault</span>
                 </Link>
 
                 {/* Evidence Vault link */}
-                <Link href="/evidences" className="glass-panel p-6 rounded-2xl border border-slate-800/50 hover:border-blue-500/30 transition-all group flex flex-col justify-between min-h-[120px]">
+                <Link href="/evidences" className="glass-panel p-6 rounded-2xl border border-border/50 hover:border-blue-500/30 transition-all group flex flex-col justify-between min-h-[120px]">
                     <div className="flex items-center justify-between mb-3">
                         <div className="flex items-center gap-2">
                             <FileText className="w-4 h-4 text-blue-400" />
-                            <span className="text-sm font-semibold text-slate-200">Evidence Vault</span>
+                            <span className="text-sm font-semibold text-foreground">Evidence Vault</span>
                         </div>
-                        <ExternalLink className="w-4 h-4 text-slate-500 group-hover:text-blue-400 transition-colors" />
+                        <ExternalLink className="w-4 h-4 text-muted-foreground group-hover:text-blue-400 transition-colors" />
                     </div>
-                    <p className="text-xs text-slate-400 mb-3">
+                    <p className="text-xs text-muted-foreground mb-3">
                         {evidenceCount > 0
                             ? `${evidenceCount} evidence artifact${evidenceCount !== 1 ? "s" : ""} collected across your controls.`
                             : "No evidence collected yet. Upload files to link them to controls."}
@@ -119,11 +119,11 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
 
             {/* ─── Controls Needing Evidence ─── */}
             {needsEvidence.length > 0 && (
-                <div className="glass-panel p-6 rounded-2xl border border-slate-800/50">
-                    <div className="flex items-center justify-between mb-4 border-b border-slate-800/50 pb-3">
+                <div className="glass-panel p-6 rounded-2xl border border-border/50">
+                    <div className="flex items-center justify-between mb-4 border-b border-border/50 pb-3">
                         <div className="flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4 text-amber-400" />
-                            <h3 className="text-sm font-semibold text-slate-100">Controls Needing Evidence</h3>
+                            <h3 className="text-sm font-semibold text-foreground">Controls Needing Evidence</h3>
                         </div>
                         <span className="text-xs font-mono bg-amber-500/10 text-amber-400 border border-amber-500/20 px-2.5 py-1 rounded">
                             {notStarted} pending
@@ -131,7 +131,7 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="text-[10px] text-slate-500 font-mono uppercase bg-slate-900/40">
+                            <thead className="text-[10px] text-muted-foreground font-mono uppercase bg-card/40">
                                 <tr>
                                     <th className="px-4 py-3 font-medium rounded-tl-lg">Control</th>
                                     <th className="px-4 py-3 font-medium">Description</th>
@@ -139,23 +139,23 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
                                     <th className="px-4 py-3 font-medium rounded-tr-lg">Category</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/50">
+                            <tbody className="divide-y divide-border/50">
                                 {needsEvidence.map((c) => (
-                                    <tr key={c.id} className="hover:bg-slate-800/20 transition-colors">
-                                        <td className="px-4 py-3 font-mono text-slate-300 text-xs whitespace-nowrap">{c.controlId}</td>
-                                        <td className="px-4 py-3 text-slate-200 text-xs max-w-[300px]">
+                                    <tr key={c.id} className="hover:bg-secondary/20 transition-colors">
+                                        <td className="px-4 py-3 font-mono text-muted-foreground text-xs whitespace-nowrap">{c.controlId}</td>
+                                        <td className="px-4 py-3 text-foreground text-xs max-w-[300px]">
                                             <span className="truncate block">{c.title}</span>
                                         </td>
-                                        <td className="px-4 py-3 text-slate-400 text-xs">{c.domain || "—"}</td>
-                                        <td className="px-4 py-3 text-slate-400 text-xs">{c.category || "—"}</td>
+                                        <td className="px-4 py-3 text-muted-foreground text-xs">{c.domain || "—"}</td>
+                                        <td className="px-4 py-3 text-muted-foreground text-xs">{c.category || "—"}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
                     {notStarted > 10 && (
-                        <div className="mt-3 pt-3 border-t border-slate-800/50">
-                            <Link href="/evidences" className="text-xs text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1">
+                        <div className="mt-3 pt-3 border-t border-border/50">
+                            <Link href="/evidences" className="text-xs text-muted-foreground hover:text-blue-400 transition-colors flex items-center gap-1">
                                 View all {notStarted} controls needing evidence in Evidence Vault <ArrowRight className="w-3 h-3" />
                             </Link>
                         </div>
@@ -165,10 +165,10 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
 
             {/* ─── Gaps by Domain ─── */}
             {domainGaps.length > 0 && (
-                <div className="glass-panel p-6 rounded-2xl border border-slate-800/50">
+                <div className="glass-panel p-6 rounded-2xl border border-border/50">
                     <div className="flex items-center gap-2 mb-4">
-                        <Layers className="w-4 h-4 text-slate-400" />
-                        <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider">Evidence Gaps by Domain</h3>
+                        <Layers className="w-4 h-4 text-muted-foreground" />
+                        <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Evidence Gaps by Domain</h3>
                     </div>
                     <div className="space-y-3">
                         {domainGaps.map(([domain, count]) => {
@@ -177,15 +177,15 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
                             return (
                                 <div key={domain}>
                                     <div className="flex justify-between text-xs mb-1">
-                                        <span className="text-slate-300 font-medium">{domain}</span>
+                                        <span className="text-muted-foreground font-medium">{domain}</span>
                                         <div className="flex items-center gap-3">
-                                            <span className="text-slate-500 text-[10px]">{count} / {domainTotal} not started</span>
-                                            <span className={cn("font-bold text-[11px]", gapPct > 60 ? "text-red-400" : gapPct > 30 ? "text-amber-400" : "text-slate-400")}>
+                                            <span className="text-muted-foreground text-[10px]">{count} / {domainTotal} not started</span>
+                                            <span className={cn("font-bold text-[11px]", gapPct > 60 ? "text-red-400" : gapPct > 30 ? "text-amber-400" : "text-muted-foreground")}>
                                                 {gapPct}% gap
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                    <div className="w-full bg-secondary/60 rounded-full h-1.5 overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${gapPct}%` }}
@@ -204,8 +204,8 @@ export function EvidenceTab({ controls = [], evidenceCount = 0 }: EvidenceTabPro
             {notStarted === 0 && total > 0 && (
                 <div className="glass-panel p-8 rounded-2xl border border-emerald-500/20 flex flex-col items-center justify-center text-center">
                     <CheckCircle2 className="w-12 h-12 text-emerald-500/60 mb-3" />
-                    <p className="text-slate-200 font-medium mb-1">All controls have evidence or are verified</p>
-                    <p className="text-slate-500 text-sm">
+                    <p className="text-foreground font-medium mb-1">All controls have evidence or are verified</p>
+                    <p className="text-muted-foreground text-sm">
                         {evidenceCount} artifact{evidenceCount !== 1 ? "s" : ""} collected across {total} controls.
                     </p>
                     <Link href="/evidences" className="mt-4 text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 transition-colors">

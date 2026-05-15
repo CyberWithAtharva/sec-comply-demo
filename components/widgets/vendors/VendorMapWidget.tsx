@@ -13,15 +13,15 @@ const locations = [
 
 export function VendorMapWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                     <Globe className="w-5 h-5 text-indigo-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Data Processors Geometry</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Data Processors Geometry</h3>
                 </div>
             </div>
 
-            <div className="flex-1 w-full relative min-h-[220px] rounded-xl overflow-hidden bg-slate-900/40 border border-slate-800/50 flex flex-col items-center justify-center">
+            <div className="flex-1 w-full relative min-h-[220px] rounded-xl overflow-hidden bg-card/40 border border-border/50 flex flex-col items-center justify-center">
                 {/* Abstract Dotted Map Background */}
                 <svg className="absolute inset-0 w-full h-full opacity-10" xmlns="http://www.w3.org/2000/svg">
                     <defs>
@@ -39,23 +39,23 @@ export function VendorMapWidget() {
                         style={{ top: loc.top, left: loc.left }}
                     >
                         <div className={`w-3 h-3 rounded-full ${loc.dot} shadow-[0_0_15px_currentColor] animate-pulse`} />
-                        <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-4 whitespace-nowrap bg-slate-900 border border-slate-700 p-2 rounded-lg z-10 flex flex-col items-center shadow-xl">
-                            <span className="text-xs font-bold text-slate-200">{loc.country}</span>
+                        <div className="opacity-0 group-hover:opacity-100 transition-opacity absolute top-4 whitespace-nowrap bg-card border border-border p-2 rounded-lg z-10 flex flex-col items-center shadow-xl">
+                            <span className="text-xs font-bold text-foreground">{loc.country}</span>
                             <span className={`text-[10px] ${loc.color}`}>{loc.count} Vendors</span>
                         </div>
                     </div>
                 ))}
             </div>
 
-            <div className="mt-4 flex flex-wrap gap-2 text-xs pt-4 border-t border-slate-800/50">
+            <div className="mt-4 flex flex-wrap gap-2 text-xs pt-4 border-t border-border/50">
                 {locations.slice(0, 3).map((loc, i) => (
-                    <div key={i} className="flex items-center space-x-1.5 bg-slate-800/50 px-2 py-1 rounded border border-slate-700">
+                    <div key={i} className="flex items-center space-x-1.5 bg-secondary/50 px-2 py-1 rounded border border-border">
                         <MapPin className={`w-3 h-3 ${loc.color}`} />
-                        <span className="text-slate-300">{loc.country}</span>
+                        <span className="text-muted-foreground">{loc.country}</span>
                     </div>
                 ))}
-                <div className="flex items-center space-x-1.5 bg-slate-800/50 px-2 py-1 rounded border border-slate-700">
-                    <span className="text-slate-400">+2 more</span>
+                <div className="flex items-center space-x-1.5 bg-secondary/50 px-2 py-1 rounded border border-border">
+                    <span className="text-muted-foreground">+2 more</span>
                 </div>
             </div>
         </div>

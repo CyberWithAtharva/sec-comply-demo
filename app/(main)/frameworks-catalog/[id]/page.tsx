@@ -43,7 +43,7 @@ export default async function FrameworkBrowserPage({
             <div>
                 <Link
                     href="/frameworks-catalog"
-                    className="inline-flex items-center gap-1.5 text-xs text-slate-500 hover:text-slate-300 transition-colors mb-3"
+                    className="inline-flex items-center gap-1.5 text-xs text-muted-foreground hover:text-muted-foreground transition-colors mb-3"
                 >
                     <ArrowLeft className="w-3 h-3" />
                     Frameworks Catalog
@@ -56,25 +56,25 @@ export default async function FrameworkBrowserPage({
                         <ShieldCheck className="w-5 h-5" style={{ color: accent }} />
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-slate-100">
+                        <h1 className="text-2xl font-bold text-foreground">
                             {framework.name}
-                            {framework.version && <span className="ml-2 text-sm text-slate-500">v{framework.version}</span>}
+                            {framework.version && <span className="ml-2 text-sm text-muted-foreground">v{framework.version}</span>}
                         </h1>
                         {framework.description && (
-                            <p className="text-sm text-slate-400 mt-1 max-w-3xl">{framework.description}</p>
+                            <p className="text-sm text-muted-foreground mt-1 max-w-3xl">{framework.description}</p>
                         )}
                     </div>
                 </div>
                 <div className="flex items-center gap-2 mt-3">
-                    <span className="text-[10px] font-mono text-slate-500 px-2 py-0.5 rounded-full bg-slate-800/60 border border-slate-700/60">
+                    <span className="text-[10px] font-mono text-muted-foreground px-2 py-0.5 rounded-full bg-secondary/60 border border-border/60">
                         {framework.slug}
                     </span>
                     {framework.category && (
-                        <span className="text-[10px] font-semibold text-slate-400 px-2 py-0.5 rounded-full bg-slate-800/60 border border-slate-700/60 uppercase tracking-wider">
+                        <span className="text-[10px] font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary/60 border border-border/60 uppercase tracking-wider">
                             {framework.category.replace(/_/g, " ")}
                         </span>
                     )}
-                    <span className="flex items-center gap-1 text-xs text-slate-400 tabular-nums">
+                    <span className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
                         <ListChecks className="w-3 h-3" />
                         {list.length} control{list.length === 1 ? "" : "s"}
                     </span>

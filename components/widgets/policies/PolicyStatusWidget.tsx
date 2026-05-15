@@ -12,11 +12,11 @@ const data = [
 
 export function PolicyStatusWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                     <FileText className="w-5 h-5 text-blue-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Policy Status</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Policy Status</h3>
                 </div>
                 <div className="text-xs font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2 py-1 rounded">24 Total</div>
             </div>
@@ -37,7 +37,7 @@ export function PolicyStatusWidget() {
                             ))}
                         </Pie>
                         <RechartsTooltip
-                            contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px", fontSize: "12px" }}
+                            contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "8px", fontSize: "12px" }}
                             itemStyle={{ color: "#e2e8f0" }}
                         />
                     </PieChart>
@@ -45,8 +45,8 @@ export function PolicyStatusWidget() {
 
                 {/* Center Text overlay */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-3xl font-bold text-slate-100 pb-2">75%</span>
-                    <span className="text-xs text-slate-500 font-medium">Approved</span>
+                    <span className="text-3xl font-bold text-foreground pb-2">75%</span>
+                    <span className="text-xs text-muted-foreground font-medium">Approved</span>
                 </div>
             </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback, useTransition } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -59,10 +60,10 @@ interface PoliciesClientProps {
 // ─── Config ───────────────────────────────────────────────────────────────────
 
 const STATUS_CONFIG = {
-    draft:        { label: "Draft",        color: "text-slate-400",   bg: "bg-slate-500/10",   border: "border-slate-500/30" },
+    draft:        { label: "Draft",        color: "text-muted-foreground",   bg: "bg-slate-500/10",   border: "border-slate-500/30" },
     under_review: { label: "Under Review", color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30" },
     approved:     { label: "Approved",     color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
-    archived:     { label: "Archived",     color: "text-slate-500",   bg: "bg-slate-800/30",   border: "border-slate-700/30" },
+    archived:     { label: "Archived",     color: "text-muted-foreground",   bg: "bg-secondary/30",   border: "border-border/30" },
 };
 
 const EXCEPTION_RISK = {
@@ -127,36 +128,36 @@ function MarkdownEditor({ value, onChange, compact = false }: MarkdownEditorProp
     };
 
     return (
-        <div className="border border-slate-700/50 rounded-xl overflow-hidden bg-slate-800/40">
+        <div className="border border-border/50 rounded-xl overflow-hidden bg-secondary/40">
             {/* Toolbar */}
-            <div className="flex items-center gap-1 px-2 py-1.5 border-b border-slate-700/50 bg-slate-800/60">
+            <div className="flex items-center gap-1 px-2 py-1.5 border-b border-border/50 bg-secondary/60">
                 {MD_TOOLBAR.map(btn => (
-                    <button
+                    <Button variant="plain"
                         key={btn.label}
                         type="button"
                         title={btn.title}
                         onMouseDown={e => { e.preventDefault(); applyAction(btn.action); }}
-                        className="px-2 py-1 text-xs font-mono text-slate-400 hover:text-slate-100 hover:bg-slate-700/60 rounded transition-colors"
+                        className="px-2 py-1 text-xs font-mono text-muted-foreground hover:text-foreground hover:bg-secondary/60 rounded transition-colors h-auto"
                     >
                         {btn.label}
-                    </button>
+                    </Button>
                 ))}
                 <div className="flex-1" />
-                <div className="flex items-center rounded-lg overflow-hidden border border-slate-700/50">
+                <div className="flex items-center rounded-lg overflow-hidden border border-border/50">
                     {(["write", "preview"] as const).map(m => (
-                        <button
+                        <Button variant="plain"
                             key={m}
                             type="button"
                             onClick={() => setMode(m)}
-                            className={cn(
+                            className={cn("h-auto", 
                                 "px-3 py-1 text-[11px] font-medium capitalize transition-colors",
                                 mode === m
-                                    ? "bg-slate-700 text-slate-100"
-                                    : "text-slate-500 hover:text-slate-300"
+                                    ? "bg-secondary text-foreground"
+                                    : "text-muted-foreground hover:text-muted-foreground"
                             )}
                         >
                             {m}
-                        </button>
+                        </Button>
                     ))}
                 </div>
             </div>
@@ -169,39 +170,39 @@ function MarkdownEditor({ value, onChange, compact = false }: MarkdownEditorProp
                     onChange={e => onChange(e.target.value)}
                     rows={compact ? 5 : 12}
                     placeholder="Write policy content in Markdown…&#10;&#10;## Objective&#10;Describe the purpose of this policy.&#10;&#10;## Scope&#10;Define who and what this policy applies to."
-                    className="w-full bg-transparent px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none resize-none font-mono leading-relaxed"
+                    className="w-full bg-transparent px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none resize-none font-mono leading-relaxed"
                 />
             )}
 
             {/* Preview */}
             {mode === "preview" && (
-                <div className={cn("px-4 py-3 text-sm text-slate-300 leading-relaxed space-y-2 overflow-y-auto", compact ? "min-h-[120px]" : "min-h-[280px]")}>
+                <div className={cn("px-4 py-3 text-sm text-muted-foreground leading-relaxed space-y-2 overflow-y-auto", compact ? "min-h-[120px]" : "min-h-[280px]")}>
                     {value.trim() ? (
                         <ReactMarkdown
                             remarkPlugins={[remarkGfm]}
                             components={{
                                 h1: ({ children }) => <h1 className="text-lg font-bold text-white mt-3 mb-1 first:mt-0">{children}</h1>,
-                                h2: ({ children }) => <h2 className="text-base font-semibold text-slate-100 mt-3 mb-1 first:mt-0">{children}</h2>,
-                                h3: ({ children }) => <h3 className="text-sm font-semibold text-slate-200 mt-2 mb-1">{children}</h3>,
-                                p: ({ children }) => <p className="text-slate-300 leading-relaxed">{children}</p>,
-                                ul: ({ children }) => <ul className="list-disc list-inside space-y-1 text-slate-400 pl-2">{children}</ul>,
-                                ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 text-slate-400 pl-2">{children}</ol>,
-                                li: ({ children }) => <li className="text-slate-400 text-sm">{children}</li>,
-                                strong: ({ children }) => <strong className="font-semibold text-slate-200">{children}</strong>,
-                                em: ({ children }) => <em className="italic text-slate-300">{children}</em>,
-                                hr: () => <hr className="border-slate-700/50 my-3" />,
-                                blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-500/50 pl-3 italic text-slate-400">{children}</blockquote>,
-                                code: ({ children }) => <code className="bg-slate-800 text-blue-300 px-1.5 py-0.5 rounded text-[11px] font-mono">{children}</code>,
-                                table: ({ children }) => <div className="overflow-x-auto rounded-lg border border-slate-700/50 my-2"><table className="w-full text-xs">{children}</table></div>,
-                                thead: ({ children }) => <thead className="bg-slate-800/60">{children}</thead>,
-                                th: ({ children }) => <th className="px-3 py-2 text-left font-semibold text-slate-300 text-[10px] uppercase tracking-wider">{children}</th>,
-                                td: ({ children }) => <td className="px-3 py-2 text-slate-400">{children}</td>,
+                                h2: ({ children }) => <h2 className="text-base font-semibold text-foreground mt-3 mb-1 first:mt-0">{children}</h2>,
+                                h3: ({ children }) => <h3 className="text-sm font-semibold text-foreground mt-2 mb-1">{children}</h3>,
+                                p: ({ children }) => <p className="text-muted-foreground leading-relaxed">{children}</p>,
+                                ul: ({ children }) => <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-2">{children}</ul>,
+                                ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 text-muted-foreground pl-2">{children}</ol>,
+                                li: ({ children }) => <li className="text-muted-foreground text-sm">{children}</li>,
+                                strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
+                                em: ({ children }) => <em className="italic text-muted-foreground">{children}</em>,
+                                hr: () => <hr className="border-border/50 my-3" />,
+                                blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-500/50 pl-3 italic text-muted-foreground">{children}</blockquote>,
+                                code: ({ children }) => <code className="bg-secondary text-blue-300 px-1.5 py-0.5 rounded text-[11px] font-mono">{children}</code>,
+                                table: ({ children }) => <div className="overflow-x-auto rounded-lg border border-border/50 my-2"><table className="w-full text-xs">{children}</table></div>,
+                                thead: ({ children }) => <thead className="bg-secondary/60">{children}</thead>,
+                                th: ({ children }) => <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-[10px] uppercase tracking-wider">{children}</th>,
+                                td: ({ children }) => <td className="px-3 py-2 text-muted-foreground">{children}</td>,
                             }}
                         >
                             {value}
                         </ReactMarkdown>
                     ) : (
-                        <p className="text-slate-600 italic">Nothing to preview yet…</p>
+                        <p className="text-muted-foreground/70 italic">Nothing to preview yet…</p>
                     )}
                 </div>
             )}
@@ -300,7 +301,7 @@ function PolicyModal({ orgId, owners, editing, onClose, onSaved }: PolicyModalPr
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-indigo-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -308,19 +309,19 @@ function PolicyModal({ orgId, owners, editing, onClose, onSaved }: PolicyModalPr
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50 shrink-0">
+                <div className="flex items-center justify-between p-6 border-b border-border/50 shrink-0">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
                             <FileText className="w-4 h-4 text-indigo-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-100">{editing ? "Edit Policy" : "Create Policy"}</h2>
-                            <p className="text-xs text-slate-500">{editing ? "Update policy details" : "Add a new governance policy"}</p>
+                            <h2 className="text-base font-semibold text-foreground">{editing ? "Edit Policy" : "Create Policy"}</h2>
+                            <p className="text-xs text-muted-foreground">{editing ? "Update policy details" : "Add a new governance policy"}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground h-auto"><X className="w-5 h-5" /></Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
@@ -332,19 +333,19 @@ function PolicyModal({ orgId, owners, editing, onClose, onSaved }: PolicyModalPr
                     )}
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Title *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Title *</label>
                         <input type="text" value={form.title} onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                             placeholder="Information Security Policy" className={inputCls} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Version</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Version</label>
                             <input type="text" value={form.version} onChange={e => setForm(f => ({ ...f, version: e.target.value }))}
                                 placeholder="1.0" className={inputCls} />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Status</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Status</label>
                             <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as PolicyData["status"] }))} className={inputCls}>
                                 {Object.entries(STATUS_CONFIG).map(([k, v]) => (
                                     <option key={k} value={k}>{v.label}</option>
@@ -355,20 +356,20 @@ function PolicyModal({ orgId, owners, editing, onClose, onSaved }: PolicyModalPr
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Owner</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Owner</label>
                             <select value={form.owner_id} onChange={e => setForm(f => ({ ...f, owner_id: e.target.value }))} className={inputCls}>
                                 <option value="">Unassigned</option>
                                 {owners.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Next Review</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Next Review</label>
                             <input type="date" value={form.next_review} onChange={e => setForm(f => ({ ...f, next_review: e.target.value }))} className={inputCls} />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Content / Summary</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Content / Summary</label>
                         <MarkdownEditor
                             value={form.content ?? ""}
                             onChange={v => setForm(f => ({ ...f, content: v }))}
@@ -377,24 +378,24 @@ function PolicyModal({ orgId, owners, editing, onClose, onSaved }: PolicyModalPr
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Policy Document (PDF)</label>
-                        <label className="flex items-center justify-center w-full h-16 border-2 border-dashed border-slate-700/50 rounded-xl cursor-pointer hover:border-slate-600/50 transition-colors bg-slate-800/30">
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Policy Document (PDF)</label>
+                        <label className="flex items-center justify-center w-full h-16 border-2 border-dashed border-border/50 rounded-xl cursor-pointer hover:border-slate-600/50 transition-colors bg-secondary/30">
                             <div className="flex items-center space-x-2">
-                                <Upload className="w-4 h-4 text-slate-500" />
-                                <span className="text-xs text-slate-500">{file ? file.name : editing?.file_url ? "Replace existing PDF" : "Upload PDF"}</span>
+                                <Upload className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">{file ? file.name : editing?.file_url ? "Replace existing PDF" : "Upload PDF"}</span>
                             </div>
                             <input type="file" accept=".pdf" className="hidden" onChange={e => setFile(e.target.files?.[0] ?? null)} />
                         </label>
                     </div>
                 </form>
 
-                <div className="flex justify-end space-x-3 p-6 border-t border-slate-800/50 shrink-0">
-                    <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">Cancel</button>
-                    <button onClick={handleSubmit as unknown as React.MouseEventHandler} disabled={saving}
-                        className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors flex items-center space-x-2">
+                <div className="flex justify-end space-x-3 p-6 border-t border-border/50 shrink-0">
+                    <Button variant="plain" type="button" onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors h-auto">Cancel</Button>
+                    <Button variant="plain" onClick={handleSubmit as unknown as React.MouseEventHandler} disabled={saving}
+                        className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors flex items-center space-x-2 h-auto">
                         {saving ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                         <span>{saving ? "Saving…" : editing ? "Save Changes" : "Create Policy"}</span>
-                    </button>
+                    </Button>
                 </div>
             </motion.div>
         </div>
@@ -456,25 +457,25 @@ function PolicyDetailDrawer({ policy, currentUserId, onClose, onAcknowledge, onU
                 animate={{ x: 0 }}
                 exit={{ x: "100%" }}
                 transition={{ type: "spring", damping: 25, stiffness: 200 }}
-                className="bg-slate-900 border-l border-slate-700/50 w-full max-w-md h-full overflow-y-auto flex flex-col shadow-2xl"
+                className="bg-card border-l border-border/50 w-full max-w-md h-full overflow-y-auto flex flex-col shadow-2xl"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50 sticky top-0 bg-slate-900/95 backdrop-blur-sm z-10">
+                <div className="flex items-center justify-between p-6 border-b border-border/50 sticky top-0 bg-card/95 backdrop-blur-sm z-10">
                     <div className="flex items-center space-x-2">
                         <FileText className="w-5 h-5 text-indigo-400" />
-                        <h2 className="text-sm font-semibold text-slate-100 truncate max-w-[180px]">{policy.title}</h2>
+                        <h2 className="text-sm font-semibold text-foreground truncate max-w-[180px]">{policy.title}</h2>
                     </div>
                     <div className="flex items-center space-x-2">
-                        <button
+                        <Button variant="plain"
                             onClick={() => { setIsEditing(!isEditing); setSaveError(null); }}
-                            className={cn(
+                            className={cn("h-auto", 
                                 "p-1.5 rounded-lg transition-colors text-xs font-medium flex items-center gap-1",
-                                isEditing ? "bg-blue-600/20 text-blue-400 border border-blue-500/30" : "text-slate-500 hover:text-blue-400 hover:bg-blue-500/10"
+                                isEditing ? "bg-blue-600/20 text-blue-400 border border-blue-500/30" : "text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10"
                             )}
                         >
                             <Edit2 className="w-3.5 h-3.5" />
                             {isEditing ? "Editing" : "Edit"}
-                        </button>
-                        <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                        </Button>
+                        <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground h-auto"><X className="w-5 h-5" /></Button>
                     </div>
                 </div>
 
@@ -482,52 +483,52 @@ function PolicyDetailDrawer({ policy, currentUserId, onClose, onAcknowledge, onU
                     {/* Meta */}
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Version</p>
-                            <p className="text-sm text-slate-200 font-mono">v{policy.version}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Version</p>
+                            <p className="text-sm text-foreground font-mono">v{policy.version}</p>
                         </div>
                         <div>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Status</p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Status</p>
                             <StatusBadge status={policy.status} />
                         </div>
                         <div>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Owner</p>
-                            <p className="text-sm text-slate-300">{policy.owner?.full_name ?? "Unassigned"}</p>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Owner</p>
+                            <p className="text-sm text-muted-foreground">{policy.owner?.full_name ?? "Unassigned"}</p>
                         </div>
                         <div>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-1">Next Review</p>
-                            <p className={cn("text-sm", policy.next_review && new Date(policy.next_review) < new Date() ? "text-red-400" : "text-slate-300")}>
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-1">Next Review</p>
+                            <p className={cn("text-sm", policy.next_review && new Date(policy.next_review) < new Date() ? "text-red-400" : "text-muted-foreground")}>
                                 {policy.next_review ? new Date(policy.next_review).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" }) : "Not set"}
                             </p>
                         </div>
                     </div>
 
                     {/* Acknowledgement progress */}
-                    <div className="bg-slate-800/40 rounded-xl p-4 border border-slate-700/30">
+                    <div className="bg-secondary/40 rounded-xl p-4 border border-border/30">
                         <div className="flex items-center justify-between mb-3">
                             <div className="flex items-center space-x-2">
                                 <Users className="w-4 h-4 text-indigo-400" />
-                                <span className="text-sm font-medium text-slate-200">Acknowledgements</span>
+                                <span className="text-sm font-medium text-foreground">Acknowledgements</span>
                             </div>
                             <span className="text-sm font-bold text-indigo-400">{policy.ackCount} / {policy.totalMembers}</span>
                         </div>
-                        <div className="w-full h-2 bg-slate-700/50 rounded-full overflow-hidden">
+                        <div className="w-full h-2 bg-secondary/50 rounded-full overflow-hidden">
                             <div
                                 className="h-full bg-indigo-500 rounded-full transition-all duration-500"
                                 style={{ width: `${ackPct}%` }}
                             />
                         </div>
-                        <p className="text-[10px] text-slate-500 mt-2">{ackPct}% of team members have acknowledged</p>
+                        <p className="text-[10px] text-muted-foreground mt-2">{ackPct}% of team members have acknowledged</p>
                     </div>
 
                     {/* Inline edit mode */}
                     {isEditing && (
                         <div className="space-y-3">
                             <div>
-                                <label className="block text-[10px] text-slate-500 uppercase tracking-widest mb-1.5">Status</label>
+                                <label className="block text-[10px] text-muted-foreground uppercase tracking-widest mb-1.5">Status</label>
                                 <select
                                     value={editStatus}
                                     onChange={e => setEditStatus(e.target.value as PolicyData["status"])}
-                                    className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-100 focus:outline-none focus:border-indigo-500/50"
+                                    className="w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-foreground focus:outline-none focus:border-indigo-500/50"
                                 >
                                     {Object.entries(STATUS_CONFIG).map(([k, v]) => (
                                         <option key={k} value={k}>{v.label}</option>
@@ -542,18 +543,18 @@ function PolicyDetailDrawer({ policy, currentUserId, onClose, onAcknowledge, onU
                             </div>
                             {saveError && <p className="text-xs text-red-400">{saveError}</p>}
                             <div className="flex justify-end space-x-2">
-                                <button
+                                <Button variant="plain"
                                     onClick={() => setIsEditing(false)}
-                                    className="px-3 py-1.5 text-xs text-slate-400 hover:text-slate-200 transition-colors"
-                                >Cancel</button>
-                                <button
+                                    className="px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors h-auto"
+                                >Cancel</Button>
+                                <Button variant="plain"
                                     onClick={handleSaveEdits}
                                     disabled={saving}
-                                    className="flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors"
+                                    className="flex items-center gap-1.5 px-4 py-1.5 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-xs font-medium rounded-lg transition-colors h-auto"
                                 >
                                     {saving ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
                                     {saving ? "Saving…" : "Save"}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     )}
@@ -561,31 +562,31 @@ function PolicyDetailDrawer({ policy, currentUserId, onClose, onAcknowledge, onU
                     {/* Content */}
                     {!isEditing && policy.content && (
                         <div>
-                            <p className="text-[10px] text-slate-500 uppercase tracking-widest mb-3">Content</p>
-                            <div className="policy-markdown text-sm text-slate-300 leading-relaxed space-y-3">
+                            <p className="text-[10px] text-muted-foreground uppercase tracking-widest mb-3">Content</p>
+                            <div className="policy-markdown text-sm text-muted-foreground leading-relaxed space-y-3">
                                 <ReactMarkdown
                                     remarkPlugins={[remarkGfm]}
                                     components={{
-                                        h2: ({ children }) => <h2 className="text-base font-semibold text-slate-100 mt-4 mb-1 first:mt-0">{children}</h2>,
-                                        h3: ({ children }) => <h3 className="text-sm font-semibold text-slate-200 mt-3 mb-1">{children}</h3>,
-                                        p: ({ children }) => <p className="text-slate-300 leading-relaxed">{children}</p>,
-                                        ul: ({ children }) => <ul className="list-disc list-inside space-y-1 text-slate-400 pl-2">{children}</ul>,
-                                        ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 text-slate-400 pl-2">{children}</ol>,
-                                        li: ({ children }) => <li className="text-slate-400 text-sm">{children}</li>,
-                                        strong: ({ children }) => <strong className="font-semibold text-slate-200">{children}</strong>,
+                                        h2: ({ children }) => <h2 className="text-base font-semibold text-foreground mt-4 mb-1 first:mt-0">{children}</h2>,
+                                        h3: ({ children }) => <h3 className="text-sm font-semibold text-foreground mt-3 mb-1">{children}</h3>,
+                                        p: ({ children }) => <p className="text-muted-foreground leading-relaxed">{children}</p>,
+                                        ul: ({ children }) => <ul className="list-disc list-inside space-y-1 text-muted-foreground pl-2">{children}</ul>,
+                                        ol: ({ children }) => <ol className="list-decimal list-inside space-y-1 text-muted-foreground pl-2">{children}</ol>,
+                                        li: ({ children }) => <li className="text-muted-foreground text-sm">{children}</li>,
+                                        strong: ({ children }) => <strong className="font-semibold text-foreground">{children}</strong>,
                                         table: ({ children }) => (
-                                            <div className="overflow-x-auto rounded-lg border border-slate-700/50 my-2">
+                                            <div className="overflow-x-auto rounded-lg border border-border/50 my-2">
                                                 <table className="w-full text-xs">{children}</table>
                                             </div>
                                         ),
-                                        thead: ({ children }) => <thead className="bg-slate-800/60">{children}</thead>,
-                                        tbody: ({ children }) => <tbody className="divide-y divide-slate-700/30">{children}</tbody>,
-                                        th: ({ children }) => <th className="px-3 py-2 text-left font-semibold text-slate-300 text-[10px] uppercase tracking-wider">{children}</th>,
-                                        td: ({ children }) => <td className="px-3 py-2 text-slate-400">{children}</td>,
-                                        tr: ({ children }) => <tr className="hover:bg-slate-800/30 transition-colors">{children}</tr>,
-                                        hr: () => <hr className="border-slate-700/50 my-3" />,
-                                        blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-500/50 pl-3 italic text-slate-400">{children}</blockquote>,
-                                        code: ({ children }) => <code className="bg-slate-800 text-blue-300 px-1.5 py-0.5 rounded text-[11px] font-mono">{children}</code>,
+                                        thead: ({ children }) => <thead className="bg-secondary/60">{children}</thead>,
+                                        tbody: ({ children }) => <tbody className="divide-y divide-border/30">{children}</tbody>,
+                                        th: ({ children }) => <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-[10px] uppercase tracking-wider">{children}</th>,
+                                        td: ({ children }) => <td className="px-3 py-2 text-muted-foreground">{children}</td>,
+                                        tr: ({ children }) => <tr className="hover:bg-secondary/30 transition-colors">{children}</tr>,
+                                        hr: () => <hr className="border-border/50 my-3" />,
+                                        blockquote: ({ children }) => <blockquote className="border-l-2 border-blue-500/50 pl-3 italic text-muted-foreground">{children}</blockquote>,
+                                        code: ({ children }) => <code className="bg-secondary text-blue-300 px-1.5 py-0.5 rounded text-[11px] font-mono">{children}</code>,
                                     }}
                                 >
                                     {policy.content}
@@ -600,26 +601,26 @@ function PolicyDetailDrawer({ policy, currentUserId, onClose, onAcknowledge, onU
                             href={policy.file_url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center space-x-3 p-4 bg-slate-800/40 rounded-xl border border-slate-700/30 hover:bg-slate-800/60 transition-colors group"
+                            className="flex items-center space-x-3 p-4 bg-secondary/40 rounded-xl border border-border/30 hover:bg-secondary/60 transition-colors group"
                         >
                             <FileText className="w-8 h-8 text-indigo-400 shrink-0" />
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm text-slate-200 group-hover:text-white transition-colors">Policy Document</p>
-                                <p className="text-xs text-slate-500">Click to open PDF</p>
+                                <p className="text-sm text-foreground group-hover:text-white transition-colors">Policy Document</p>
+                                <p className="text-xs text-muted-foreground">Click to open PDF</p>
                             </div>
                         </a>
                     )}
 
                     {/* Acknowledge CTA */}
                     {policy.status === "approved" && (
-                        <button
+                        <Button variant="plain"
                             onClick={handleAcknowledge}
                             disabled={acking}
-                            className="w-full flex items-center justify-center space-x-2 py-3 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 rounded-xl text-sm font-medium text-indigo-400 transition-colors disabled:opacity-50"
+                            className="w-full flex items-center justify-center space-x-2 py-3 bg-indigo-600/20 hover:bg-indigo-600/30 border border-indigo-500/30 rounded-xl text-sm font-medium text-indigo-400 transition-colors disabled:opacity-50 h-auto"
                         >
                             {acking ? <RotateCcw className="w-4 h-4 animate-spin" /> : <CheckCircle2 className="w-4 h-4" />}
                             <span>{acking ? "Recording…" : "Acknowledge Policy"}</span>
-                        </button>
+                        </Button>
                     )}
                 </div>
             </motion.div>
@@ -710,28 +711,28 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center">
                         <FileText className="w-8 h-8 mr-3 text-indigo-500" />
                         Governance & Policies
                     </h1>
-                    <p className="text-sm text-slate-400 mt-1">Manage policy lifecycle, acknowledgements, and exceptions.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Manage policy lifecycle, acknowledgements, and exceptions.</p>
                 </div>
                 <div className="flex items-center space-x-3">
-                    <button
+                    <Button variant="plain"
                         onClick={handleGenerate}
                         disabled={generating}
-                        className="flex items-center space-x-2 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-50"
+                        className="flex items-center space-x-2 border border-blue-500/30 text-blue-400 hover:bg-blue-500/10 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 h-auto"
                     >
                         {generating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                         <span>{generating ? "Generating…" : "Generate Templates"}</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="plain"
                         onClick={() => { setEditing(null); setShowCreate(true); }}
-                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors flex items-center space-x-2"
+                        className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors flex items-center space-x-2 h-auto"
                     >
                         <Plus className="w-4 h-4" />
                         <span>New Policy</span>
-                    </button>
+                    </Button>
                 </div>
             </div>
 
@@ -740,9 +741,9 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                 <div className="flex items-center space-x-2 px-4 py-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-sm text-emerald-400">
                     <CheckCircle2 className="w-4 h-4 shrink-0" />
                     <span>{genMessage}</span>
-                    <button onClick={() => setGenMessage(null)} className="ml-auto text-emerald-600 hover:text-emerald-400">
+                    <Button variant="plain" onClick={() => setGenMessage(null)} className="ml-auto text-emerald-600 hover:text-emerald-400 h-auto">
                         <X className="w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
             )}
 
@@ -753,38 +754,38 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                         <Sparkles className="w-10 h-10 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-semibold text-slate-200 mb-2">No Policies Yet</h3>
-                        <p className="text-sm text-slate-500 max-w-md">
+                        <h3 className="text-lg font-semibold text-foreground mb-2">No Policies Yet</h3>
+                        <p className="text-sm text-muted-foreground max-w-md">
                             Generate a full set of compliance-ready policy templates (Information Security, Access Control, Incident Response, and more) for your assigned frameworks in one click.
                         </p>
                     </div>
-                    <button
+                    <Button variant="plain"
                         onClick={handleGenerate}
                         disabled={generating}
-                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors"
+                        className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-semibold transition-colors h-auto"
                     >
                         {generating ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                         {generating ? "Generating…" : "Generate Policy Templates"}
-                    </button>
+                    </Button>
                 </div>
             )}
 
             {/* Stat Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 {[
-                    { label: "Total Policies",    count: stats.total,             color: "text-slate-100",   icon: <FileText className="w-4 h-4" /> },
+                    { label: "Total Policies",    count: stats.total,             color: "text-foreground",   icon: <FileText className="w-4 h-4" /> },
                     { label: "Approved",           count: stats.approved,          color: "text-emerald-400", icon: <CheckCircle2 className="w-4 h-4" /> },
                     { label: "Draft / Review",     count: stats.draft,             color: "text-amber-400",   icon: <Clock className="w-4 h-4" /> },
-                    { label: "Overdue Reviews",    count: stats.overdue,           color: stats.overdue > 0 ? "text-red-400" : "text-slate-400",  icon: <AlertTriangle className="w-4 h-4" /> },
-                    { label: "Open Exceptions",    count: stats.pendingExceptions, color: stats.pendingExceptions > 0 ? "text-orange-400" : "text-slate-400", icon: <Shield className="w-4 h-4" /> },
+                    { label: "Overdue Reviews",    count: stats.overdue,           color: stats.overdue > 0 ? "text-red-400" : "text-muted-foreground",  icon: <AlertTriangle className="w-4 h-4" /> },
+                    { label: "Open Exceptions",    count: stats.pendingExceptions, color: stats.pendingExceptions > 0 ? "text-orange-400" : "text-muted-foreground", icon: <Shield className="w-4 h-4" /> },
                 ].map((s) => (
                     <div
                         key={s.label}
-                        className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col"
+                        className="glass-panel rounded-2xl p-4 border border-border/50 flex flex-col"
                     >
                         <div className={cn("flex items-center space-x-1.5 mb-1", s.color)}>
                             {s.icon}
-                            <span className="text-[10px] text-slate-500">{s.label}</span>
+                            <span className="text-[10px] text-muted-foreground">{s.label}</span>
                         </div>
                         <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
                     </div>
@@ -792,42 +793,42 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
             </div>
 
             {/* Policies Table */}
-            <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col">
+            <div className="glass-panel rounded-2xl border border-border/50 flex flex-col">
                 {/* Filters */}
-                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-slate-800/50">
+                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-border/50">
                     <div className="relative flex-1 min-w-[180px]">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input
                             type="text"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Search policies…"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50"
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-indigo-500/50"
                         />
                     </div>
                     <select
                         value={filterStatus}
                         onChange={e => setFilterStatus(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none"
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none"
                     >
                         <option value="all">All Statuses</option>
                         {Object.entries(STATUS_CONFIG).map(([k, v]) => (
                             <option key={k} value={k}>{v.label}</option>
                         ))}
                     </select>
-                    <span className="text-xs text-slate-500 ml-auto">{filtered.length} polic{filtered.length !== 1 ? "ies" : "y"}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{filtered.length} polic{filtered.length !== 1 ? "ies" : "y"}</span>
                 </div>
 
                 {filtered.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <BookOpen className="w-12 h-12 text-slate-700 mb-3" />
-                        <p className="text-sm font-medium text-slate-400">No policies found</p>
-                        <p className="text-xs text-slate-600 mt-1">Create your first policy to get started</p>
+                        <BookOpen className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                        <p className="text-sm font-medium text-muted-foreground">No policies found</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">Create your first policy to get started</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="text-[10px] text-slate-500 font-mono uppercase bg-slate-900/40">
+                            <thead className="text-[10px] text-muted-foreground font-mono uppercase bg-card/40">
                                 <tr>
                                     <th className="px-5 py-3 font-medium">Policy</th>
                                     <th className="px-4 py-3 font-medium">Status</th>
@@ -837,7 +838,7 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                                     <th className="px-4 py-3 font-medium">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/50">
+                            <tbody className="divide-y divide-border/50">
                                 <AnimatePresence initial={false}>
                                     {filtered.map(p => {
                                         const overdue = isOverdueReview(p);
@@ -848,62 +849,62 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                className="hover:bg-slate-800/20 transition-colors group"
+                                                className="hover:bg-secondary/20 transition-colors group"
                                             >
                                                 <td className="px-5 py-3">
                                                     <div className="flex flex-col">
-                                                        <button
+                                                        <Button variant="plain"
                                                             onClick={() => setViewing(p)}
-                                                            className="text-sm text-slate-200 font-medium hover:text-orange-400 text-left transition-colors"
+                                                            className="text-sm text-foreground font-medium hover:text-orange-400 text-left transition-colors h-auto"
                                                         >
                                                             {p.title}
-                                                        </button>
-                                                        <span className="text-[11px] text-slate-500 font-mono mt-0.5">v{p.version}</span>
+                                                        </Button>
+                                                        <span className="text-[11px] text-muted-foreground font-mono mt-0.5">v{p.version}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3"><StatusBadge status={p.status} /></td>
                                                 <td className="px-4 py-3">
-                                                    <span className="text-xs text-slate-400">{p.owner?.full_name ?? "Unassigned"}</span>
+                                                    <span className="text-xs text-muted-foreground">{p.owner?.full_name ?? "Unassigned"}</span>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center space-x-2">
-                                                        <div className="w-16 h-1.5 bg-slate-700/50 rounded-full overflow-hidden">
+                                                        <div className="w-16 h-1.5 bg-secondary/50 rounded-full overflow-hidden">
                                                             <div className="h-full bg-indigo-500 rounded-full" style={{ width: `${ackPct}%` }} />
                                                         </div>
-                                                        <span className="text-[11px] text-slate-500">{p.ackCount}/{p.totalMembers}</span>
+                                                        <span className="text-[11px] text-muted-foreground">{p.ackCount}/{p.totalMembers}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     {p.next_review ? (
-                                                        <span className={cn("text-xs", overdue ? "text-red-400 font-medium" : "text-slate-400")}>
+                                                        <span className={cn("text-xs", overdue ? "text-red-400 font-medium" : "text-muted-foreground")}>
                                                             {overdue && <AlertTriangle className="w-3 h-3 inline mr-1" />}
                                                             {new Date(p.next_review).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}
                                                         </span>
-                                                    ) : <span className="text-xs text-slate-600">—</span>}
+                                                    ) : <span className="text-xs text-muted-foreground/70">—</span>}
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button
+                                                        <Button variant="plain"
                                                             onClick={() => setViewing(p)}
-                                                            className="p-1.5 text-slate-500 hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors"
+                                                            className="p-1.5 text-muted-foreground hover:text-orange-400 hover:bg-orange-500/10 rounded-lg transition-colors h-auto"
                                                             title="Preview"
                                                         >
                                                             <Eye className="w-4 h-4" />
-                                                        </button>
-                                                        <button
+                                                        </Button>
+                                                        <Button variant="plain"
                                                             onClick={() => router.push(`/policies/${p.id}`)}
-                                                            className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors"
+                                                            className="p-1.5 text-muted-foreground hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors h-auto"
                                                             title="Open full editor"
                                                         >
                                                             <Edit2 className="w-4 h-4" />
-                                                        </button>
-                                                        <button
+                                                        </Button>
+                                                        <Button variant="plain"
                                                             onClick={() => handleDelete(p.id)}
-                                                            className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                            className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors h-auto"
                                                             title="Delete"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </td>
                                             </motion.tr>
@@ -918,22 +919,22 @@ export function PoliciesClient({ initialPolicies, initialExceptions, orgId, curr
 
             {/* Exceptions section (if any) */}
             {exceptions.length > 0 && (
-                <div className="glass-panel rounded-2xl border border-slate-800/50 p-6">
+                <div className="glass-panel rounded-2xl border border-border/50 p-6">
                     <div className="flex items-center space-x-2 mb-5">
                         <Shield className="w-5 h-5 text-orange-400" />
-                        <h3 className="text-base font-semibold text-slate-100">Policy Exceptions</h3>
-                        <span className="ml-auto text-xs text-slate-500">{exceptions.length} exception{exceptions.length !== 1 ? "s" : ""}</span>
+                        <h3 className="text-base font-semibold text-foreground">Policy Exceptions</h3>
+                        <span className="ml-auto text-xs text-muted-foreground">{exceptions.length} exception{exceptions.length !== 1 ? "s" : ""}</span>
                     </div>
                     <div className="flex flex-col space-y-3">
                         {exceptions.slice(0, 5).map(ex => {
                             const riskCfg = EXCEPTION_RISK[ex.risk_level] ?? EXCEPTION_RISK.medium;
-                            const statusColor = ex.status === "approved" ? "text-emerald-400" : ex.status === "pending" ? "text-amber-400" : "text-slate-500";
+                            const statusColor = ex.status === "approved" ? "text-emerald-400" : ex.status === "pending" ? "text-amber-400" : "text-muted-foreground";
                             return (
-                                <div key={ex.id} className="flex items-start justify-between p-4 bg-slate-900/40 rounded-xl border border-slate-800/50">
+                                <div key={ex.id} className="flex items-start justify-between p-4 bg-card/40 rounded-xl border border-border/50">
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm text-slate-200 truncate">{ex.description}</p>
+                                        <p className="text-sm text-foreground truncate">{ex.description}</p>
                                         {ex.expires_at && (
-                                            <p className="text-[11px] text-slate-500 mt-0.5">Expires {new Date(ex.expires_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</p>
+                                            <p className="text-[11px] text-muted-foreground mt-0.5">Expires {new Date(ex.expires_at).toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" })}</p>
                                         )}
                                     </div>
                                     <div className="flex items-center space-x-3 ml-4 shrink-0">

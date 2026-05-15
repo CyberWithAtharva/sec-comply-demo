@@ -25,8 +25,8 @@ export default async function AdminDashboard() {
         <div className="space-y-8">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-100">Admin Dashboard</h1>
-                    <p className="text-sm text-slate-500 mt-1">Manage all client organizations and users from here.</p>
+                    <h1 className="text-2xl font-bold text-foreground">Admin Dashboard</h1>
+                    <p className="text-sm text-muted-foreground mt-1">Manage all client organizations and users from here.</p>
                 </div>
                 <Link
                     href="/admin/organizations"
@@ -42,7 +42,7 @@ export default async function AdminDashboard() {
                 {stats.map((stat) => (
                     <div key={stat.label} className={`rounded-2xl border p-5 ${stat.bg} backdrop-blur-sm`}>
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{stat.label}</span>
+                            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{stat.label}</span>
                             <stat.icon className={`w-4 h-4 ${stat.color}`} />
                         </div>
                         <p className={`text-3xl font-bold ${stat.color}`}>{stat.value}</p>
@@ -51,18 +51,18 @@ export default async function AdminDashboard() {
             </div>
 
             {/* Organizations table */}
-            <div className="rounded-2xl border border-slate-800/60 bg-slate-900/30 backdrop-blur-sm overflow-hidden">
-                <div className="px-6 py-4 border-b border-slate-800/60 flex items-center justify-between">
-                    <h2 className="text-sm font-semibold text-slate-200">Client Organizations</h2>
+            <div className="rounded-2xl border border-border/60 bg-card/30 backdrop-blur-sm overflow-hidden">
+                <div className="px-6 py-4 border-b border-border/60 flex items-center justify-between">
+                    <h2 className="text-sm font-semibold text-foreground">Client Organizations</h2>
                     <Link href="/admin/organizations" className="text-xs text-blue-400 hover:text-blue-300 transition-colors">
                         View all →
                     </Link>
                 </div>
-                <div className="divide-y divide-slate-800/40">
+                <div className="divide-y divide-border/40">
                     {!orgs || orgs.length === 0 ? (
                         <div className="px-6 py-12 text-center">
-                            <Building2 className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-                            <p className="text-sm text-slate-500">No organizations yet.</p>
+                            <Building2 className="w-10 h-10 text-muted-foreground/70 mx-auto mb-3" />
+                            <p className="text-sm text-muted-foreground">No organizations yet.</p>
                             <Link href="/admin/organizations" className="mt-3 inline-block text-xs text-amber-400 hover:text-amber-300">
                                 Create your first client →
                             </Link>
@@ -70,25 +70,25 @@ export default async function AdminDashboard() {
                     ) : (
                         orgs.slice(0, 8).map((org) => (
                             <Link key={org.id} href={`/admin/organizations/${org.id}`}>
-                                <div className="px-6 py-4 flex items-center justify-between hover:bg-slate-800/30 transition-colors cursor-pointer">
+                                <div className="px-6 py-4 flex items-center justify-between hover:bg-secondary/30 transition-colors cursor-pointer">
                                     <div className="flex items-center gap-3">
                                         <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600/20 to-blue-400/10 border border-blue-500/20 flex items-center justify-center flex-shrink-0">
                                             <span className="text-sm font-bold text-blue-400">{org.name[0].toUpperCase()}</span>
                                         </div>
                                         <div>
-                                            <p className="text-sm font-semibold text-slate-200">{org.name}</p>
-                                            <p className="text-xs text-slate-500 font-mono">{org.slug}</p>
+                                            <p className="text-sm font-semibold text-foreground">{org.name}</p>
+                                            <p className="text-xs text-muted-foreground font-mono">{org.slug}</p>
                                         </div>
                                     </div>
                                     <div className="flex items-center gap-4">
                                         <span className={`text-xs font-semibold px-2.5 py-1 rounded-full ${
                                             org.plan === "enterprise" ? "bg-amber-500/10 text-amber-400 border border-amber-500/20" :
                                             org.plan === "professional" ? "bg-blue-500/10 text-blue-400 border border-blue-500/20" :
-                                            "bg-slate-700/50 text-slate-400 border border-slate-600/30"
+                                            "bg-secondary/50 text-muted-foreground border border-slate-600/30"
                                         }`}>
                                             {org.plan}
                                         </span>
-                                        <span className="text-xs text-slate-500">
+                                        <span className="text-xs text-muted-foreground">
                                             {new Date(org.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                                         </span>
                                     </div>

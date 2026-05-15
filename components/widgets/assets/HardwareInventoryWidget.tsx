@@ -6,11 +6,11 @@ import { cn } from "@/components/ui/Card";
 
 export function HardwareInventoryWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50 relative overflow-hidden">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50 relative overflow-hidden">
             <div className="flex items-center justify-between mb-4 relative z-10">
                 <div className="flex items-center space-x-2">
                     <Laptop className="w-5 h-5 text-blue-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Hardware Fleet</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Hardware Fleet</h3>
                 </div>
             </div>
 
@@ -22,24 +22,24 @@ export function HardwareInventoryWidget() {
                         <circle cx="64" cy="64" r="56" className="stroke-blue-500" strokeWidth="12" fill="none" strokeDasharray="351.8" strokeDashoffset={351.8 - (351.8 * 88) / 100} strokeLinecap="round" />
                     </svg>
                     <div className="absolute flex flex-col items-center">
-                        <span className="text-3xl font-bold text-slate-100">88%</span>
+                        <span className="text-3xl font-bold text-foreground">88%</span>
                         <span className="text-[9px] text-blue-400 uppercase tracking-widest font-bold mt-1 text-center leading-tight">MDM<br />Enrolled</span>
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3 mt-4 relative z-10">
-                <div className="bg-slate-900/40 border border-slate-800/50 p-2.5 rounded-lg flex items-center justify-between">
+                <div className="bg-card/40 border border-border/50 p-2.5 rounded-lg flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <Smartphone className="w-4 h-4 text-emerald-400" />
-                        <span className="text-xs text-slate-300">BYOD</span>
+                        <span className="text-xs text-muted-foreground">BYOD</span>
                     </div>
-                    <span className="font-bold text-slate-200">114</span>
+                    <span className="font-bold text-foreground">114</span>
                 </div>
                 <div className="bg-red-500/10 border border-red-500/20 p-2.5 rounded-lg flex items-center justify-between">
                     <div className="flex items-center space-x-2">
                         <MonitorOff className="w-4 h-4 text-red-500" />
-                        <span className="text-xs text-slate-300">Missing</span>
+                        <span className="text-xs text-muted-foreground">Missing</span>
                     </div>
                     <span className="font-bold text-red-400 flex items-center"><AlertCircle className="w-3 h-3 mr-1" /> 7</span>
                 </div>

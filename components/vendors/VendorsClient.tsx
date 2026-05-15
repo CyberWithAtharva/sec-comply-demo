@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -71,7 +72,7 @@ const RISK_CONFIG: Record<string, { color: string; bg: string; border: string }>
 
 const STATUS_CONFIG: Record<string, { color: string; bg: string; border: string }> = {
     active:     { color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
-    inactive:   { color: "text-slate-400",   bg: "bg-slate-500/10",   border: "border-slate-500/30" },
+    inactive:   { color: "text-muted-foreground",   bg: "bg-slate-500/10",   border: "border-slate-500/30" },
     onboarding: { color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30" },
     offboarding:{ color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30" },
 };
@@ -94,11 +95,11 @@ function RiskBadge({ risk }: { risk: string }) {
 }
 
 function TierBadge({ tier }: { tier: number }) {
-    const colors = ["", "text-red-400", "text-orange-400", "text-amber-400", "text-slate-400"];
+    const colors = ["", "text-red-400", "text-orange-400", "text-amber-400", "text-muted-foreground"];
     return (
         <div className="flex items-center space-x-0.5">
             {[1, 2, 3, 4].map(i => (
-                <Star key={i} className={cn("w-3 h-3", i <= tier ? (colors[tier] ?? "text-slate-400") : "text-slate-700")}
+                <Star key={i} className={cn("w-3 h-3", i <= tier ? (colors[tier] ?? "text-muted-foreground") : "text-muted-foreground/50")}
                     fill={i <= tier ? "currentColor" : "none"} />
             ))}
         </div>
@@ -157,7 +158,7 @@ function VendorModal({ orgId, editing, onClose, onSaved }: VendorModalProps) {
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-indigo-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -165,19 +166,19 @@ function VendorModal({ orgId, editing, onClose, onSaved }: VendorModalProps) {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-6 border-b border-border/50">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center">
                             <Building2 className="w-4 h-4 text-indigo-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-100">{editing ? "Edit Vendor" : "Onboard Vendor"}</h2>
-                            <p className="text-xs text-slate-500">{editing ? "Update vendor details" : "Add a new third-party vendor"}</p>
+                            <h2 className="text-base font-semibold text-foreground">{editing ? "Edit Vendor" : "Onboard Vendor"}</h2>
+                            <p className="text-xs text-muted-foreground">{editing ? "Update vendor details" : "Add a new third-party vendor"}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground h-auto"><X className="w-5 h-5" /></Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -188,20 +189,20 @@ function VendorModal({ orgId, editing, onClose, onSaved }: VendorModalProps) {
                     )}
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Vendor Name *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Vendor Name *</label>
                         <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                             placeholder="Acme Security Ltd." className={inputCls} />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Tier (1=Critical)</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Tier (1=Critical)</label>
                             <select value={form.tier} onChange={e => setForm(f => ({ ...f, tier: Number(e.target.value) }))} className={inputCls}>
                                 {[1, 2, 3, 4].map(t => <option key={t} value={t}>Tier {t}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Risk Level</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Risk Level</label>
                             <select value={form.risk_level} onChange={e => setForm(f => ({ ...f, risk_level: e.target.value }))} className={inputCls}>
                                 {["critical", "high", "medium", "low"].map(r => (
                                     <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
@@ -209,7 +210,7 @@ function VendorModal({ orgId, editing, onClose, onSaved }: VendorModalProps) {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Status</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Status</label>
                             <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))} className={inputCls}>
                                 {["active", "inactive", "onboarding", "offboarding"].map(s => (
                                     <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>
@@ -220,30 +221,30 @@ function VendorModal({ orgId, editing, onClose, onSaved }: VendorModalProps) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Contact Name</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Contact Name</label>
                             <input type="text" value={form.contact_name} onChange={e => setForm(f => ({ ...f, contact_name: e.target.value }))}
                                 placeholder="Jane Smith" className={inputCls} />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Contact Email</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Contact Email</label>
                             <input type="email" value={form.contact_email} onChange={e => setForm(f => ({ ...f, contact_email: e.target.value }))}
                                 placeholder="jane@vendor.com" className={inputCls} />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Website</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Website</label>
                         <input type="text" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
                             placeholder="https://vendor.com" className={inputCls} />
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">Cancel</button>
-                        <button type="submit" disabled={saving}
-                            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 transition-colors">
+                        <Button variant="plain" type="button" onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors h-auto">Cancel</Button>
+                        <Button variant="plain" type="submit" disabled={saving}
+                            className="px-5 py-2 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 transition-colors h-auto">
                             {saving ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                             <span>{saving ? "Saving…" : editing ? "Save Changes" : "Add Vendor"}</span>
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </motion.div>
@@ -286,7 +287,7 @@ function AssessmentModal({ vendorId, owners, onClose, onSaved }: AssessmentModal
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-indigo-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -294,16 +295,16 @@ function AssessmentModal({ vendorId, owners, onClose, onSaved }: AssessmentModal
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-md shadow-2xl"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-md shadow-2xl"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-6 border-b border-border/50">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                             <ClipboardList className="w-4 h-4 text-blue-400" />
                         </div>
-                        <h2 className="text-base font-semibold text-slate-100">Schedule Assessment</h2>
+                        <h2 className="text-base font-semibold text-foreground">Schedule Assessment</h2>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground h-auto"><X className="w-5 h-5" /></Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -311,7 +312,7 @@ function AssessmentModal({ vendorId, owners, onClose, onSaved }: AssessmentModal
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Type</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Type</label>
                             <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))} className={inputCls}>
                                 {["questionnaire", "on-site", "document-review", "automated"].map(t => (
                                     <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1).replace(/-/g, ' ')}</option>
@@ -319,7 +320,7 @@ function AssessmentModal({ vendorId, owners, onClose, onSaved }: AssessmentModal
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Status</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Status</label>
                             <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))} className={inputCls}>
                                 {["scheduled", "in_progress", "completed", "overdue"].map(s => (
                                     <option key={s} value={s}>{s.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</option>
@@ -330,11 +331,11 @@ function AssessmentModal({ vendorId, owners, onClose, onSaved }: AssessmentModal
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Due Date</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Due Date</label>
                             <input type="date" value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))} className={inputCls} />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Assessor</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Assessor</label>
                             <select value={form.assessor_id} onChange={e => setForm(f => ({ ...f, assessor_id: e.target.value }))} className={inputCls}>
                                 <option value="">Unassigned</option>
                                 {owners.map(o => <option key={o.id} value={o.id}>{o.name}</option>)}
@@ -343,19 +344,19 @@ function AssessmentModal({ vendorId, owners, onClose, onSaved }: AssessmentModal
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Notes</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Notes</label>
                         <textarea rows={2} value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))}
                             placeholder="Scope, instructions, or context…"
                             className={cn(inputCls, "resize-none")} />
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">Cancel</button>
-                        <button type="submit" disabled={saving}
-                            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2">
+                        <Button variant="plain" type="button" onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground h-auto">Cancel</Button>
+                        <Button variant="plain" type="submit" disabled={saving}
+                            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 h-auto">
                             {saving ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                             <span>{saving ? "Scheduling…" : "Schedule"}</span>
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </motion.div>
@@ -450,73 +451,73 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center">
                         <Building2 className="w-8 h-8 mr-3 text-indigo-500" />
                         Vendor Risk Management
                     </h1>
-                    <p className="text-sm text-slate-400 mt-1">Third-party security assessments, tiering, and continuous monitoring.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Third-party security assessments, tiering, and continuous monitoring.</p>
                 </div>
-                <button
+                <Button variant="plain"
                     onClick={() => { setEditing(null); setShowCreate(true); }}
-                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors flex items-center space-x-2"
+                    className="bg-indigo-600 hover:bg-indigo-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-colors flex items-center space-x-2 h-auto"
                 >
                     <Plus className="w-4 h-4" />
                     <span>Onboard Vendor</span>
-                </button>
+                </Button>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
                 {[
-                    { label: "Total Vendors",   count: stats.total,              color: "text-slate-100" },
+                    { label: "Total Vendors",   count: stats.total,              color: "text-foreground" },
                     { label: "Active",           count: stats.active,             color: "text-emerald-400" },
-                    { label: "High / Critical",  count: stats.highRisk,           color: stats.highRisk > 0 ? "text-red-400" : "text-slate-400" },
+                    { label: "High / Critical",  count: stats.highRisk,           color: stats.highRisk > 0 ? "text-red-400" : "text-muted-foreground" },
                     { label: "Tier 1",           count: stats.tier1,              color: "text-orange-400" },
-                    { label: "Open Assessments", count: stats.pendingAssessments, color: stats.pendingAssessments > 0 ? "text-amber-400" : "text-slate-400" },
+                    { label: "Open Assessments", count: stats.pendingAssessments, color: stats.pendingAssessments > 0 ? "text-amber-400" : "text-muted-foreground" },
                 ].map((s) => (
                     <div
                         key={s.label}
-                        className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col"
+                        className="glass-panel rounded-2xl p-4 border border-border/50 flex flex-col"
                     >
-                        <span className="text-[10px] text-slate-500 mb-1">{s.label}</span>
+                        <span className="text-[10px] text-muted-foreground mb-1">{s.label}</span>
                         <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
                     </div>
                 ))}
             </div>
 
             {/* Vendors Table */}
-            <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col">
+            <div className="glass-panel rounded-2xl border border-border/50 flex flex-col">
                 {/* Filters */}
-                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-slate-800/50">
+                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-border/50">
                     <div className="relative flex-1 min-w-[180px]">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                             placeholder="Search vendors…"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-indigo-500/50" />
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-indigo-500/50" />
                     </div>
                     <select value={filterRisk} onChange={e => setFilterRisk(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none">
                         <option value="all">All Risk Levels</option>
                         {["critical", "high", "medium", "low"].map(r => (
                             <option key={r} value={r}>{r.charAt(0).toUpperCase() + r.slice(1)}</option>
                         ))}
                     </select>
                     <select value={filterTier} onChange={e => setFilterTier(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none">
                         <option value="all">All Tiers</option>
                         {[1, 2, 3, 4].map(t => <option key={t} value={t}>Tier {t}</option>)}
                     </select>
-                    <span className="text-xs text-slate-500 ml-auto">{filtered.length} vendor{filtered.length !== 1 ? "s" : ""}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{filtered.length} vendor{filtered.length !== 1 ? "s" : ""}</span>
                 </div>
 
                 {filtered.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <Building2 className="w-12 h-12 text-slate-700 mb-3" />
-                        <p className="text-sm font-medium text-slate-400">No vendors found</p>
-                        <p className="text-xs text-slate-600 mt-1">Onboard your first vendor to get started</p>
+                        <Building2 className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                        <p className="text-sm font-medium text-muted-foreground">No vendors found</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">Onboard your first vendor to get started</p>
                     </div>
                 ) : (
-                    <div className="flex flex-col divide-y divide-slate-800/50">
+                    <div className="flex flex-col divide-y divide-border/50">
                         <AnimatePresence initial={false}>
                             {filtered.map(v => {
                                 const vAssessments = vendorAssessments(v.id);
@@ -525,22 +526,22 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                     <motion.div key={v.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                                         {/* Vendor row */}
                                         <div
-                                            className="flex items-center px-5 py-4 hover:bg-slate-800/20 transition-colors group cursor-pointer"
+                                            className="flex items-center px-5 py-4 hover:bg-secondary/20 transition-colors group cursor-pointer"
                                             onClick={() => setExpandedVendor(isExpanded ? null : v.id)}
                                         >
                                             {/* Expand icon */}
-                                            <ChevronDown className={cn("w-4 h-4 text-slate-600 mr-3 transition-transform shrink-0", isExpanded && "rotate-180")} />
+                                            <ChevronDown className={cn("w-4 h-4 text-muted-foreground/70 mr-3 transition-transform shrink-0", isExpanded && "rotate-180")} />
 
                                             {/* Vendor info */}
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center space-x-3">
-                                                    <span className="text-sm font-medium text-slate-200 group-hover:text-white truncate">{v.name}</span>
+                                                    <span className="text-sm font-medium text-foreground group-hover:text-white truncate">{v.name}</span>
                                                     <RiskBadge risk={v.risk_level} />
                                                 </div>
                                                 <div className="flex items-center space-x-4 mt-0.5">
                                                     <TierBadge tier={v.tier} />
                                                     {v.contact_email && (
-                                                        <span className="text-[11px] text-slate-500">{v.contact_email}</span>
+                                                        <span className="text-[11px] text-muted-foreground">{v.contact_email}</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -548,26 +549,26 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                             {/* Status + last assessment + security score */}
                                             <div className="hidden md:flex items-center space-x-6 mx-6">
                                                 <div className="text-right">
-                                                    <p className="text-[10px] text-slate-500">Status</p>
-                                                    <span className={cn("text-[11px] font-semibold uppercase", STATUS_CONFIG[v.status]?.color ?? "text-slate-400")}>
+                                                    <p className="text-[10px] text-muted-foreground">Status</p>
+                                                    <span className={cn("text-[11px] font-semibold uppercase", STATUS_CONFIG[v.status]?.color ?? "text-muted-foreground")}>
                                                         {v.status}
                                                     </span>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-[10px] text-slate-500">Last Assessment</p>
-                                                    <p className="text-[11px] text-slate-400">
+                                                    <p className="text-[10px] text-muted-foreground">Last Assessment</p>
+                                                    <p className="text-[11px] text-muted-foreground">
                                                         {v.last_assessment ? new Date(v.last_assessment).toLocaleDateString() : "None"}
                                                     </p>
                                                 </div>
                                                 <div className="text-right">
-                                                    <p className="text-[10px] text-slate-500">Assessments</p>
-                                                    <p className="text-[11px] text-slate-400">{vAssessments.length}</p>
+                                                    <p className="text-[10px] text-muted-foreground">Assessments</p>
+                                                    <p className="text-[11px] text-muted-foreground">{vAssessments.length}</p>
                                                 </div>
                                                 {/* Security Score */}
                                                 <div className="text-right min-w-[60px]">
-                                                    <p className="text-[10px] text-slate-500 mb-0.5">Security</p>
+                                                    <p className="text-[10px] text-muted-foreground mb-0.5">Security</p>
                                                     {assessingSecurityFor[v.id] ? (
-                                                        <span className="inline-flex items-center gap-1 text-[10px] text-slate-400">
+                                                        <span className="inline-flex items-center gap-1 text-[10px] text-muted-foreground">
                                                             <RotateCcw className="w-3 h-3 animate-spin" /> Scanning…
                                                         </span>
                                                     ) : v.security_score !== null && v.security_score !== undefined ? (
@@ -580,14 +581,14 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                                             );
                                                         })()
                                                     ) : v.website ? (
-                                                        <button
+                                                        <Button variant="plain"
                                                             onClick={e => { e.stopPropagation(); handleSecurityAssess(v.id, v.website!); }}
-                                                            className="text-[10px] text-indigo-400 hover:text-indigo-300 underline underline-offset-2"
+                                                            className="text-[10px] text-indigo-400 hover:text-indigo-300 underline underline-offset-2 h-auto"
                                                         >
                                                             Assess
-                                                        </button>
+                                                        </Button>
                                                     ) : (
-                                                        <span className="text-[10px] text-slate-600">No domain</span>
+                                                        <span className="text-[10px] text-muted-foreground/70">No domain</span>
                                                     )}
                                                 </div>
                                             </div>
@@ -595,34 +596,34 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                             {/* Actions */}
                                             <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={e => e.stopPropagation()}>
                                                 {v.website && (
-                                                    <button
+                                                    <Button variant="plain"
                                                         onClick={() => handleSecurityAssess(v.id, v.website!)}
                                                         disabled={!!assessingSecurityFor[v.id]}
-                                                        className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors disabled:opacity-40"
+                                                        className="p-1.5 text-muted-foreground hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors disabled:opacity-40 h-auto"
                                                         title="Re-assess security"
                                                     >
                                                         <ScanSearch className="w-4 h-4" />
-                                                    </button>
+                                                    </Button>
                                                 )}
-                                                <button onClick={() => setAssessingVendor(v.id)}
-                                                    className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                                <Button variant="plain" onClick={() => setAssessingVendor(v.id)}
+                                                    className="p-1.5 text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors h-auto"
                                                     title="Schedule assessment">
                                                     <ClipboardList className="w-4 h-4" />
-                                                </button>
+                                                </Button>
                                                 {v.website && (
                                                     <a href={v.website} target="_blank" rel="noopener noreferrer"
-                                                        className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-slate-700/50 rounded-lg transition-colors">
+                                                        className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-secondary/50 rounded-lg transition-colors">
                                                         <ExternalLink className="w-4 h-4" />
                                                     </a>
                                                 )}
-                                                <button onClick={() => { setEditing(v); setShowCreate(true); }}
-                                                    className="p-1.5 text-slate-500 hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors">
+                                                <Button variant="plain" onClick={() => { setEditing(v); setShowCreate(true); }}
+                                                    className="p-1.5 text-muted-foreground hover:text-indigo-400 hover:bg-indigo-500/10 rounded-lg transition-colors h-auto">
                                                     <Edit2 className="w-4 h-4" />
-                                                </button>
-                                                <button onClick={() => handleDelete(v.id)}
-                                                    className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                                                </Button>
+                                                <Button variant="plain" onClick={() => handleDelete(v.id)}
+                                                    className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors h-auto">
                                                     <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                </Button>
                                             </div>
                                         </div>
 
@@ -639,27 +640,27 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                                     <div className="px-12 pb-4 space-y-4">
                                                         {/* ── Scheduled assessments ── */}
                                                         {vAssessments.length === 0 ? (
-                                                            <div className="text-xs text-slate-500 py-3 text-center">
+                                                            <div className="text-xs text-muted-foreground py-3 text-center">
                                                                 No assessments yet.{" "}
-                                                                <button onClick={() => setAssessingVendor(v.id)} className="text-blue-400 hover:text-blue-300">
+                                                                <Button variant="plain" onClick={() => setAssessingVendor(v.id)} className="text-blue-400 hover:text-blue-300 h-auto">
                                                                     Schedule one
-                                                                </button>
+                                                                </Button>
                                                             </div>
                                                         ) : (
                                                             <div className="flex flex-col space-y-2">
                                                                 {vAssessments.slice(0, 5).map(a => {
                                                                     const statusColor = a.status === "completed" ? "text-emerald-400" :
                                                                         a.status === "in_progress" ? "text-amber-400" :
-                                                                            a.status === "overdue" ? "text-red-400" : "text-slate-400";
+                                                                            a.status === "overdue" ? "text-red-400" : "text-muted-foreground";
                                                                     return (
-                                                                        <div key={a.id} className="flex items-center justify-between p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 text-xs">
+                                                                        <div key={a.id} className="flex items-center justify-between p-3 bg-card/40 rounded-xl border border-border/50 text-xs">
                                                                             <div className="flex items-center space-x-3">
-                                                                                <ClipboardList className="w-3.5 h-3.5 text-slate-500 shrink-0" />
-                                                                                <span className="text-slate-300 capitalize">{a.type.replace(/-/g, ' ')}</span>
+                                                                                <ClipboardList className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                                                                                <span className="text-muted-foreground capitalize">{a.type.replace(/-/g, ' ')}</span>
                                                                             </div>
                                                                             <div className="flex items-center space-x-4">
-                                                                                {a.score !== null && <span className="text-slate-400 font-mono">Score: {a.score}</span>}
-                                                                                {a.due_date && <span className="text-slate-500">{new Date(a.due_date).toLocaleDateString()}</span>}
+                                                                                {a.score !== null && <span className="text-muted-foreground font-mono">Score: {a.score}</span>}
+                                                                                {a.due_date && <span className="text-muted-foreground">{new Date(a.due_date).toLocaleDateString()}</span>}
                                                                                 <span className={cn("uppercase font-bold text-[10px]", statusColor)}>{a.status.replace(/_/g, ' ')}</span>
                                                                             </div>
                                                                         </div>
@@ -670,7 +671,7 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
 
                                                         {/* ── Auto Security Scan Results ── */}
                                                         {assessingSecurityFor[v.id] && (
-                                                            <div className="flex items-center gap-2 text-xs text-slate-400 py-2">
+                                                            <div className="flex items-center gap-2 text-xs text-muted-foreground py-2">
                                                                 <RotateCcw className="w-3.5 h-3.5 animate-spin text-indigo-400" />
                                                                 Running automated security assessment…
                                                             </div>
@@ -678,7 +679,7 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                                         {v.security_findings && v.security_findings.length > 0 && !assessingSecurityFor[v.id] && (
                                                             <div>
                                                                 <div className="flex items-center justify-between mb-2">
-                                                                    <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                                                    <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
                                                                         <ScanSearch className="w-3 h-3" /> Auto Security Scan
                                                                     </p>
                                                                     <div className="flex items-center gap-2">
@@ -691,7 +692,7 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                                                             );
                                                                         })()}
                                                                         {v.security_checked_at && (
-                                                                            <span className="text-[9px] text-slate-600">
+                                                                            <span className="text-[9px] text-muted-foreground/70">
                                                                                 {new Date(v.security_checked_at).toLocaleDateString()}
                                                                             </span>
                                                                         )}
@@ -711,9 +712,9 @@ export function VendorsClient({ initialVendors, initialAssessments, orgId, owner
                                                                             }
                                                                             <div className="flex-1 min-w-0">
                                                                                 <p className={cn("font-medium", f.passed ? "text-emerald-300" : "text-red-300")}>{f.label}</p>
-                                                                                <p className="text-slate-500 mt-0.5">{f.description}</p>
+                                                                                <p className="text-muted-foreground mt-0.5">{f.description}</p>
                                                                             </div>
-                                                                            <span className={cn("text-[9px] font-bold shrink-0", f.passed ? "text-emerald-500" : "text-slate-600")}>
+                                                                            <span className={cn("text-[9px] font-bold shrink-0", f.passed ? "text-emerald-500" : "text-muted-foreground/70")}>
                                                                                 {f.passed ? `+${f.points}` : `0/${f.points}`}
                                                                             </span>
                                                                         </div>

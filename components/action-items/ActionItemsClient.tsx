@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import {
     ListChecks,
@@ -113,7 +114,7 @@ function getPriorityColor(priority: Priority): string {
         case "critical": return "bg-red-500/15 text-red-400 border-red-500/30";
         case "evidence": return "bg-amber-500/15 text-amber-400 border-amber-500/30";
         case "quickwin": return "bg-emerald-500/15 text-emerald-400 border-emerald-500/30";
-        default: return "bg-slate-500/15 text-slate-400 border-slate-500/30";
+        default: return "bg-slate-500/15 text-muted-foreground border-slate-500/30";
     }
 }
 
@@ -200,15 +201,15 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
                         <ListChecks className="w-5 h-5 text-orange-400" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-slate-100">Action Items</h1>
-                        <p className="text-sm text-slate-500 mt-0.5">
+                        <h1 className="text-xl font-bold text-foreground">Action Items</h1>
+                        <p className="text-sm text-muted-foreground mt-0.5">
                             Your prioritized compliance tasks — address critical gaps and answer questionnaires
                         </p>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-slate-900/60 border border-slate-800 rounded-lg px-3 py-1.5">
-                    <span className="text-sm text-slate-400">Pending</span>
+                <div className="flex items-center gap-2 bg-card/60 border border-border rounded-lg px-3 py-1.5">
+                    <span className="text-sm text-muted-foreground">Pending</span>
                     <span className="text-sm font-bold text-orange-400">{pendingControls.length}</span>
                 </div>
             </div>
@@ -216,16 +217,16 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
             {/* Tabs + Search row */}
             <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center justify-between">
                 {/* Tabs */}
-                <div className="flex items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-lg p-1">
+                <div className="flex items-center gap-1 bg-card/50 border border-border rounded-lg p-1">
                     {tabs.map(tab => (
-                        <button
+                        <Button variant="plain"
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id)}
-                            className={cn(
+                            className={cn("h-auto", 
                                 "flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all",
                                 activeTab === tab.id
                                     ? "bg-orange-600 text-white shadow-sm"
-                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
                             )}
                         >
                             {tab.label}
@@ -234,24 +235,24 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
                                     "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
                                     activeTab === tab.id
                                         ? "bg-white/20 text-white"
-                                        : "bg-slate-800 text-slate-400"
+                                        : "bg-secondary text-muted-foreground"
                                 )}>
                                     {tab.count}
                                 </span>
                             )}
-                        </button>
+                        </Button>
                     ))}
                 </div>
 
                 {/* Search */}
                 <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                     <input
                         type="text"
                         placeholder="Search controls…"
                         value={search}
                         onChange={e => setSearch(e.target.value)}
-                        className="w-60 bg-slate-900/50 border border-slate-800 rounded-lg py-2 pl-9 pr-4 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/30 transition-all"
+                        className="w-60 bg-card/50 border border-border rounded-lg py-2 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/30 transition-all"
                     />
                 </div>
             </div>
@@ -259,9 +260,9 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
             {/* Content */}
             {filtered.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-20 text-center">
-                    <ListChecks className="w-12 h-12 text-slate-700 mb-3" />
-                    <p className="text-slate-400 font-medium">No action items found</p>
-                    <p className="text-slate-600 text-sm mt-1">
+                    <ListChecks className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                    <p className="text-muted-foreground font-medium">No action items found</p>
+                    <p className="text-muted-foreground/70 text-sm mt-1">
                         {search ? "Try adjusting your search query" : "All controls are verified or not applicable"}
                     </p>
                 </div>
@@ -297,16 +298,16 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
                     {others.length > 0 && (
                         <ControlSection
                             title="Other Tasks"
-                            icon={<ListChecks className="w-4 h-4 text-slate-400" />}
-                            iconBg="bg-slate-800 border-slate-700"
+                            icon={<ListChecks className="w-4 h-4 text-muted-foreground" />}
+                            iconBg="bg-secondary border-border"
                             items={others}
                             frameworkMap={frameworkMap}
                         />
                     )}
                 </div>
             ) : (
-                <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
-                    <div className="divide-y divide-slate-800/60">
+                <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
+                    <div className="divide-y divide-border/60">
                         {filtered.map(item => (
                             <ControlRow key={item.control.id} item={item} frameworkMap={frameworkMap} />
                         ))}
@@ -336,11 +337,11 @@ function ControlSection({
                 <div className={cn("p-1.5 rounded-lg border", iconBg)}>
                     {icon}
                 </div>
-                <h2 className="text-sm font-semibold text-slate-300">{title}</h2>
-                <span className="text-xs text-slate-500 ml-1">{items.length} item{items.length !== 1 ? "s" : ""}</span>
+                <h2 className="text-sm font-semibold text-muted-foreground">{title}</h2>
+                <span className="text-xs text-muted-foreground ml-1">{items.length} item{items.length !== 1 ? "s" : ""}</span>
             </div>
-            <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
-                <div className="divide-y divide-slate-800/60">
+            <div className="bg-card/50 border border-border rounded-xl overflow-hidden">
+                <div className="divide-y divide-border/60">
                     {items.map(item => (
                         <ControlRow key={item.control.id} item={item} frameworkMap={frameworkMap} />
                     ))}
@@ -364,7 +365,7 @@ function ControlRow({
     const currentStatus = status?.status ?? "not_started";
 
     return (
-        <div className="flex items-center gap-4 px-4 py-3 hover:bg-slate-800/30 transition-colors group">
+        <div className="flex items-center gap-4 px-4 py-3 hover:bg-secondary/30 transition-colors group">
             {/* Priority badge */}
             <span className={cn(
                 "text-[10px] font-bold px-2 py-0.5 rounded border flex-shrink-0",
@@ -374,14 +375,14 @@ function ControlRow({
             </span>
 
             {/* Control ID */}
-            <span className="text-xs font-mono text-slate-500 flex-shrink-0 w-24 truncate" title={control.control_id}>
+            <span className="text-xs font-mono text-muted-foreground flex-shrink-0 w-24 truncate" title={control.control_id}>
                 {control.control_id}
             </span>
 
             {/* Title + domain */}
             <div className="flex-1 min-w-0">
-                <p className="text-sm text-slate-200 font-medium truncate">{control.title}</p>
-                <p className="text-xs text-slate-500 truncate">{control.domain}{fwName ? ` · ${fwName}` : ""}</p>
+                <p className="text-sm text-foreground font-medium truncate">{control.title}</p>
+                <p className="text-xs text-muted-foreground truncate">{control.domain}{fwName ? ` · ${fwName}` : ""}</p>
             </div>
 
             {/* Status */}
@@ -398,7 +399,7 @@ function ControlRow({
             {/* View button */}
             <Link
                 href="/gap-assessment"
-                className="flex items-center gap-1 text-xs font-medium text-slate-500 hover:text-orange-400 transition-colors flex-shrink-0 group-hover:text-orange-400"
+                className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-orange-400 transition-colors flex-shrink-0 group-hover:text-orange-400"
             >
                 View
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -409,13 +410,13 @@ function ControlRow({
 
 function StatusBadge({ status }: { status: string }) {
     const map: Record<string, { label: string; cls: string }> = {
-        not_started: { label: "Not Started", cls: "text-slate-500 bg-slate-800/60 border-slate-700/50" },
+        not_started: { label: "Not Started", cls: "text-muted-foreground bg-secondary/60 border-border/50" },
         in_progress: { label: "In Progress", cls: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
         evidence_pending: { label: "Evidence Pending", cls: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
         verified: { label: "Verified", cls: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
-        not_applicable: { label: "N/A", cls: "text-slate-500 bg-slate-800/60 border-slate-700/50" },
+        not_applicable: { label: "N/A", cls: "text-muted-foreground bg-secondary/60 border-border/50" },
     };
-    const info = map[status] ?? { label: status, cls: "text-slate-500 bg-slate-800/60 border-slate-700/50" };
+    const info = map[status] ?? { label: status, cls: "text-muted-foreground bg-secondary/60 border-border/50" };
     return (
         <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded border flex-shrink-0", info.cls)}>
             {info.label}

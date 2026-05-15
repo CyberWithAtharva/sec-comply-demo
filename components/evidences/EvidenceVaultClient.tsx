@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
@@ -388,7 +389,7 @@ const FILTERS = ["all", "complete", "incomplete", "missing"] as const;
 const STATUS_BADGE_STYLES: Record<EvidenceRequirement["status"], string> = {
     fulfilled: "text-emerald-400 bg-emerald-500/10 border-emerald-500/30",
     pending: "text-amber-400 bg-amber-500/10 border-amber-500/30",
-    missing: "text-slate-400 bg-slate-800/70 border-slate-700/60",
+    missing: "text-muted-foreground bg-secondary/70 border-border/60",
 };
 
 const SOURCE_LABEL: Record<NonNullable<EvidenceRequirement["source"]>, string> = {
@@ -750,9 +751,9 @@ function SummaryStat({
     bg: string;
 }) {
     return (
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div className="bg-card/60 border border-border rounded-xl p-4">
             <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-slate-500 uppercase tracking-wide">{label}</span>
+                <span className="text-xs text-muted-foreground uppercase tracking-wide">{label}</span>
                 <div className={cn("p-1.5 rounded-lg border", bg)}>
                     <Icon className={cn("w-4 h-4", color)} />
                 </div>
@@ -775,16 +776,16 @@ function ReplaceConfirmModal({
                 initial={{ opacity: 0, scale: 0.96 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.96 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl"
             >
-                <div className="flex items-center justify-between p-5 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-5 border-b border-border/50">
                     <div>
-                        <h2 className="text-base font-semibold text-slate-100">Replace Evidence</h2>
-                        <p className="text-xs text-slate-500 mt-0.5">Confirm before uploading a replacement file.</p>
+                        <h2 className="text-base font-semibold text-foreground">Replace Evidence</h2>
+                        <p className="text-xs text-muted-foreground mt-0.5">Confirm before uploading a replacement file.</p>
                     </div>
-                    <button onClick={onCancel} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors">
+                    <Button variant="plain" onClick={onCancel} className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground transition-colors h-auto">
                         <X className="w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
                 <div className="p-5 space-y-4">
                     <div className="bg-amber-500/10 border border-amber-500/20 rounded-xl p-4">
@@ -793,20 +794,20 @@ function ReplaceConfirmModal({
                         </p>
                     </div>
                     <div className="flex justify-end gap-3">
-                        <button
+                        <Button variant="plain"
                             type="button"
                             onClick={onCancel}
-                            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200"
+                            className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground h-auto"
                         >
                             Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button variant="plain"
                             type="button"
                             onClick={onConfirm}
-                            className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium rounded-lg transition-colors"
+                            className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium rounded-lg transition-colors h-auto"
                         >
                             Continue
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </motion.div>
@@ -1177,62 +1178,62 @@ export function EvidenceVaultClient({
                         <FolderGit2 className="w-5 h-5 text-orange-400" />
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-slate-100">Evidence Vault</h1>
-                        <p className="text-sm text-slate-500 mt-0.5">
+                        <h1 className="text-xl font-bold text-foreground">Evidence Vault</h1>
+                        <p className="text-sm text-muted-foreground mt-0.5">
                             Map each control to policy, scanner, and manually uploaded evidence without leaving the compliance workspace.
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-fit">
+            <div className="flex flex-wrap items-center gap-1 bg-card/50 border border-border rounded-lg p-1 w-fit">
                 {frameworks.map((framework) => (
-                    <button
+                    <Button variant="plain"
                         key={framework.id}
                         onClick={() => setSelectedFrameworkId(framework.id)}
-                        className={cn(
+                        className={cn("h-auto", 
                             "px-3 py-1.5 rounded-md text-sm font-medium transition-all",
                             selectedFrameworkId === framework.id
                                 ? "bg-orange-600 text-white shadow-sm"
-                                : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60",
+                                : "text-muted-foreground hover:text-foreground hover:bg-secondary/60",
                         )}
                     >
                         {framework.name} {framework.version ? `v${framework.version}` : ""}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <SummaryStat label="Total Controls" value={summary.total} icon={ShieldCheck} color="text-slate-100" bg="bg-slate-800/70 border-slate-700/60" />
+                <SummaryStat label="Total Controls" value={summary.total} icon={ShieldCheck} color="text-foreground" bg="bg-secondary/70 border-border/60" />
                 <SummaryStat label="Fully Evidenced" value={summary.complete} icon={CheckCircle2} color="text-emerald-400" bg="bg-emerald-500/10 border-emerald-500/20" />
                 <SummaryStat label="Partially Evidenced" value={summary.partial} icon={AlertCircle} color="text-amber-400" bg="bg-amber-500/10 border-amber-500/20" />
                 <SummaryStat label="Missing Evidence" value={summary.missing} icon={AlertTriangle} color="text-red-400" bg="bg-red-500/10 border-red-500/20" />
             </div>
 
             <div className="grid grid-cols-1 xl:grid-cols-[380px_minmax(0,1fr)] gap-6 items-start">
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
-                    <div className="p-4 border-b border-slate-800/60 space-y-4">
+                <div className="bg-card/60 border border-border rounded-xl overflow-hidden">
+                    <div className="p-4 border-b border-border/60 space-y-4">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-sm font-semibold text-slate-100">Control List</p>
-                                <p className="text-xs text-slate-500 mt-1">{filteredControls.length} controls in view</p>
+                                <p className="text-sm font-semibold text-foreground">Control List</p>
+                                <p className="text-xs text-muted-foreground mt-1">{filteredControls.length} controls in view</p>
                             </div>
                         </div>
 
-                        <div className="flex items-center gap-1 bg-slate-800/50 border border-slate-700/50 rounded-lg p-1 w-fit">
+                        <div className="flex items-center gap-1 bg-secondary/50 border border-border/50 rounded-lg p-1 w-fit">
                             {FILTERS.map((filter) => (
-                                <button
+                                <Button variant="plain"
                                     key={filter}
                                     onClick={() => setActiveFilter(filter)}
-                                    className={cn(
+                                    className={cn("h-auto", 
                                         "px-3 py-1.5 rounded-md text-sm font-medium capitalize transition-all",
                                         activeFilter === filter
                                             ? "bg-orange-600 text-white shadow-sm"
-                                            : "text-slate-400 hover:text-slate-200 hover:bg-slate-700/40",
+                                            : "text-muted-foreground hover:text-foreground hover:bg-secondary/40",
                                     )}
                                 >
                                     {filter === "all" ? "All" : filter}
-                                </button>
+                                </Button>
                             ))}
                         </div>
                     </div>
@@ -1241,40 +1242,40 @@ export function EvidenceVaultClient({
                         {Object.entries(groupedControls).map(([group, groupControls]) => {
                             const isCollapsed = collapsedGroups.has(group);
                             return (
-                                <div key={group} className="border-b border-slate-800/50 last:border-b-0">
-                                    <button
+                                <div key={group} className="border-b border-border/50 last:border-b-0">
+                                    <Button variant="plain"
                                         onClick={() => toggleGroup(group)}
-                                        className="w-full flex items-center justify-between px-4 py-3 hover:bg-slate-800/30 transition-colors text-left"
+                                        className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/30 transition-colors text-left h-auto"
                                     >
                                         <div>
-                                            <p className="text-sm font-medium text-slate-200">{group}</p>
-                                            <p className="text-[11px] text-slate-500 mt-0.5">{groupControls.length} controls</p>
+                                            <p className="text-sm font-medium text-foreground">{group}</p>
+                                            <p className="text-[11px] text-muted-foreground mt-0.5">{groupControls.length} controls</p>
                                         </div>
                                         {isCollapsed ? (
-                                            <ChevronRight className="w-4 h-4 text-slate-500" />
+                                            <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                         ) : (
-                                            <ChevronDown className="w-4 h-4 text-slate-500" />
+                                            <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                         )}
-                                    </button>
+                                    </Button>
 
                                     {!isCollapsed && (
-                                        <div className="divide-y divide-slate-800/40">
+                                        <div className="divide-y divide-border/40">
                                             {groupControls.map((control) => {
                                                 const stats = getRequirementSummary(control);
                                                 const active = selectedControl?.id === control.id;
                                                 return (
-                                                    <button
+                                                    <Button variant="plain"
                                                         key={control.id}
                                                         onClick={() => setSelectedControlId(control.id)}
-                                                        className={cn(
+                                                        className={cn("h-auto", 
                                                             "w-full px-4 py-3 text-left transition-colors",
-                                                            active ? "bg-orange-500/10" : "hover:bg-slate-800/20",
+                                                            active ? "bg-orange-500/10" : "hover:bg-secondary/20",
                                                         )}
                                                     >
                                                         <div className="flex items-start justify-between gap-3">
                                                             <div className="min-w-0">
                                                                 <p className="text-xs font-mono text-orange-400">{control.control_id}</p>
-                                                                <p className="text-sm font-medium text-slate-100 truncate mt-1">{control.title}</p>
+                                                                <p className="text-sm font-medium text-foreground truncate mt-1">{control.title}</p>
                                                             </div>
                                                             <span
                                                                 className={cn(
@@ -1300,12 +1301,12 @@ export function EvidenceVaultClient({
                                                                             ? "bg-emerald-500"
                                                                             : requirement.status === "pending"
                                                                                 ? "bg-amber-500"
-                                                                                : "bg-slate-700",
+                                                                                : "bg-secondary",
                                                                     )}
                                                                 />
                                                             ))}
                                                         </div>
-                                                    </button>
+                                                    </Button>
                                                 );
                                             })}
                                         </div>
@@ -1316,39 +1317,39 @@ export function EvidenceVaultClient({
 
                         {!filteredControls.length && (
                             <div className="py-16 px-6 text-center">
-                                <SearchCheck className="w-10 h-10 text-slate-700 mx-auto mb-3" />
-                                <p className="text-sm font-medium text-slate-300">No controls match this filter</p>
-                                <p className="text-xs text-slate-500 mt-1">Try switching the framework or widening the evidence filter.</p>
+                                <SearchCheck className="w-10 h-10 text-muted-foreground/50 mx-auto mb-3" />
+                                <p className="text-sm font-medium text-muted-foreground">No controls match this filter</p>
+                                <p className="text-xs text-muted-foreground mt-1">Try switching the framework or widening the evidence filter.</p>
                             </div>
                         )}
                     </div>
                 </div>
 
-                <div className="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden min-h-[680px]">
+                <div className="bg-card/60 border border-border rounded-xl overflow-hidden min-h-[680px]">
                     {selectedControl ? (
                         <div className="p-5 space-y-5">
-                            <div className="space-y-3 border-b border-slate-800/60 pb-5">
+                            <div className="space-y-3 border-b border-border/60 pb-5">
                                 <div className="flex items-start justify-between gap-3">
                                     <div>
                                         <p className="text-xs font-mono text-orange-400">{selectedControl.control_id}</p>
-                                        <h2 className="text-xl font-semibold text-slate-100 mt-1">{selectedControl.title}</h2>
+                                        <h2 className="text-xl font-semibold text-foreground mt-1">{selectedControl.title}</h2>
                                     </div>
-                                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-slate-300 bg-slate-800/80 border-slate-700/60">
+                                    <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-muted-foreground bg-secondary/80 border-border/60">
                                         {selectedControl.vaultGroup}
                                     </span>
                                 </div>
-                                <p className="text-sm text-slate-400 leading-relaxed">{selectedControl.description ?? "No description available for this control."}</p>
+                                <p className="text-sm text-muted-foreground leading-relaxed">{selectedControl.description ?? "No description available for this control."}</p>
 
                                 <div className="space-y-2">
                                     <div className="flex items-center justify-between text-sm">
-                                        <span className="text-slate-300">
+                                        <span className="text-muted-foreground">
                                             {getRequirementSummary(selectedControl).fulfilled} of {getRequirementSummary(selectedControl).total} requirements met
                                         </span>
-                                        <span className="text-slate-500 text-xs">
+                                        <span className="text-muted-foreground text-xs">
                                             {getRequirementSummary(selectedControl).pending} pending · {getRequirementSummary(selectedControl).missing} missing
                                         </span>
                                     </div>
-                                    <div className="w-full bg-slate-800 rounded-full h-2 overflow-hidden">
+                                    <div className="w-full bg-secondary rounded-full h-2 overflow-hidden">
                                         <div
                                             className="h-2 rounded-full bg-orange-500 transition-all"
                                             style={{
@@ -1377,15 +1378,15 @@ export function EvidenceVaultClient({
                                                     ? "bg-emerald-500/5 border-emerald-500/20"
                                                     : requirement.status === "pending"
                                                         ? "bg-amber-500/5 border-amber-500/20"
-                                                        : "bg-slate-950/40 border-slate-800/80",
+                                                        : "bg-background/40 border-border/80",
                                             )}
                                         >
                                             <div className="flex items-start justify-between gap-3">
                                                 <div>
                                                     <div className="flex items-center gap-2 flex-wrap">
-                                                        <p className="text-sm font-semibold text-slate-100">{requirement.label}</p>
+                                                        <p className="text-sm font-semibold text-foreground">{requirement.label}</p>
                                                         <RequirementStatusPill status={requirement.status} />
-                                                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-slate-400 bg-slate-800/70 border-slate-700/60">
+                                                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-muted-foreground bg-secondary/70 border-border/60">
                                                             {requirement.type}
                                                         </span>
                                                         {requirement.source && (
@@ -1400,15 +1401,15 @@ export function EvidenceVaultClient({
                                             {requirement.type === "policy" && requirement.status === "fulfilled" && (
                                                 <div className="mt-4 space-y-3">
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Policy</p>
-                                                            <p className="text-sm text-slate-100">{requirement.evidence?.policyName ?? requirement.label}</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Policy</p>
+                                                            <p className="text-sm text-foreground">{requirement.evidence?.policyName ?? requirement.label}</p>
                                                         </div>
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Published</p>
-                                                            <p className="text-sm text-slate-100">{formatDate(requirement.evidence?.policyPublishedAt)}</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Published</p>
+                                                            <p className="text-sm text-foreground">{formatDate(requirement.evidence?.policyPublishedAt)}</p>
                                                         </div>
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3 flex items-center">
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3 flex items-center">
                                                             <Link
                                                                 href={requirement.linkedPolicyId ? `/policies/${requirement.linkedPolicyId}` : "/policies"}
                                                                 className="text-sm text-emerald-300 hover:text-emerald-200 transition-colors flex items-center gap-1"
@@ -1421,18 +1422,18 @@ export function EvidenceVaultClient({
                                             )}
 
                                             {requirement.type === "policy" && requirement.status !== "fulfilled" && (
-                                                <div className="mt-4 bg-slate-900/60 border border-amber-500/15 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                                <div className="mt-4 bg-card/60 border border-amber-500/15 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                                                     <div>
                                                         <p className="text-sm text-amber-300">
                                                             Publish {requirement.label} to fulfil this requirement.
                                                         </p>
-                                                        <p className="text-xs text-slate-500 mt-1">
+                                                        <p className="text-xs text-muted-foreground mt-1">
                                                             This requirement will update automatically when the linked policy moves to approved.
                                                         </p>
                                                     </div>
                                                     <Link
                                                         href={requirement.linkedPolicyId ? `/policies/${requirement.linkedPolicyId}` : "/policies"}
-                                                        className="text-sm font-medium bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2 rounded-lg transition-colors w-fit"
+                                                        className="text-sm font-medium bg-secondary hover:bg-secondary text-foreground px-4 py-2 rounded-lg transition-colors w-fit"
                                                     >
                                                         Open Policies
                                                     </Link>
@@ -1442,21 +1443,21 @@ export function EvidenceVaultClient({
                                             {requirement.type === "scanner" && requirement.status === "fulfilled" && (
                                                 <div className="mt-4 space-y-3">
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Source</p>
-                                                            <p className="text-sm text-slate-100">{SOURCE_LABEL[requirement.source ?? "cspm"]}</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Source</p>
+                                                            <p className="text-sm text-foreground">{SOURCE_LABEL[requirement.source ?? "cspm"]}</p>
                                                         </div>
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Fetched</p>
-                                                            <p className="text-sm text-slate-100">{formatDateTime(requirement.evidence?.autoFetchedAt)}</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Fetched</p>
+                                                            <p className="text-sm text-foreground">{formatDateTime(requirement.evidence?.autoFetchedAt)}</p>
                                                         </div>
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Summary</p>
-                                                            <p className="text-sm text-slate-100">{requirement.evidence?.scanSummary ?? "Scanner evidence attached"}</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Summary</p>
+                                                            <p className="text-sm text-foreground">{requirement.evidence?.scanSummary ?? "Scanner evidence attached"}</p>
                                                         </div>
                                                     </div>
 
-                                                    <button
+                                                    <Button variant="plain"
                                                         onClick={() => {
                                                             setExpandedScans((previous) => {
                                                                 const next = new Set(previous);
@@ -1465,16 +1466,16 @@ export function EvidenceVaultClient({
                                                                 return next;
                                                             });
                                                         }}
-                                                        className="text-sm text-emerald-300 hover:text-emerald-200 transition-colors flex items-center gap-1"
+                                                        className="text-sm text-emerald-300 hover:text-emerald-200 transition-colors flex items-center gap-1 h-auto"
                                                     >
                                                         {scanExpanded ? "Hide Full Scan" : "View Full Scan"}
                                                         {scanExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
-                                                    </button>
+                                                    </Button>
 
                                                     {scanExpanded && (
-                                                        <div className="bg-slate-950/40 border border-slate-800 rounded-lg p-4 space-y-2">
+                                                        <div className="bg-background/40 border border-border rounded-lg p-4 space-y-2">
                                                             {(extendedRequirement.scanDetails ?? [requirement.evidence?.scanSummary ?? "No additional scanner detail available."]).map((detail) => (
-                                                                <p key={detail} className="text-sm text-slate-300">
+                                                                <p key={detail} className="text-sm text-muted-foreground">
                                                                     {detail}
                                                                 </p>
                                                             ))}
@@ -1484,53 +1485,53 @@ export function EvidenceVaultClient({
                                             )}
 
                                             {requirement.type === "scanner" && requirement.status !== "fulfilled" && (
-                                                <div className="mt-4 bg-slate-900/60 border border-amber-500/15 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+                                                <div className="mt-4 bg-card/60 border border-amber-500/15 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
                                                     <div>
-                                                        <p className="text-sm text-slate-100">Latest scanner evidence has not been fetched yet.</p>
-                                                        <p className="text-xs text-slate-500 mt-1">
+                                                        <p className="text-sm text-foreground">Latest scanner evidence has not been fetched yet.</p>
+                                                        <p className="text-xs text-muted-foreground mt-1">
                                                             Last attempted {formatDateTime(extendedRequirement.lastAttemptedAt)}
                                                         </p>
                                                     </div>
-                                                    <button
+                                                    <Button variant="plain"
                                                         onClick={() => handleTriggerRescan(selectedControl, requirement)}
                                                         disabled={isLoading}
-                                                        className="px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 w-fit"
+                                                        className="px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2 w-fit h-auto"
                                                     >
                                                         {isLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
                                                         {isLoading ? "Refreshing..." : "Trigger Rescan"}
-                                                    </button>
+                                                    </Button>
                                                 </div>
                                             )}
 
                                             {requirement.type === "manual" && requirement.status === "fulfilled" && (
                                                 <div className="mt-4 space-y-3">
                                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Filename</p>
-                                                            <p className="text-sm text-slate-100">{requirement.evidence?.name}</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Filename</p>
+                                                            <p className="text-sm text-foreground">{requirement.evidence?.name}</p>
                                                         </div>
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Uploaded</p>
-                                                            <p className="text-sm text-slate-100">{formatDateTime(requirement.evidence?.uploadedAt)}</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Uploaded</p>
+                                                            <p className="text-sm text-foreground">{formatDateTime(requirement.evidence?.uploadedAt)}</p>
                                                         </div>
-                                                        <div className="bg-slate-900/60 border border-emerald-500/15 rounded-lg p-3">
-                                                            <p className="text-[10px] uppercase tracking-widest text-slate-500 font-semibold mb-1">Uploader</p>
-                                                            <p className="text-sm text-slate-100">Compliance Team</p>
+                                                        <div className="bg-card/60 border border-emerald-500/15 rounded-lg p-3">
+                                                            <p className="text-[10px] uppercase tracking-widest text-muted-foreground font-semibold mb-1">Uploader</p>
+                                                            <p className="text-sm text-foreground">Compliance Team</p>
                                                         </div>
                                                     </div>
 
                                                     <div className="flex flex-wrap items-center gap-2">
-                                                        <button
+                                                        <Button variant="plain"
                                                             onClick={() => setReplaceContext({
                                                                 frameworkId: selectedFrameworkId,
                                                                 controlId: selectedControl.id,
                                                                 requirementId: requirement.id,
                                                                 mode: "replace",
                                                             })}
-                                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg transition-colors"
+                                                            className="px-4 py-2 bg-secondary hover:bg-secondary text-foreground text-sm font-medium rounded-lg transition-colors h-auto"
                                                         >
                                                             Replace
-                                                        </button>
+                                                        </Button>
                                                         {requirement.evidence?.fileUrl && (
                                                             <a
                                                                 href={requirement.evidence.fileUrl}
@@ -1571,17 +1572,17 @@ export function EvidenceVaultClient({
                                                             "border-2 border-dashed rounded-xl p-6 text-center transition-colors",
                                                             dragTargetId === requirement.id
                                                                 ? "border-orange-500/60 bg-orange-500/5"
-                                                                : "border-slate-700/60 bg-slate-950/30",
+                                                                : "border-border/60 bg-background/30",
                                                         )}
                                                     >
-                                                        <UploadCloud className="w-6 h-6 text-slate-500 mx-auto mb-3" />
-                                                        <p className="text-sm font-medium text-slate-200">
+                                                        <UploadCloud className="w-6 h-6 text-muted-foreground mx-auto mb-3" />
+                                                        <p className="text-sm font-medium text-foreground">
                                                             Drop file here or click to upload
                                                         </p>
-                                                        <p className="text-xs text-slate-500 mt-1">
+                                                        <p className="text-xs text-muted-foreground mt-1">
                                                             PDF, PNG, JPG, and XLSX are supported.
                                                         </p>
-                                                        <button
+                                                        <Button variant="plain"
                                                             type="button"
                                                             disabled={isLoading}
                                                             onClick={() => openFilePicker({
@@ -1590,10 +1591,10 @@ export function EvidenceVaultClient({
                                                                 requirementId: requirement.id,
                                                                 mode: "upload",
                                                             })}
-                                                            className="mt-4 px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors"
+                                                            className="mt-4 px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-lg transition-colors h-auto"
                                                         >
                                                             {isLoading ? "Uploading..." : "Browse Files"}
-                                                        </button>
+                                                        </Button>
                                                     </div>
 
                                                     <div className="flex flex-col md:flex-row gap-2">
@@ -1602,17 +1603,17 @@ export function EvidenceVaultClient({
                                                             value={linkDrafts[requirement.id] ?? ""}
                                                             onChange={(event) => setLinkDrafts((previous) => ({ ...previous, [requirement.id]: event.target.value }))}
                                                             placeholder="Paste evidence URL"
-                                                            className="flex-1 bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 transition-colors"
+                                                            className="flex-1 bg-secondary/60 border border-border/50 rounded-lg px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-orange-500/50 transition-colors"
                                                         />
-                                                        <button
+                                                        <Button variant="plain"
                                                             type="button"
                                                             disabled={isLoading || !(linkDrafts[requirement.id] ?? "").trim()}
                                                             onClick={() => void handleLinkSubmit(selectedControl, requirement)}
-                                                            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 disabled:opacity-50 text-slate-200 text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
+                                                            className="px-4 py-2 bg-secondary hover:bg-secondary disabled:opacity-50 text-foreground text-sm font-medium rounded-lg transition-colors flex items-center gap-2 h-auto"
                                                         >
                                                             <Link2 className="w-3.5 h-3.5" />
                                                             Add Link
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </div>
                                             )}
@@ -1621,21 +1622,21 @@ export function EvidenceVaultClient({
                                 })}
                             </div>
 
-                            <div className="border-t border-slate-800/60 pt-5">
-                                <button
+                            <div className="border-t border-border/60 pt-5">
+                                <Button variant="plain"
                                     onClick={() => setAuditOpen((previous) => !previous)}
-                                    className="w-full flex items-center justify-between text-left"
+                                    className="w-full flex items-center justify-between text-left h-auto"
                                 >
                                     <div>
-                                        <p className="text-sm font-semibold text-slate-100">Audit Trail</p>
-                                        <p className="text-xs text-slate-500 mt-1">Uploaded, replaced, auto-fetched, and policy publication events.</p>
+                                        <p className="text-sm font-semibold text-foreground">Audit Trail</p>
+                                        <p className="text-xs text-muted-foreground mt-1">Uploaded, replaced, auto-fetched, and policy publication events.</p>
                                     </div>
                                     {auditOpen ? (
-                                        <ChevronDown className="w-4 h-4 text-slate-500" />
+                                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                     ) : (
-                                        <ChevronRight className="w-4 h-4 text-slate-500" />
+                                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                     )}
-                                </button>
+                                </Button>
 
                                 {auditOpen && (
                                     <div className="mt-4 space-y-4">
@@ -1652,11 +1653,11 @@ export function EvidenceVaultClient({
                                                                     : "bg-slate-600",
                                                         )}
                                                     />
-                                                    {index !== selectedControl.auditTrail.length - 1 && <span className="w-px flex-1 bg-slate-800 mt-2" />}
+                                                    {index !== selectedControl.auditTrail.length - 1 && <span className="w-px flex-1 bg-secondary mt-2" />}
                                                 </div>
                                                 <div className="pb-4">
-                                                    <p className="text-sm text-slate-200">{event.message}</p>
-                                                    <p className="text-xs text-slate-500 mt-1">{formatDateTime(event.at)}</p>
+                                                    <p className="text-sm text-foreground">{event.message}</p>
+                                                    <p className="text-xs text-muted-foreground mt-1">{formatDateTime(event.at)}</p>
                                                 </div>
                                             </div>
                                         ))}
@@ -1666,9 +1667,9 @@ export function EvidenceVaultClient({
                         </div>
                     ) : (
                         <div className="flex flex-col items-center justify-center h-full py-24 px-6 text-center">
-                            <FolderGit2 className="w-12 h-12 text-slate-700 mb-3" />
-                            <p className="text-sm font-medium text-slate-300">Select a control to review its evidence requirements</p>
-                            <p className="text-xs text-slate-500 mt-1">The detail panel will load without leaving the page.</p>
+                            <FolderGit2 className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                            <p className="text-sm font-medium text-muted-foreground">Select a control to review its evidence requirements</p>
+                            <p className="text-xs text-muted-foreground mt-1">The detail panel will load without leaving the page.</p>
                         </div>
                     )}
                 </div>

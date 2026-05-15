@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -129,25 +130,25 @@ export function FrameworkFormDialog({ open, initial, onClose, onSaved }: Props) 
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-lg bg-slate-900 border border-slate-700/60 rounded-2xl shadow-2xl p-6 z-10 max-h-[90vh] overflow-y-auto"
+                        className="relative w-full max-w-lg bg-card border border-border/60 rounded-2xl shadow-2xl p-6 z-10 max-h-[90vh] overflow-y-auto"
                     >
                         <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-lg font-bold text-slate-100">
+                            <h2 className="text-lg font-bold text-foreground">
                                 {editing ? "Edit Framework" : "New Framework"}
                             </h2>
-                            <button
+                            <Button variant="plain"
                                 type="button"
                                 onClick={() => !submitting && onClose()}
-                                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors"
+                                className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground transition-colors h-auto"
                             >
                                 <X className="w-4 h-4" />
-                            </button>
+                            </Button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div>
-                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">
-                                    Slug {editing && <span className="text-slate-600 normal-case">(immutable)</span>}
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+                                    Slug {editing && <span className="text-muted-foreground/70 normal-case">(immutable)</span>}
                                 </label>
                                 <input
                                     value={form.slug}
@@ -155,13 +156,13 @@ export function FrameworkFormDialog({ open, initial, onClose, onSaved }: Props) 
                                     disabled={editing}
                                     required={!editing}
                                     placeholder="iso-27001-2022"
-                                    className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40 disabled:opacity-50 disabled:cursor-not-allowed"
                                 />
                             </div>
 
                             <div className="grid grid-cols-3 gap-3">
                                 <div className="col-span-2">
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Name</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</label>
                                     <input
                                         value={form.name}
                                         onChange={e => setForm(f => ({
@@ -171,60 +172,60 @@ export function FrameworkFormDialog({ open, initial, onClose, onSaved }: Props) 
                                         }))}
                                         required
                                         placeholder="ISO 27001:2022"
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Version</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Version</label>
                                     <input
                                         value={form.version}
                                         onChange={e => setForm(f => ({ ...f, version: e.target.value }))}
                                         placeholder="2022"
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Description</label>
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Description</label>
                                 <textarea
                                     value={form.description}
                                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                                     rows={3}
                                     placeholder="Optional summary of the framework's scope."
-                                    className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
+                                    className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
                                 />
                             </div>
 
                             <div className="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Category</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Category</label>
                                     <input
                                         value={form.category}
                                         onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                                         placeholder="information_security"
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Icon</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Icon</label>
                                     <input
                                         value={form.icon_name}
                                         onChange={e => setForm(f => ({ ...f, icon_name: e.target.value }))}
                                         placeholder="ShieldCheck"
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Color</label>
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Color</label>
                                 <div className="mt-1.5 flex items-center gap-2">
                                     <input
                                         type="color"
                                         value={/^#[0-9a-fA-F]{6}$/.test(form.color) ? form.color : "#64748b"}
                                         onChange={e => setForm(f => ({ ...f, color: e.target.value }))}
-                                        className="h-10 w-12 rounded-lg border border-slate-700 bg-slate-950 cursor-pointer"
+                                        className="h-10 w-12 rounded-lg border border-border bg-background cursor-pointer"
                                     />
                                     <input
                                         value={form.color}
@@ -234,16 +235,16 @@ export function FrameworkFormDialog({ open, initial, onClose, onSaved }: Props) 
                                             if (next !== e.target.value) setForm(f => ({ ...f, color: next }));
                                         }}
                                         placeholder="#10b981"
-                                        className="flex-1 bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                        className="flex-1 bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                     />
                                 </div>
                                 <div className="mt-2 flex flex-wrap gap-1.5">
                                     {COLOR_PRESETS.map(c => (
-                                        <button
+                                        <Button variant="plain"
                                             key={c}
                                             type="button"
                                             onClick={() => setForm(f => ({ ...f, color: c }))}
-                                            className="w-6 h-6 rounded-md border border-slate-700 hover:scale-110 transition-transform"
+                                            className="w-6 h-6 rounded-md border border-border hover:scale-110 transition-transform h-auto"
                                             style={{ backgroundColor: c }}
                                             aria-label={`Use ${c}`}
                                         />
@@ -252,21 +253,21 @@ export function FrameworkFormDialog({ open, initial, onClose, onSaved }: Props) 
                             </div>
 
                             <div className="flex gap-3 pt-2">
-                                <button
+                                <Button variant="plain"
                                     type="button"
                                     onClick={() => !submitting && onClose()}
-                                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-400 hover:bg-slate-800 transition-colors"
+                                    className="flex-1 px-4 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:bg-secondary transition-colors h-auto"
                                 >
                                     Cancel
-                                </button>
-                                <button
+                                </Button>
+                                <Button variant="plain"
                                     type="submit"
                                     disabled={submitting}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors disabled:opacity-70"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors disabled:opacity-70 h-auto"
                                 >
                                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                     {editing ? "Save changes" : "Create framework"}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </motion.div>

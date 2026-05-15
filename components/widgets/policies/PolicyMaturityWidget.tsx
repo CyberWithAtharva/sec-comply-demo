@@ -6,11 +6,11 @@ import { cn } from "@/components/ui/Card";
 
 export function PolicyMaturityWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50 relative overflow-hidden">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50 relative overflow-hidden">
             <div className="flex items-center justify-between mb-4 relative z-10">
                 <div className="flex items-center space-x-2">
                     <Award className="w-5 h-5 text-indigo-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Governance Maturity</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Governance Maturity</h3>
                 </div>
             </div>
 
@@ -21,7 +21,7 @@ export function PolicyMaturityWidget() {
                         <circle cx="64" cy="64" r="56" className="stroke-indigo-500" strokeWidth="12" fill="none" strokeDasharray="351.8" strokeDashoffset={351.8 - (351.8 * 88) / 100} strokeLinecap="round" />
                     </svg>
                     <div className="absolute flex flex-col items-center">
-                        <span className="text-3xl font-bold text-slate-100">Level 4</span>
+                        <span className="text-3xl font-bold text-foreground">Level 4</span>
                         <span className="text-[10px] text-indigo-400 uppercase tracking-widest font-bold mt-1">Managed</span>
                     </div>
                 </div>

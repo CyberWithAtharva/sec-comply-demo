@@ -34,7 +34,7 @@ export function OverviewTab({ risks, history, nowMs, onJumpToTab }: Props) {
                 {/* Heatmap */}
                 <div className="lg:col-span-2 glass-panel rounded-2xl p-5">
                     <div className="flex items-center justify-between mb-4">
-                        <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider">Risk Heatmap</h3>
+                        <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Risk Heatmap</h3>
                         <div className="flex gap-3">
                             {[
                                 { label: "Critical", color: "#ef4444" },
@@ -44,7 +44,7 @@ export function OverviewTab({ risks, history, nowMs, onJumpToTab }: Props) {
                             ].map(({ label, color }) => (
                                 <div key={label} className="flex items-center gap-1.5">
                                     <div className="w-2 h-2 rounded-full" style={{ background: color }} />
-                                    <span className="text-[10px] text-slate-500">{label}</span>
+                                    <span className="text-[10px] text-muted-foreground">{label}</span>
                                 </div>
                             ))}
                         </div>
@@ -53,7 +53,7 @@ export function OverviewTab({ risks, history, nowMs, onJumpToTab }: Props) {
                         risks={activeRisks}
                         onCellClick={() => onJumpToTab("register")}
                     />
-                    <p className="text-[10px] text-slate-600 text-center mt-2">
+                    <p className="text-[10px] text-muted-foreground/70 text-center mt-2">
                         Active risks (Open · In Progress) plotted by Likelihood × Impact. Click a cell to open the register.
                     </p>
                 </div>

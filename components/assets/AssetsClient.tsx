@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -48,9 +49,9 @@ function TypeIcon({ type }: { type: string }) {
     const lower = type.toLowerCase();
     if (lower.includes("ec2") || lower.includes("server") || lower.includes("vm")) return <Server className="w-4 h-4 text-blue-400" />;
     if (lower.includes("rds") || lower.includes("database") || lower.includes("db")) return <Database className="w-4 h-4 text-amber-400" />;
-    if (lower.includes("laptop") || lower.includes("endpoint")) return <Laptop className="w-4 h-4 text-slate-400" />;
+    if (lower.includes("laptop") || lower.includes("endpoint")) return <Laptop className="w-4 h-4 text-muted-foreground" />;
     if (lower.includes("s3") || lower.includes("storage") || lower.includes("cloud")) return <Cloud className="w-4 h-4 text-emerald-400" />;
-    return <Monitor className="w-4 h-4 text-slate-500" />;
+    return <Monitor className="w-4 h-4 text-muted-foreground" />;
 }
 
 // ─── Add Asset Modal ──────────────────────────────────────────────────────────
@@ -105,7 +106,7 @@ function AssetModal({ orgId, editing, onClose, onSaved }: AssetModalProps) {
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -113,33 +114,33 @@ function AssetModal({ orgId, editing, onClose, onSaved }: AssetModalProps) {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-6 border-b border-border/50">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                             <Server className="w-4 h-4 text-blue-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-100">{editing ? "Edit Asset" : "Add Asset"}</h2>
-                            <p className="text-xs text-slate-500">Manually register an asset in the inventory</p>
+                            <h2 className="text-base font-semibold text-foreground">{editing ? "Edit Asset" : "Add Asset"}</h2>
+                            <p className="text-xs text-muted-foreground">Manually register an asset in the inventory</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground h-auto"><X className="w-5 h-5" /></Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
                     {error && <div className="bg-red-500/10 border border-red-500/30 rounded-xl px-4 py-3 text-sm text-red-400 flex items-center space-x-2"><AlertCircle className="w-4 h-4" /><span>{error}</span></div>}
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Name *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Name *</label>
                         <input type="text" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                             placeholder="prod-api-server-01" className={inputCls} />
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Type</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Type</label>
                             <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value }))} className={inputCls}>
                                 {["server", "ec2", "rds", "s3", "lambda", "database", "laptop", "endpoint", "network", "other"].map(t => (
                                     <option key={t} value={t}>{t.toUpperCase()}</option>
@@ -147,13 +148,13 @@ function AssetModal({ orgId, editing, onClose, onSaved }: AssetModalProps) {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Provider</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Provider</label>
                             <select value={form.provider} onChange={e => setForm(f => ({ ...f, provider: e.target.value }))} className={inputCls}>
                                 {["manual", "aws", "github"].map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Criticality</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Criticality</label>
                             <select value={form.criticality} onChange={e => setForm(f => ({ ...f, criticality: e.target.value }))} className={inputCls}>
                                 {["critical", "high", "medium", "low"].map(c => (
                                     <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
@@ -164,30 +165,30 @@ function AssetModal({ orgId, editing, onClose, onSaved }: AssetModalProps) {
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">IP Address</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">IP Address</label>
                             <input type="text" value={form.ip_address} onChange={e => setForm(f => ({ ...f, ip_address: e.target.value }))}
                                 placeholder="10.0.1.5" className={inputCls} />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Region</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Region</label>
                             <input type="text" value={form.region} onChange={e => setForm(f => ({ ...f, region: e.target.value }))}
                                 placeholder="us-east-1" className={inputCls} />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">External ID</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">External ID</label>
                         <input type="text" value={form.external_id} onChange={e => setForm(f => ({ ...f, external_id: e.target.value }))}
                             placeholder="i-0a1b2c3d4e5f (AWS resource ID)" className={inputCls} />
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-2">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">Cancel</button>
-                        <button type="submit" disabled={saving}
-                            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 transition-colors">
+                        <Button variant="plain" type="button" onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground h-auto">Cancel</Button>
+                        <Button variant="plain" type="submit" disabled={saving}
+                            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 transition-colors h-auto">
                             {saving ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                             <span>{saving ? "Saving…" : editing ? "Save" : "Add Asset"}</span>
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </motion.div>
@@ -243,68 +244,68 @@ export function AssetsClient({ initialAssets, orgId }: AssetsClientProps) {
         <div className="w-full flex flex-col space-y-8 animate-in fade-in duration-700">
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center">
                         <ServerCrash className="w-8 h-8 mr-3 text-blue-500" />
                         Asset Inventory
                     </h1>
-                    <p className="text-sm text-slate-400 mt-1">Track all cloud, network, and endpoint assets across your environment.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Track all cloud, network, and endpoint assets across your environment.</p>
                 </div>
-                <button
+                <Button variant="plain"
                     onClick={() => { setEditing(null); setShowCreate(true); }}
-                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2"
+                    className="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2 h-auto"
                 >
                     <Plus className="w-4 h-4" />
                     <span>Add Asset</span>
-                </button>
+                </Button>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 {[
-                    { label: "Total Assets",    count: stats.total,    color: "text-slate-100" },
+                    { label: "Total Assets",    count: stats.total,    color: "text-foreground" },
                     { label: "Cloud (AWS)",     count: stats.cloud,    color: "text-emerald-400" },
-                    { label: "Critical / High", count: stats.critical, color: stats.critical > 0 ? "text-orange-400" : "text-slate-400" },
+                    { label: "Critical / High", count: stats.critical, color: stats.critical > 0 ? "text-orange-400" : "text-muted-foreground" },
                     { label: "Manual",          count: stats.manual,   color: "text-blue-400" },
                 ].map((s) => (
                     <div key={s.label}
-                        className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col">
-                        <span className="text-[10px] text-slate-500 mb-1">{s.label}</span>
+                        className="glass-panel rounded-2xl p-4 border border-border/50 flex flex-col">
+                        <span className="text-[10px] text-muted-foreground mb-1">{s.label}</span>
                         <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
                     </div>
                 ))}
             </div>
 
             {/* Table */}
-            <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col">
-                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-slate-800/50">
+            <div className="glass-panel rounded-2xl border border-border/50 flex flex-col">
+                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-border/50">
                     <div className="relative flex-1 min-w-[180px]">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search assets…"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none" />
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none" />
                     </div>
                     <select value={filterProvider} onChange={e => setFilterProvider(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none">
                         <option value="all">All Providers</option>
                         {providers.map(p => <option key={p} value={p}>{p.toUpperCase()}</option>)}
                     </select>
                     <select value={filterCriticality} onChange={e => setFilterCriticality(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none">
                         <option value="all">All Criticalities</option>
                         {["critical", "high", "medium", "low"].map(c => <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>)}
                     </select>
-                    <span className="text-xs text-slate-500 ml-auto">{filtered.length} asset{filtered.length !== 1 ? "s" : ""}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{filtered.length} asset{filtered.length !== 1 ? "s" : ""}</span>
                 </div>
 
                 {filtered.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <ServerCrash className="w-12 h-12 text-slate-700 mb-3" />
-                        <p className="text-sm font-medium text-slate-400">No assets found</p>
-                        <p className="text-xs text-slate-600 mt-1">Connect your AWS account or add assets manually</p>
+                        <ServerCrash className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                        <p className="text-sm font-medium text-muted-foreground">No assets found</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">Connect your AWS account or add assets manually</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="text-[10px] text-slate-500 font-mono uppercase bg-slate-900/40">
+                            <thead className="text-[10px] text-muted-foreground font-mono uppercase bg-card/40">
                                 <tr>
                                     <th className="px-5 py-3 font-medium">Asset</th>
                                     <th className="px-4 py-3 font-medium">Type</th>
@@ -316,52 +317,52 @@ export function AssetsClient({ initialAssets, orgId }: AssetsClientProps) {
                                     <th className="px-4 py-3 font-medium">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/50">
+                            <tbody className="divide-y divide-border/50">
                                 <AnimatePresence initial={false}>
                                     {filtered.map(a => {
                                         const critCfg = CRITICALITY_CONFIG[a.criticality] ?? CRITICALITY_CONFIG.medium;
                                         const ProvIcon = PROVIDER_ICONS[a.provider] ?? Server;
                                         return (
                                             <motion.tr key={a.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                                className="hover:bg-slate-800/20 transition-colors group">
+                                                className="hover:bg-secondary/20 transition-colors group">
                                                 <td className="px-5 py-3">
                                                     <div className="flex items-center space-x-2">
                                                         <TypeIcon type={a.type} />
                                                         <div>
-                                                            <p className="text-sm font-medium text-slate-200">{a.name}</p>
-                                                            {a.external_id && <p className="text-[11px] text-slate-500 font-mono">{a.external_id}</p>}
+                                                            <p className="text-sm font-medium text-foreground">{a.name}</p>
+                                                            {a.external_id && <p className="text-[11px] text-muted-foreground font-mono">{a.external_id}</p>}
                                                         </div>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-3"><span className="text-xs text-slate-300 font-mono uppercase">{a.type}</span></td>
+                                                <td className="px-4 py-3"><span className="text-xs text-muted-foreground font-mono uppercase">{a.type}</span></td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center space-x-1.5">
-                                                        <ProvIcon className="w-3.5 h-3.5 text-slate-400" />
-                                                        <span className="text-xs text-slate-300 uppercase">{a.provider}</span>
+                                                        <ProvIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                                                        <span className="text-xs text-muted-foreground uppercase">{a.provider}</span>
                                                     </div>
                                                 </td>
-                                                <td className="px-4 py-3"><span className="text-xs text-slate-400">{a.region ?? "—"}</span></td>
-                                                <td className="px-4 py-3"><span className="text-xs text-slate-400 font-mono">{a.ip_address ?? "—"}</span></td>
+                                                <td className="px-4 py-3"><span className="text-xs text-muted-foreground">{a.region ?? "—"}</span></td>
+                                                <td className="px-4 py-3"><span className="text-xs text-muted-foreground font-mono">{a.ip_address ?? "—"}</span></td>
                                                 <td className="px-4 py-3">
                                                     <span className={cn("text-[10px] uppercase font-bold px-2 py-0.5 rounded border", critCfg.color, critCfg.bg, critCfg.border)}>
                                                         {a.criticality}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    <span className="text-xs text-slate-400">
+                                                    <span className="text-xs text-muted-foreground">
                                                         {a.last_seen ? new Date(a.last_seen).toLocaleDateString() : "—"}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                        <button onClick={() => { setEditing(a); setShowCreate(true); }}
-                                                            className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors">
+                                                        <Button variant="plain" onClick={() => { setEditing(a); setShowCreate(true); }}
+                                                            className="p-1.5 text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors h-auto">
                                                             <Edit2 className="w-4 h-4" />
-                                                        </button>
-                                                        <button onClick={() => handleDelete(a.id)}
-                                                            className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                                                        </Button>
+                                                        <Button variant="plain" onClick={() => handleDelete(a.id)}
+                                                            className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors h-auto">
                                                             <Trash2 className="w-4 h-4" />
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </td>
                                             </motion.tr>

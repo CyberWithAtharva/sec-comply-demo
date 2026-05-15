@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
     Plug, CheckCircle2, AlertTriangle, Plus, ChevronRight,
     Cloud, GitBranch, Server, Shield, ExternalLink, RefreshCw,
@@ -103,13 +104,13 @@ function ProviderLogo({ logo, size = "md" }: { logo: string; size?: "sm" | "md" 
         aws:     { bg: "bg-orange-500/15 border-orange-500/25", text: "text-orange-400", label: "AWS" },
         azure:   { bg: "bg-blue-500/15 border-blue-500/25",     text: "text-blue-400",   label: "Az" },
         gcp:     { bg: "bg-yellow-500/15 border-yellow-500/25", text: "text-yellow-400", label: "GCP" },
-        github:  { bg: "bg-slate-500/20 border-slate-500/30",   text: "text-slate-200",  label: "GH" },
+        github:  { bg: "bg-slate-500/20 border-slate-500/30",   text: "text-foreground",  label: "GH" },
         gitlab:  { bg: "bg-orange-600/15 border-orange-600/25", text: "text-orange-500", label: "GL" },
         okta:    { bg: "bg-blue-600/15 border-blue-600/25",     text: "text-blue-400",   label: "OK" },
         entra:   { bg: "bg-blue-500/15 border-blue-500/25",     text: "text-blue-400",   label: "MS" },
         google:  { bg: "bg-green-500/15 border-green-500/25",   text: "text-green-400",  label: "GW" },
     };
-    const cfg = map[logo] ?? { bg: "bg-slate-700/30 border-slate-600/30", text: "text-slate-400", label: "?" };
+    const cfg = map[logo] ?? { bg: "bg-secondary/30 border-slate-600/30", text: "text-muted-foreground", label: "?" };
     return (
         <div className={cn("rounded-xl border flex items-center justify-center font-bold flex-shrink-0", cls, cfg.bg, cfg.text)}>
             {size === "sm" ? cfg.label.slice(0, 2) : cfg.label}
@@ -147,20 +148,20 @@ function ProviderCard({ provider, connectedAccounts = [], onAddAccount }: Provid
     const hasError = connectedAccounts.some(a => a.status === "error");
 
     return (
-        <div className="bg-slate-900/40 border border-slate-800 rounded-xl overflow-hidden">
+        <div className="bg-card/40 border border-border rounded-xl overflow-hidden">
             <div className="flex items-center gap-4 p-4">
                 <ProviderLogo logo={provider.logo} />
                 <div className="flex-1 min-w-0">
                     <p className={cn(
                         "text-sm font-semibold",
-                        provider.status === "coming_soon" ? "text-slate-500" : "text-slate-100"
+                        provider.status === "coming_soon" ? "text-muted-foreground" : "text-foreground"
                     )}>{provider.name}</p>
-                    <p className="text-xs text-slate-600 mt-0.5">{provider.description}</p>
+                    <p className="text-xs text-muted-foreground/70 mt-0.5">{provider.description}</p>
                 </div>
 
                 <div className="flex items-center gap-2 flex-shrink-0">
                     {provider.status === "coming_soon" ? (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-slate-800 border-slate-700 text-slate-500 uppercase tracking-wider">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded border bg-secondary border-border text-muted-foreground uppercase tracking-wider">
                             Coming Soon
                         </span>
                     ) : connCount > 0 ? (
@@ -168,7 +169,7 @@ function ProviderCard({ provider, connectedAccounts = [], onAddAccount }: Provid
                     ) : (
                         <a
                             href={provider.href}
-                            className="flex items-center gap-1 text-xs font-medium text-slate-300 hover:text-white transition-colors"
+                            className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-white transition-colors"
                         >
                             Connect <ChevronRight className="w-3.5 h-3.5" />
                         </a>
@@ -179,16 +180,16 @@ function ProviderCard({ provider, connectedAccounts = [], onAddAccount }: Provid
 
             {/* Connected account rows */}
             {connectedAccounts.length > 0 && (
-                <div className="border-t border-slate-800/60">
+                <div className="border-t border-border/60">
                     {connectedAccounts.map(acc => (
-                        <div key={acc.id} className="flex items-center gap-3 px-5 py-2.5 border-b border-slate-800/40 last:border-b-0 hover:bg-slate-800/20 transition-colors">
+                        <div key={acc.id} className="flex items-center gap-3 px-5 py-2.5 border-b border-border/40 last:border-b-0 hover:bg-secondary/20 transition-colors">
                             <span className={cn(
                                 "w-2 h-2 rounded-full flex-shrink-0",
                                 acc.status === "connected" ? "bg-emerald-500" :
                                 acc.status === "error" ? "bg-red-500" : "bg-amber-500"
                             )} />
-                            <span className="text-sm text-slate-200 flex-1">{acc.label}</span>
-                            {acc.sublabel && <span className="text-xs text-slate-500">{acc.sublabel}</span>}
+                            <span className="text-sm text-foreground flex-1">{acc.label}</span>
+                            {acc.sublabel && <span className="text-xs text-muted-foreground">{acc.sublabel}</span>}
                             <span className={cn(
                                 "text-[10px] font-semibold px-2 py-0.5 rounded border uppercase",
                                 acc.status === "connected"
@@ -199,17 +200,17 @@ function ProviderCard({ provider, connectedAccounts = [], onAddAccount }: Provid
                             )}>
                                 {acc.status}
                             </span>
-                            <ChevronRight className="w-4 h-4 text-slate-600" />
+                            <ChevronRight className="w-4 h-4 text-muted-foreground/70" />
                         </div>
                     ))}
                     {onAddAccount && (
-                        <button
+                        <Button variant="plain"
                             onClick={onAddAccount}
-                            className="flex items-center gap-2 px-5 py-2.5 text-xs text-slate-500 hover:text-slate-300 transition-colors w-full"
+                            className="flex items-center gap-2 px-5 py-2.5 text-xs text-muted-foreground hover:text-muted-foreground transition-colors w-full h-auto"
                         >
                             <Plus className="w-3.5 h-3.5" />
                             Add account
-                        </button>
+                        </Button>
                     )}
                 </div>
             )}
@@ -222,8 +223,8 @@ function ProviderCard({ provider, connectedAccounts = [], onAddAccount }: Provid
 function SectionHeader({ icon: Icon, label }: { icon: React.ElementType; label: string }) {
     return (
         <div className="flex items-center gap-2 mb-3">
-            <Icon className="w-4 h-4 text-slate-500" />
-            <span className="text-[11px] font-bold uppercase tracking-widest text-slate-500">{label}</span>
+            <Icon className="w-4 h-4 text-muted-foreground" />
+            <span className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">{label}</span>
         </div>
     );
 }
@@ -285,36 +286,36 @@ export function IntegrationsClient({ orgId: _, awsAccounts, githubInstalls }: In
                     </div>
                     <div>
                         <h1 className="text-xl font-bold text-white">Integrations</h1>
-                        <p className="text-sm text-slate-400 mt-0.5">Connect and manage your cloud, SCM, and identity providers.</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">Connect and manage your cloud, SCM, and identity providers.</p>
                     </div>
                 </div>
-                <button
+                <Button variant="plain"
                     onClick={handleRefresh}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-300 hover:bg-slate-700 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg bg-secondary border border-border text-sm text-muted-foreground hover:bg-secondary transition-colors h-auto"
                 >
                     <RefreshCw className={cn("w-4 h-4", refreshing && "animate-spin")} />
                     Refresh
-                </button>
+                </Button>
             </div>
 
             {/* Summary bar */}
-            <div className="flex items-center gap-6 px-5 py-3.5 bg-slate-900/60 border border-slate-800 rounded-xl">
+            <div className="flex items-center gap-6 px-5 py-3.5 bg-card/60 border border-border rounded-xl">
                 <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                    <span className="text-sm text-slate-300">
+                    <span className="text-sm text-muted-foreground">
                         <span className="font-semibold text-emerald-400">{connectedProviders} connected</span>
                     </span>
                 </div>
                 {errorCount > 0 && (
                     <>
-                        <span className="text-slate-700">•</span>
+                        <span className="text-muted-foreground/50">•</span>
                         <div className="flex items-center gap-2">
                             <AlertTriangle className="w-4 h-4 text-amber-400" />
                             <span className="text-sm text-amber-400 font-semibold">{errorCount} needs attention</span>
                         </div>
                     </>
                 )}
-                <span className="ml-auto text-xs text-slate-500">
+                <span className="ml-auto text-xs text-muted-foreground">
                     {connectedProviders} of {totalProviders} available providers connected
                 </span>
             </div>
@@ -380,7 +381,7 @@ export function IntegrationsClient({ orgId: _, awsAccounts, githubInstalls }: In
             </div>
 
             {/* Footer note */}
-            <div className="flex items-center gap-2 text-xs text-slate-600 pb-4">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground/70 pb-4">
                 <ExternalLink className="w-3.5 h-3.5" />
                 <span>More integrations are added regularly. Contact support to request a specific integration.</span>
             </div>

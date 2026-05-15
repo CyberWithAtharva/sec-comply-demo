@@ -15,11 +15,11 @@ const data = [
 
 export function BurnRateChart() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50">
             <div className="flex items-center justify-between mb-6 pb-2">
                 <div className="flex items-center space-x-2">
                     <Activity className="w-5 h-5 text-emerald-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Remediation Velocity</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Remediation Velocity</h3>
                 </div>
                 <div className="text-xs font-mono text-emerald-500 bg-emerald-500/10 px-2 py-1 rounded">280% Sprint ↑</div>
             </div>
@@ -37,24 +37,24 @@ export function BurnRateChart() {
                                 <stop offset="95%" stopColor="#ef4444" stopOpacity={0} />
                             </linearGradient>
                         </defs>
-                        <XAxis dataKey="name" stroke="#475569" fontSize={11} tickLine={false} axisLine={false} />
-                        <YAxis stroke="#475569" fontSize={11} tickLine={false} axisLine={false} />
+                        <XAxis dataKey="name" stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
+                        <YAxis stroke="var(--muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
                         <RechartsTooltip
-                            contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px", fontSize: "12px" }}
-                            itemStyle={{ color: "#e2e8f0" }}
+                            contentStyle={{ backgroundColor: "var(--popover)", borderColor: "var(--border)", borderRadius: "8px", fontSize: "12px" }}
+                            itemStyle={{ color: "var(--popover-foreground)" }}
                         />
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                         <Area type="monotone" dataKey="resolved" stroke="#10b981" strokeWidth={2} fillOpacity={1} fill="url(#colorResolved)" />
                         <Area type="monotone" dataKey="issues" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorIssues)" />
                     </AreaChart>
                 </ResponsiveContainer>
             </div>
 
-            <div className="mt-4 flex justify-between items-center text-sm pt-4 border-t border-slate-800/50">
-                <span className="text-slate-400 flex items-center">
+            <div className="mt-4 flex justify-between items-center text-sm pt-4 border-t border-border/50">
+                <span className="text-muted-foreground flex items-center">
                     <span className="w-2 h-2 bg-emerald-500 rounded-full mr-2" /> Resolved Controls
                 </span>
-                <span className="text-slate-400 flex items-center">
+                <span className="text-muted-foreground flex items-center">
                     <span className="w-2 h-2 bg-red-500 rounded-full mr-2" /> Open Vulnerabilities
                 </span>
             </div>

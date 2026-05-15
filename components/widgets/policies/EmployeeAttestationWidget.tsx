@@ -14,23 +14,23 @@ const data = [
 
 export function EmployeeAttestationWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                     <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Attestation Rates</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Attestation Rates</h3>
                 </div>
             </div>
 
             <div className="flex-1 w-full min-h-[200px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                         <XAxis dataKey="name" stroke="#475569" fontSize={11} tickLine={false} axisLine={false} />
                         <YAxis stroke="#475569" fontSize={11} tickLine={false} axisLine={false} />
                         <Tooltip
-                            cursor={{ fill: '#1e293b', opacity: 0.4 }}
-                            contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px", fontSize: "12px" }}
+                            cursor={{ fill: 'var(--border)', opacity: 0.4 }}
+                            contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "8px", fontSize: "12px" }}
                         />
                         <Bar dataKey="rate" radius={[4, 4, 0, 0]}>
                             {data.map((entry, index) => (

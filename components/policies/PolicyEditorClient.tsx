@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useEffect, useState, useCallback, useTransition } from "react";
+import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import {
     ChevronLeft, FileText, Save, CheckCircle2, Clock,
@@ -35,10 +36,10 @@ interface PolicyEditorClientProps {
 }
 
 const STATUS_CONFIG = {
-    draft:        { label: "Draft",        color: "text-slate-400",   bg: "bg-slate-800",      border: "border-slate-700" },
+    draft:        { label: "Draft",        color: "text-muted-foreground",   bg: "bg-secondary",      border: "border-border" },
     under_review: { label: "Under Review", color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30" },
     approved:     { label: "Active",       color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
-    archived:     { label: "Archived",     color: "text-slate-500",   bg: "bg-slate-800/50",   border: "border-slate-700/50" },
+    archived:     { label: "Archived",     color: "text-muted-foreground",   bg: "bg-secondary/50",   border: "border-border/50" },
 };
 
 const TABS = ["Editor", "Versions", "Acknowledgments"] as const;
@@ -49,19 +50,19 @@ function ToolBtn({
     label, title, onMouseDown, active,
 }: { label: React.ReactNode; title: string; onMouseDown: (e: React.MouseEvent) => void; active?: boolean }) {
     return (
-        <button
+        <Button variant="plain"
             type="button"
             title={title}
             onMouseDown={onMouseDown}
-            className={cn(
+            className={cn("h-auto", 
                 "px-2.5 py-1.5 rounded-md text-sm font-medium transition-colors select-none",
                 active
                     ? "bg-orange-500/20 text-orange-400 border border-orange-500/30"
-                    : "text-slate-400 hover:text-slate-100 hover:bg-slate-700/60"
+                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
             )}
         >
             {label}
-        </button>
+        </Button>
     );
 }
 
@@ -156,14 +157,14 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
         <div className="flex flex-col min-h-[calc(100vh-56px)] -mx-6 -my-6">
 
             {/* Top action bar */}
-            <div className="flex items-center justify-between px-8 py-4 border-b border-slate-800/60 bg-[#020617]">
-                <button
+            <div className="flex items-center justify-between px-8 py-4 border-b border-border/60 bg-background">
+                <Button variant="plain"
                     onClick={() => router.push("/policies")}
-                    className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-slate-200 transition-colors"
+                    className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors h-auto"
                 >
                     <ChevronLeft className="w-4 h-4" />
                     Back to Policies
-                </button>
+                </Button>
                 <div className="flex items-center gap-2">
                     {saveError && (
                         <span className="flex items-center gap-1 text-xs text-red-400">
@@ -171,7 +172,7 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
                         </span>
                     )}
                     {savedAt && !saveError && (
-                        <span className="flex items-center gap-1 text-xs text-slate-500">
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
                             <Clock className="w-3 h-3" /> Saved at {savedAt}
                         </span>
                     )}
@@ -181,32 +182,32 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
                     )}>
                         {cfg.label}
                     </span>
-                    <button
+                    <Button variant="plain"
                         onClick={() => save()}
                         disabled={saving}
-                        className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-sm text-slate-200 hover:bg-slate-700 disabled:opacity-50 transition-colors"
+                        className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-secondary border border-border text-sm text-foreground hover:bg-secondary disabled:opacity-50 transition-colors h-auto"
                     >
                         {saving ? <RotateCcw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
                         Save Draft
-                    </button>
+                    </Button>
                     {status !== "approved" && (
-                        <button
+                        <Button variant="plain"
                             onClick={() => save("approved")}
                             disabled={saving}
-                            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium disabled:opacity-50 transition-colors"
+                            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium disabled:opacity-50 transition-colors h-auto"
                         >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             Mark as Active
-                        </button>
+                        </Button>
                     )}
                     {status === "approved" && (
-                        <button
+                        <Button variant="plain"
                             onClick={() => save("draft")}
                             disabled={saving}
-                            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 text-slate-200 text-sm font-medium disabled:opacity-50 transition-colors"
+                            className="flex items-center gap-2 px-4 py-1.5 rounded-lg bg-secondary hover:bg-slate-600 text-foreground text-sm font-medium disabled:opacity-50 transition-colors h-auto"
                         >
                             Revert to Draft
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
@@ -219,7 +220,7 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
                     </div>
                     <div>
                         <h1 className="text-2xl font-bold text-white">{policy.title}</h1>
-                        <p className="text-sm text-slate-500 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                             {policy.owner?.full_name ?? "Unassigned"} · policy
                         </p>
                     </div>
@@ -227,20 +228,20 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-1 px-8 border-b border-slate-800">
+            <div className="flex items-center gap-1 px-8 border-b border-border">
                 {TABS.map(tab => (
-                    <button
+                    <Button variant="plain"
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={cn(
+                        className={cn("h-auto", 
                             "px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors",
                             activeTab === tab
                                 ? "border-orange-500 text-orange-400"
-                                : "border-transparent text-slate-500 hover:text-slate-300"
+                                : "border-transparent text-muted-foreground hover:text-muted-foreground"
                         )}
                     >
                         {tab}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
@@ -248,7 +249,7 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
             {activeTab === "Editor" && (
                 <div className="flex-1 flex flex-col px-8 py-5">
                     {/* Formatting toolbar */}
-                    <div className="flex items-center gap-0.5 mb-3 p-2 bg-[#0e1117] border border-slate-800 rounded-xl w-fit">
+                    <div className="flex items-center gap-0.5 mb-3 p-2 bg-card border border-border rounded-xl w-fit">
                         <ToolBtn
                             label={<strong>B</strong>} title="Bold"
                             onMouseDown={e => { e.preventDefault(); exec("bold"); }}
@@ -264,7 +265,7 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
                             onMouseDown={e => { e.preventDefault(); exec("underline"); }}
                             active={isActive("underline")}
                         />
-                        <div className="w-px h-5 bg-slate-700 mx-1" />
+                        <div className="w-px h-5 bg-secondary mx-1" />
                         <ToolBtn
                             label={<span className="text-xs font-bold">H2</span>} title="Heading 2"
                             onMouseDown={e => { e.preventDefault(); exec("formatBlock", "h2"); }}
@@ -275,7 +276,7 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
                             onMouseDown={e => { e.preventDefault(); exec("formatBlock", "h3"); }}
                             active={false}
                         />
-                        <div className="w-px h-5 bg-slate-700 mx-1" />
+                        <div className="w-px h-5 bg-secondary mx-1" />
                         <ToolBtn
                             label={
                                 <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
@@ -315,8 +316,8 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
                         suppressContentEditableWarning
                         spellCheck
                         className={cn(
-                            "flex-1 min-h-[480px] px-6 py-5 rounded-xl border border-slate-800 bg-[#0e1117]",
-                            "text-slate-100 text-sm leading-7 focus:outline-none focus:border-orange-500/40",
+                            "flex-1 min-h-[480px] px-6 py-5 rounded-xl border border-border bg-card",
+                            "text-foreground text-sm leading-7 focus:outline-none focus:border-orange-500/40",
                             "policy-editor"
                         )}
                         onKeyDown={e => {
@@ -337,8 +338,8 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
                             }
                         }}
                     />
-                    <p className="text-xs text-slate-600 mt-2">
-                        <kbd className="bg-slate-800 border border-slate-700 rounded px-1">⌘S</kbd> to save
+                    <p className="text-xs text-muted-foreground/70 mt-2">
+                        <kbd className="bg-secondary border border-border rounded px-1">⌘S</kbd> to save
                     </p>
                 </div>
             )}
@@ -347,21 +348,21 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
             {activeTab === "Versions" && (
                 <div className="flex-1 px-8 py-8">
                     <div className="max-w-2xl">
-                        <p className="text-sm font-semibold text-slate-200 mb-4">Version History</p>
+                        <p className="text-sm font-semibold text-foreground mb-4">Version History</p>
                         <div className="space-y-3">
-                            <div className="flex items-start gap-4 p-4 bg-[#0e1117] border border-slate-800 rounded-xl">
+                            <div className="flex items-start gap-4 p-4 bg-card border border-border rounded-xl">
                                 <div className="w-8 h-8 rounded-full bg-orange-500/15 border border-orange-500/20 flex items-center justify-center flex-shrink-0 text-xs font-bold text-orange-400">
                                     v{policy.version}
                                 </div>
                                 <div className="flex-1">
                                     <div className="flex items-center justify-between">
-                                        <p className="text-sm font-medium text-slate-200">Version {policy.version}</p>
+                                        <p className="text-sm font-medium text-foreground">Version {policy.version}</p>
                                         <span className={cn(
                                             "text-[10px] font-bold px-2 py-0.5 rounded border uppercase",
                                             cfg.color, cfg.bg, cfg.border
                                         )}>{cfg.label}</span>
                                     </div>
-                                    <p className="text-xs text-slate-500 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         Last updated {new Date(policy.updated_at).toLocaleDateString("en-US", {
                                             year: "numeric", month: "short", day: "numeric",
                                         })}
@@ -377,27 +378,27 @@ export function PolicyEditorClient({ policy, currentUserId: _, isAdmin: __ }: Po
             {activeTab === "Acknowledgments" && (
                 <div className="flex-1 px-8 py-8">
                     <div className="max-w-2xl space-y-5">
-                        <p className="text-sm font-semibold text-slate-200">Team Acknowledgments</p>
+                        <p className="text-sm font-semibold text-foreground">Team Acknowledgments</p>
 
                         {/* Progress */}
-                        <div className="p-5 bg-[#0e1117] border border-slate-800 rounded-xl">
+                        <div className="p-5 bg-card border border-border rounded-xl">
                             <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center gap-2">
-                                    <Users className="w-4 h-4 text-slate-400" />
-                                    <span className="text-sm font-medium text-slate-200">
+                                    <Users className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-sm font-medium text-foreground">
                                         {policy.ackCount} of {policy.totalMembers} members acknowledged
                                     </span>
                                 </div>
                                 <span className="text-sm font-bold text-orange-400">{ackPct}%</span>
                             </div>
-                            <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div className="h-2 bg-secondary rounded-full overflow-hidden">
                                 <div
                                     className="h-full rounded-full bg-orange-500 transition-all duration-700"
                                     style={{ width: `${ackPct}%` }}
                                 />
                             </div>
                             {policy.totalMembers === 0 && (
-                                <p className="text-xs text-slate-600 mt-3">No team members in your organization yet.</p>
+                                <p className="text-xs text-muted-foreground/70 mt-3">No team members in your organization yet.</p>
                             )}
                         </div>
 

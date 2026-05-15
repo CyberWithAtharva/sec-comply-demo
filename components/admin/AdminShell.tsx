@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
@@ -41,7 +42,7 @@ export function AdminShell({ profile, children }: AdminShellProps) {
             <motion.aside
                 initial={false}
                 animate={{ width: isCollapsed ? 80 : 260 }}
-                className="flex-shrink-0 h-screen sticky top-0 border-r border-amber-900/30 bg-[#020617]/90 backdrop-blur-xl z-40 flex flex-col"
+                className="flex-shrink-0 h-screen sticky top-0 border-r border-amber-900/30 bg-background/90 backdrop-blur-xl z-40 flex flex-col"
             >
                 {/* Header */}
                 <div className="h-20 flex items-center justify-between px-5 border-b border-amber-900/30">
@@ -51,7 +52,7 @@ export function AdminShell({ profile, children }: AdminShellProps) {
                                 <ShieldCheck className="w-5 h-5 text-white" />
                             </div>
                             <div className="min-w-0">
-                                <p className="text-sm font-bold text-slate-100 truncate">SecComply</p>
+                                <p className="text-sm font-bold text-foreground truncate">SecComply</p>
                                 <p className="text-[10px] text-amber-400 font-semibold uppercase tracking-wider">Admin Console</p>
                             </div>
                         </div>
@@ -63,12 +64,12 @@ export function AdminShell({ profile, children }: AdminShellProps) {
                             </div>
                         </div>
                     )}
-                    <button
+                    <Button variant="plain"
                         onClick={() => setIsCollapsed(c => !c)}
-                        className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors flex-shrink-0"
+                        className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground transition-colors flex-shrink-0 h-auto"
                     >
                         {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
-                    </button>
+                    </Button>
                 </div>
 
                 {/* Nav */}
@@ -81,7 +82,7 @@ export function AdminShell({ profile, children }: AdminShellProps) {
                                     "flex items-center gap-3 px-3 py-2.5 rounded-xl cursor-pointer transition-all duration-200 group relative",
                                     isActive
                                         ? "bg-amber-500/10 text-amber-400"
-                                        : "text-slate-400 hover:bg-slate-800/50 hover:text-slate-200"
+                                        : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                                 )}>
                                     {isActive && (
                                         <motion.div
@@ -89,7 +90,7 @@ export function AdminShell({ profile, children }: AdminShellProps) {
                                             className="absolute left-0 top-1.5 bottom-1.5 w-1 bg-amber-400 rounded-r-full shadow-[0_0_8px_rgba(251,191,36,0.8)]"
                                         />
                                     )}
-                                    <item.icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-amber-400" : "text-slate-500 group-hover:text-slate-300")} />
+                                    <item.icon className={cn("w-5 h-5 flex-shrink-0", isActive ? "text-amber-400" : "text-muted-foreground group-hover:text-muted-foreground")} />
                                     {!isCollapsed && (
                                         <span className="text-sm font-medium whitespace-nowrap">{item.name}</span>
                                     )}
@@ -112,23 +113,23 @@ export function AdminShell({ profile, children }: AdminShellProps) {
                         </div>
                         {!isCollapsed && (
                             <div className="flex flex-col min-w-0">
-                                <span className="text-sm font-semibold text-slate-200 truncate">{profile.full_name ?? "Admin"}</span>
+                                <span className="text-sm font-semibold text-foreground truncate">{profile.full_name ?? "Admin"}</span>
                                 <span className="text-[10px] font-bold text-amber-400 uppercase tracking-wider">SecComply Admin</span>
                             </div>
                         )}
                     </div>
                     <form action={signOut}>
-                        <button
+                        <Button variant="plain"
                             type="submit"
-                            className={cn(
-                                "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-500 hover:text-red-400 hover:bg-red-950/30 transition-colors text-sm",
+                            className={cn("h-auto", 
+                                "w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-muted-foreground hover:text-red-400 hover:bg-red-950/30 transition-colors text-sm",
                                 isCollapsed ? "justify-center" : "justify-start"
                             )}
                             title="Sign out"
                         >
                             <LogOut className="w-4 h-4 flex-shrink-0" />
                             {!isCollapsed && <span className="font-medium">Sign out</span>}
-                        </button>
+                        </Button>
                     </form>
                 </div>
             </motion.aside>
@@ -136,15 +137,15 @@ export function AdminShell({ profile, children }: AdminShellProps) {
             {/* Main content */}
             <div className="flex-1 w-full flex flex-col min-h-screen overflow-auto">
                 {/* Top bar */}
-                <div className="h-16 border-b border-slate-800/60 flex items-center px-8 bg-[#020617]/60 backdrop-blur-sm sticky top-0 z-30">
-                    <div className="flex items-center gap-2 text-xs text-slate-500 font-mono">
+                <div className="h-16 border-b border-border/60 flex items-center px-8 bg-background/60 backdrop-blur-sm sticky top-0 z-30">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground font-mono">
                         <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                         Admin Console
                     </div>
                     <div className="ml-auto">
                         <Link
                             href="/"
-                            className="text-xs text-slate-500 hover:text-slate-300 transition-colors border border-slate-700/50 hover:border-slate-600 px-3 py-1.5 rounded-lg"
+                            className="text-xs text-muted-foreground hover:text-muted-foreground transition-colors border border-border/50 hover:border-slate-600 px-3 py-1.5 rounded-lg"
                         >
                             ← View as Client
                         </Link>

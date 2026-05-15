@@ -26,14 +26,14 @@ function MetricCard({ title, value, trend, isPositive, icon, delay = 0 }: Metric
                 {icon}
             </div>
             <div className="flex flex-col z-10">
-                <span className="text-sm font-medium text-slate-400 mb-2">{title}</span>
-                <span className="text-3xl font-bold text-slate-100 tracking-tight">{value}</span>
+                <span className="text-sm font-medium text-muted-foreground mb-2">{title}</span>
+                <span className="text-3xl font-bold text-foreground tracking-tight">{value}</span>
             </div>
             <div className="mt-4 flex items-center text-xs font-mono font-medium z-10">
                 <span className={cn("px-2 py-0.5 rounded-full border", isPositive ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" : "text-amber-400 bg-amber-500/10 border-amber-500/20")}>
                     {trend}
                 </span>
-                <span className="ml-2 text-slate-500">vs last assessment</span>
+                <span className="ml-2 text-muted-foreground">vs last assessment</span>
             </div>
         </motion.div>
     );

@@ -18,9 +18,9 @@ export default async function DashboardPage() {
     if (!membership) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-                <ShieldCheck className="w-16 h-16 text-slate-600 mb-4" />
-                <h2 className="text-xl font-semibold text-slate-300 mb-2">No Organization Assigned</h2>
-                <p className="text-slate-500 text-sm max-w-md">
+                <ShieldCheck className="w-16 h-16 text-muted-foreground/70 mb-4" />
+                <h2 className="text-xl font-semibold text-muted-foreground mb-2">No Organization Assigned</h2>
+                <p className="text-muted-foreground text-sm max-w-md">
                     Your account hasn&apos;t been linked to an organization yet. Contact your Overwatch admin.
                 </p>
             </div>
@@ -38,9 +38,9 @@ export default async function DashboardPage() {
     if (!orgFrameworks || orgFrameworks.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-                <ShieldCheck className="w-16 h-16 text-slate-600 mb-4" />
-                <h2 className="text-xl font-semibold text-slate-300 mb-2">No Frameworks Assigned</h2>
-                <p className="text-slate-500 text-sm max-w-md">
+                <ShieldCheck className="w-16 h-16 text-muted-foreground/70 mb-4" />
+                <h2 className="text-xl font-semibold text-muted-foreground mb-2">No Frameworks Assigned</h2>
+                <p className="text-muted-foreground text-sm max-w-md">
                     No compliance frameworks have been assigned to your organization yet.
                     Contact your Overwatch admin to get started.
                 </p>

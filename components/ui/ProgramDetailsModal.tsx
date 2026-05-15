@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     X,
@@ -137,15 +138,15 @@ export function ProgramDetailsModal({
                         <TreemapWidget frameworkId={frameworkId} />
                         {/* Sub-Control Categorization Matrix */}
                         <div>
-                            <h3 className="text-lg font-semibold text-slate-100 mb-6 flex items-center">
-                                <Trello className="w-5 h-5 mr-3 text-slate-400" />
+                            <h3 className="text-lg font-semibold text-foreground mb-6 flex items-center">
+                                <Trello className="w-5 h-5 mr-3 text-muted-foreground" />
                                 Sub-Control Categorization Matrix
                             </h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                 {categories.map((cat, i) => (
-                                    <div key={i} className="glass-panel p-5 rounded-xl border border-slate-800/50">
+                                    <div key={i} className="glass-panel p-5 rounded-xl border border-border/50">
                                         <div className="flex justify-between items-start mb-4">
-                                            <h4 className="text-sm font-semibold text-slate-300">
+                                            <h4 className="text-sm font-semibold text-muted-foreground">
                                                 {cat.name}
                                             </h4>
                                             <span
@@ -160,14 +161,14 @@ export function ProgramDetailsModal({
                                             </span>
                                         </div>
                                         <div className="flex items-end justify-between">
-                                            <div className="text-3xl font-bold text-slate-100 tracking-tighter">
+                                            <div className="text-3xl font-bold text-foreground tracking-tighter">
                                                 {cat.count}
                                             </div>
-                                            <span className="text-xs text-slate-500 font-mono uppercase">
+                                            <span className="text-xs text-muted-foreground font-mono uppercase">
                                                 Controls
                                             </span>
                                         </div>
-                                        <div className="w-full h-1 bg-slate-800 mt-4 rounded-full overflow-hidden">
+                                        <div className="w-full h-1 bg-secondary mt-4 rounded-full overflow-hidden">
                                             <div
                                                 className={`h-full ${cat.status === "Good"
                                                         ? "bg-emerald-500"
@@ -207,7 +208,7 @@ export function ProgramDetailsModal({
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
                     onClick={onClose}
-                    className="absolute inset-0 bg-[#020617]/80 backdrop-blur-md"
+                    className="absolute inset-0 bg-background/80 backdrop-blur-md"
                 />
 
                 {/* Modal */}
@@ -215,36 +216,36 @@ export function ProgramDetailsModal({
                     initial={{ opacity: 0, scale: 0.95, y: 20 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
                     exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                    className="relative w-full max-w-[1400px] h-[90vh] bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl flex flex-col overflow-hidden"
+                    className="relative w-full max-w-[1400px] h-[90vh] bg-card border border-border rounded-3xl shadow-2xl flex flex-col overflow-hidden"
                 >
                     {/* Header */}
-                    <div className="px-8 pt-6 pb-0 border-b border-slate-800/50 flex flex-col justify-between bg-slate-900/50 flex-shrink-0">
+                    <div className="px-8 pt-6 pb-0 border-b border-border/50 flex flex-col justify-between bg-card/50 flex-shrink-0">
                         <div className="flex justify-between items-start mb-6">
                             <div>
-                                <h2 className="text-2xl font-bold text-slate-100 tracking-tight">
+                                <h2 className="text-2xl font-bold text-foreground tracking-tight">
                                     {frameworkName ?? "Framework"} Deep Dive
                                 </h2>
-                                <p className="text-sm text-slate-400 mt-1 font-medium tracking-wide">
+                                <p className="text-sm text-muted-foreground mt-1 font-medium tracking-wide">
                                     {frameworkStats ? `${frameworkStats.verifiedControls} of ${frameworkStats.totalControls} controls verified · ${frameworkStats.percentage}% compliant` : "Comprehensive Analysis & Visualization"}
                                 </p>
                             </div>
-                            <button
+                            <Button variant="plain"
                                 onClick={onClose}
-                                className="p-2 rounded-full hover:bg-slate-800 text-slate-400 hover:text-white transition-colors"
+                                className="p-2 rounded-full hover:bg-secondary text-muted-foreground hover:text-white transition-colors h-auto"
                             >
                                 <X className="w-6 h-6" />
-                            </button>
+                            </Button>
                         </div>
 
                         {/* Top Level Tabs */}
                         <div className="flex space-x-6 px-2">
-                            <button
+                            <Button variant="plain"
                                 onClick={() => setMainTab("Insights")}
-                                className={cn(
+                                className={cn("h-auto", 
                                     "pb-4 text-sm font-semibold transition-colors relative",
                                     mainTab === "Insights"
                                         ? "text-blue-400"
-                                        : "text-slate-500 hover:text-slate-300"
+                                        : "text-muted-foreground hover:text-muted-foreground"
                                 )}
                             >
                                 Executive Insights
@@ -254,14 +255,14 @@ export function ProgramDetailsModal({
                                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 rounded-t-full shadow-[0_-2px_8px_rgba(59,130,246,0.5)]"
                                     />
                                 )}
-                            </button>
-                            <button
+                            </Button>
+                            <Button variant="plain"
                                 onClick={() => setMainTab("Breakdown")}
-                                className={cn(
+                                className={cn("h-auto", 
                                     "pb-4 text-sm font-semibold transition-colors relative",
                                     mainTab === "Breakdown"
                                         ? "text-blue-400"
-                                        : "text-slate-500 hover:text-slate-300"
+                                        : "text-muted-foreground hover:text-muted-foreground"
                                 )}
                             >
                                 {frameworkStats?.totalControls ?? "—"} Controls Breakdown
@@ -271,27 +272,27 @@ export function ProgramDetailsModal({
                                         className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 rounded-t-full shadow-[0_-2px_8px_rgba(59,130,246,0.5)]"
                                     />
                                 )}
-                            </button>
+                            </Button>
                         </div>
                     </div>
 
-                    <div className="flex flex-1 overflow-hidden bg-[#020617]/50">
+                    <div className="flex flex-1 overflow-hidden bg-background/50">
                         {mainTab === "Insights" ? (
                             <>
                                 {/* Sidebar Tabs */}
-                                <div className="w-64 border-r border-slate-800/50 bg-slate-900/30 overflow-y-auto no-scrollbar p-4 flex flex-col space-y-1.5 flex-shrink-0">
-                                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 px-3">
+                                <div className="w-64 border-r border-border/50 bg-card/30 overflow-y-auto no-scrollbar p-4 flex flex-col space-y-1.5 flex-shrink-0">
+                                    <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3 px-3">
                                         Analysis Views
                                     </span>
                                     {tabs.map((tab) => (
-                                        <button
+                                        <Button variant="plain"
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
-                                            className={cn(
+                                            className={cn("h-auto", 
                                                 "flex items-center space-x-3 w-full px-4 py-3 rounded-xl transition-all text-left",
                                                 activeTab === tab.id
                                                     ? "bg-blue-600/10 text-blue-400 border border-blue-500/20"
-                                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/50 border border-transparent"
+                                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/50 border border-transparent"
                                             )}
                                         >
                                             <tab.icon className="w-4 h-4 flex-shrink-0" />
@@ -299,11 +300,11 @@ export function ProgramDetailsModal({
                                                 <span className="text-sm font-medium tracking-wide truncate">
                                                     {tab.label}
                                                 </span>
-                                                <span className="text-[10px] text-slate-500 truncate">
+                                                <span className="text-[10px] text-muted-foreground truncate">
                                                     {tab.description}
                                                 </span>
                                             </div>
-                                        </button>
+                                        </Button>
                                     ))}
                                 </div>
 

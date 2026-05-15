@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { Users, ShieldCheck, Mail, X, Plus, Loader2, Check, UserCircle, ChevronLeft, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -102,7 +103,7 @@ export function OrgDetailClient({
         <div className="space-y-8">
             {/* Header */}
             <div className="flex items-center gap-4">
-                <Link href="/admin/organizations" className="p-2 rounded-xl hover:bg-slate-800 text-slate-400 transition-colors">
+                <Link href="/admin/organizations" className="p-2 rounded-xl hover:bg-secondary text-muted-foreground transition-colors">
                     <ChevronLeft className="w-5 h-5" />
                 </Link>
                 <div className="flex items-center gap-3">
@@ -110,44 +111,44 @@ export function OrgDetailClient({
                         <span className="text-xl font-bold text-blue-400">{org.name[0].toUpperCase()}</span>
                     </div>
                     <div>
-                        <h1 className="text-xl font-bold text-slate-100">{org.name}</h1>
-                        <p className="text-xs text-slate-500 font-mono">{org.slug} · {org.plan}</p>
+                        <h1 className="text-xl font-bold text-foreground">{org.name}</h1>
+                        <p className="text-xs text-muted-foreground font-mono">{org.slug} · {org.plan}</p>
                     </div>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Members */}
-                <div className="rounded-2xl border border-slate-800/60 bg-slate-900/30 backdrop-blur-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-slate-800/60 flex items-center justify-between">
+                <div className="rounded-2xl border border-border/60 bg-card/30 backdrop-blur-sm overflow-hidden">
+                    <div className="px-5 py-4 border-b border-border/60 flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-slate-400" />
-                            <h2 className="text-sm font-semibold text-slate-200">Members ({members.length})</h2>
+                            <Users className="w-4 h-4 text-muted-foreground" />
+                            <h2 className="text-sm font-semibold text-foreground">Members ({members.length})</h2>
                         </div>
-                        <button
+                        <Button variant="plain"
                             onClick={() => setShowInvite(true)}
-                            className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 rounded-lg transition-colors font-medium"
+                            className="flex items-center gap-1.5 text-xs px-3 py-1.5 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 text-blue-400 rounded-lg transition-colors font-medium h-auto"
                         >
                             <Mail className="w-3.5 h-3.5" />
                             Invite
-                        </button>
+                        </Button>
                     </div>
-                    <div className="divide-y divide-slate-800/40">
+                    <div className="divide-y divide-border/40">
                         {members.length === 0 ? (
-                            <div className="px-5 py-10 text-center text-slate-500 text-sm">No members yet. Invite someone.</div>
+                            <div className="px-5 py-10 text-center text-muted-foreground text-sm">No members yet. Invite someone.</div>
                         ) : members.map(m => (
                             <div key={m.id} className="px-5 py-3 flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0">
+                                <div className="w-8 h-8 rounded-full bg-secondary border border-border flex items-center justify-center flex-shrink-0">
                                     {m.profiles?.avatar_url ? (
                                         // eslint-disable-next-line @next/next/no-img-element
                                         <img src={m.profiles.avatar_url} alt="" className="w-8 h-8 rounded-full" />
                                     ) : (
-                                        <UserCircle className="w-5 h-5 text-slate-500" />
+                                        <UserCircle className="w-5 h-5 text-muted-foreground" />
                                     )}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm font-medium text-slate-200 truncate">{m.profiles?.full_name ?? "—"}</p>
-                                    <p className="text-xs text-slate-500 font-mono">{m.role}</p>
+                                    <p className="text-sm font-medium text-foreground truncate">{m.profiles?.full_name ?? "—"}</p>
+                                    <p className="text-xs text-muted-foreground font-mono">{m.role}</p>
                                 </div>
                             </div>
                         ))}
@@ -155,10 +156,10 @@ export function OrgDetailClient({
                 </div>
 
                 {/* Frameworks */}
-                <div className="rounded-2xl border border-slate-800/60 bg-slate-900/30 backdrop-blur-sm overflow-hidden">
-                    <div className="px-5 py-4 border-b border-slate-800/60 flex items-center gap-2">
-                        <ShieldCheck className="w-4 h-4 text-slate-400" />
-                        <h2 className="text-sm font-semibold text-slate-200">Compliance Frameworks</h2>
+                <div className="rounded-2xl border border-border/60 bg-card/30 backdrop-blur-sm overflow-hidden">
+                    <div className="px-5 py-4 border-b border-border/60 flex items-center gap-2">
+                        <ShieldCheck className="w-4 h-4 text-muted-foreground" />
+                        <h2 className="text-sm font-semibold text-foreground">Compliance Frameworks</h2>
                     </div>
                     <div className="p-5 space-y-3">
                         {/* Assigned */}
@@ -166,32 +167,32 @@ export function OrgDetailClient({
                             <div key={f.id} className="flex items-center justify-between px-4 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/20">
                                 <div>
                                     <p className="text-sm font-semibold text-emerald-300">{f.frameworks.name}</p>
-                                    <p className="text-xs text-slate-500">{f.frameworks.controls_count} controls · v{f.frameworks.version}</p>
+                                    <p className="text-xs text-muted-foreground">{f.frameworks.controls_count} controls · v{f.frameworks.version}</p>
                                 </div>
-                                <button
+                                <Button variant="plain"
                                     onClick={() => handleRemoveFramework(f.framework_id)}
-                                    className="p-1.5 rounded-lg text-slate-500 hover:text-red-400 hover:bg-red-950/30 transition-colors"
+                                    className="p-1.5 rounded-lg text-muted-foreground hover:text-red-400 hover:bg-red-950/30 transition-colors h-auto"
                                     title="Remove framework"
                                 >
                                     <Trash2 className="w-3.5 h-3.5" />
-                                </button>
+                                </Button>
                             </div>
                         ))}
 
                         {/* Available to add */}
                         {allFrameworks.filter(f => !assignedFwIds.has(f.id)).map(fw => (
-                            <button
+                            <Button variant="plain"
                                 key={fw.id}
                                 onClick={() => handleAddFramework(fw.id)}
                                 disabled={addingFw === fw.id}
-                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-slate-700/60 bg-slate-950/30 hover:border-slate-600 text-sm text-slate-400 hover:text-slate-200 transition-all"
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-xl border border-border/60 bg-background/30 hover:border-slate-600 text-sm text-muted-foreground hover:text-foreground transition-all h-auto"
                             >
                                 <span className="font-medium">{fw.name} <span className="text-xs opacity-50">v{fw.version}</span></span>
                                 {addingFw === fw.id
                                     ? <Loader2 className="w-4 h-4 animate-spin" />
                                     : <Plus className="w-4 h-4 opacity-60" />
                                 }
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 </div>
@@ -204,31 +205,31 @@ export function OrgDetailClient({
                         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                             className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowInvite(false)} />
                         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                            className="relative w-full max-w-sm bg-slate-900 border border-slate-700/60 rounded-2xl shadow-2xl p-6 z-10">
+                            className="relative w-full max-w-sm bg-card border border-border/60 rounded-2xl shadow-2xl p-6 z-10">
                             <div className="flex items-center justify-between mb-5">
-                                <h2 className="text-base font-bold text-slate-100">Invite Member</h2>
-                                <button onClick={() => setShowInvite(false)} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400">
+                                <h2 className="text-base font-bold text-foreground">Invite Member</h2>
+                                <Button variant="plain" onClick={() => setShowInvite(false)} className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground h-auto">
                                     <X className="w-4 h-4" />
-                                </button>
+                                </Button>
                             </div>
                             <form onSubmit={handleInvite} className="space-y-4">
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Email Address</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Email Address</label>
                                     <input
                                         type="email"
                                         value={inviteEmail}
                                         onChange={e => setInviteEmail(e.target.value)}
                                         required
                                         placeholder="user@company.com"
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                                     />
                                 </div>
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Role</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Role</label>
                                     <select
                                         value={inviteRole}
                                         onChange={e => setInviteRole(e.target.value as "owner" | "member" | "viewer")}
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40"
                                     >
                                         <option value="owner">Owner</option>
                                         <option value="member">Member</option>
@@ -236,15 +237,15 @@ export function OrgDetailClient({
                                     </select>
                                 </div>
                                 <div className="flex gap-3 pt-1">
-                                    <button type="button" onClick={() => setShowInvite(false)}
-                                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-400 hover:bg-slate-800 transition-colors">
+                                    <Button variant="plain" type="button" onClick={() => setShowInvite(false)}
+                                        className="flex-1 px-4 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:bg-secondary transition-colors h-auto">
                                         Cancel
-                                    </button>
-                                    <button type="submit" disabled={inviting}
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-colors disabled:opacity-70">
+                                    </Button>
+                                    <Button variant="plain" type="submit" disabled={inviting}
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-colors disabled:opacity-70 h-auto">
                                         {inviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                                         Send Invite
-                                    </button>
+                                    </Button>
                                 </div>
                             </form>
                         </motion.div>

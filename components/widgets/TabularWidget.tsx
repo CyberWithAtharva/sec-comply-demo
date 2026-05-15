@@ -23,9 +23,9 @@ function getStatusDisplay(status: string): { label: string; classes: string } {
         case "in_progress":
             return { label: "In Progress", classes: "bg-blue-500/10 text-blue-400 border-blue-500/20" };
         case "not_applicable":
-            return { label: "N/A", classes: "bg-slate-600/20 text-slate-400 border-slate-500/20" };
+            return { label: "N/A", classes: "bg-slate-600/20 text-muted-foreground border-slate-500/20" };
         default:
-            return { label: "Not Started", classes: "bg-slate-500/10 text-slate-400 border-slate-500/20" };
+            return { label: "Not Started", classes: "bg-slate-500/10 text-muted-foreground border-slate-500/20" };
     }
 }
 
@@ -45,19 +45,19 @@ export function TabularWidget({ controls }: TabularWidgetProps) {
     const displayControls = sorted.slice(0, 8);
 
     return (
-        <div className="glass-panel rounded-2xl overflow-hidden col-span-full xl:col-span-2 border border-slate-800/50">
-            <div className="p-5 border-b border-slate-800/50 flex justify-between items-center bg-slate-900/20">
-                <h3 className="font-semibold text-slate-100">Controls Status</h3>
-                <span className="text-xs text-slate-500 font-mono">{controls?.length ?? 0} total</span>
+        <div className="glass-panel rounded-2xl overflow-hidden col-span-full xl:col-span-2 border border-border/50">
+            <div className="p-5 border-b border-border/50 flex justify-between items-center bg-card/20">
+                <h3 className="font-semibold text-foreground">Controls Status</h3>
+                <span className="text-xs text-muted-foreground font-mono">{controls?.length ?? 0} total</span>
             </div>
             {displayControls.length === 0 ? (
-                <div className="px-6 py-10 text-center text-slate-500 text-sm">
+                <div className="px-6 py-10 text-center text-muted-foreground text-sm">
                     No controls data available.
                 </div>
             ) : (
                 <div className="w-full overflow-x-auto">
-                    <table className="w-full text-left text-sm text-slate-400">
-                        <thead className="text-xs text-slate-500 font-mono uppercase bg-slate-900/40">
+                    <table className="w-full text-left text-sm text-muted-foreground">
+                        <thead className="text-xs text-muted-foreground font-mono uppercase bg-card/40">
                             <tr>
                                 <th className="px-6 py-3 font-medium">Control ID</th>
                                 <th className="px-6 py-3 font-medium">Description</th>
@@ -65,14 +65,14 @@ export function TabularWidget({ controls }: TabularWidgetProps) {
                                 <th className="px-6 py-3 font-medium text-right">Priority</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800/50">
+                        <tbody className="divide-y divide-border/50">
                             {displayControls.map((row) => {
                                 const { label, classes } = getStatusDisplay(row.status);
                                 const severity = domainToSeverity(row.domain);
                                 return (
-                                    <tr key={row.id} className="hover:bg-slate-800/20 transition-colors group cursor-pointer">
-                                        <td className="px-6 py-4 font-mono text-slate-300 group-hover:text-blue-400 transition-colors text-xs">{row.controlId}</td>
-                                        <td className="px-6 py-4 text-slate-200 max-w-[200px] truncate" title={row.title}>{row.title}</td>
+                                    <tr key={row.id} className="hover:bg-secondary/20 transition-colors group cursor-pointer">
+                                        <td className="px-6 py-4 font-mono text-muted-foreground group-hover:text-blue-400 transition-colors text-xs">{row.controlId}</td>
+                                        <td className="px-6 py-4 text-foreground max-w-[200px] truncate" title={row.title}>{row.title}</td>
                                         <td className="px-6 py-4">
                                             <span className={cn("px-2.5 py-1 text-[10px] uppercase font-bold tracking-wider rounded border", classes)}>
                                                 {label}

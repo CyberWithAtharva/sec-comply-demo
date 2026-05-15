@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 interface PaginationProps {
     page: number;                 // 1-indexed
@@ -26,18 +27,18 @@ export function Pagination({
     const end = Math.min(total, page * pageSize);
 
     return (
-        <div className="flex items-center justify-between text-xs text-slate-400 pt-4 border-t border-slate-800/60">
+        <div className="flex items-center justify-between text-xs text-muted-foreground pt-4 border-t border-border/60">
             <div className="flex items-center gap-3">
                 <span className="tabular-nums">
                     {start}–{end} of {total} {label}
                 </span>
-                <span className="text-slate-600">·</span>
+                <span className="text-muted-foreground/70">·</span>
                 <label className="flex items-center gap-1.5">
                     Per page
                     <select
                         value={pageSize}
                         onChange={e => onPageSizeChange(Number(e.target.value))}
-                        className="bg-slate-900 border border-slate-700 rounded-md px-2 py-0.5 text-xs text-slate-300 focus:outline-none focus:ring-1 focus:ring-amber-500/40"
+                        className="bg-card border border-border rounded-md px-2 py-0.5 text-xs text-muted-foreground focus:outline-none focus:ring-1 focus:ring-amber-500/40"
                     >
                         {pageSizeOptions.map(s => (
                             <option key={s} value={s}>{s}</option>
@@ -47,24 +48,24 @@ export function Pagination({
             </div>
             <div className="flex items-center gap-2">
                 <span className="tabular-nums">Page {page} of {totalPages}</span>
-                <button
+                <Button variant="plain"
                     type="button"
                     onClick={() => onPageChange(Math.max(1, page - 1))}
                     disabled={page <= 1}
-                    className="p-1.5 rounded-md border border-slate-700 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="p-1.5 rounded-md border border-border hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors h-auto"
                     aria-label="Previous page"
                 >
                     <ChevronLeft className="w-3.5 h-3.5" />
-                </button>
-                <button
+                </Button>
+                <Button variant="plain"
                     type="button"
                     onClick={() => onPageChange(Math.min(totalPages, page + 1))}
                     disabled={page >= totalPages}
-                    className="p-1.5 rounded-md border border-slate-700 hover:bg-slate-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                    className="p-1.5 rounded-md border border-border hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed transition-colors h-auto"
                     aria-label="Next page"
                 >
                     <ChevronRight className="w-3.5 h-3.5" />
-                </button>
+                </Button>
             </div>
         </div>
     );

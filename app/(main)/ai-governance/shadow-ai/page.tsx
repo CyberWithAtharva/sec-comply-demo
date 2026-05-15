@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     ScanSearch, AlertTriangle, Search, X, Eye,
@@ -64,7 +65,7 @@ const EXPOSURE_COLORS: Record<string, string> = {
     "PII":             "bg-red-500/15 text-red-300 border-red-500/25",
     "Financial Data":  "bg-orange-500/15 text-orange-300 border-orange-500/25",
     "Source Code":     "bg-yellow-500/15 text-yellow-300 border-yellow-500/25",
-    "Low Sensitivity": "bg-slate-700/40 text-slate-400 border-slate-600/40",
+    "Low Sensitivity": "bg-secondary/40 text-muted-foreground border-slate-600/40",
 };
 
 interface PolicyToggle { label: string; description: string; enabled: boolean; }
@@ -98,7 +99,7 @@ export default function ShadowAIPage() {
 
     const dismiss = (id: string) => setTools(prev => prev.map(t => t.id === id ? { ...t, dismissed: true } : t));
 
-    const selectCls = "bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-orange-500/40 transition-colors cursor-pointer";
+    const selectCls = "bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none focus:border-orange-500/40 transition-colors cursor-pointer";
 
     return (
         <div className="w-full flex flex-col space-y-5 animate-in fade-in duration-700">
@@ -108,10 +109,10 @@ export default function ShadowAIPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <ScanSearch className="w-5 h-5 text-orange-400" />
-                        <h1 className="text-2xl font-bold text-slate-100 tracking-tight">Shadow AI Detection</h1>
+                        <h1 className="text-2xl font-bold text-foreground tracking-tight">Shadow AI Detection</h1>
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/20">PREVIEW</span>
                     </div>
-                    <p className="text-sm text-slate-400">Discover unauthorized AI tools in use across your organization</p>
+                    <p className="text-sm text-muted-foreground">Discover unauthorized AI tools in use across your organization</p>
                 </div>
             </div>
 
@@ -136,28 +137,28 @@ export default function ShadowAIPage() {
                     { label: "Departments Affected",        value: new Set(active.map(t => t.department)).size,            icon: Building2, color: "text-blue-400", bg: "bg-blue-500/10 border-blue-500/20" },
                     { label: "Tools Pending Review",       value: active.filter(t => t.riskLevel !== "Low").length,       icon: Eye, color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
                 ].map(({ label, value, icon: Icon, color, bg }) => (
-                    <div key={label} className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
+                    <div key={label} className="bg-card/60 border border-border/60 rounded-xl p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs text-slate-500 font-medium">{label}</span>
+                            <span className="text-xs text-muted-foreground font-medium">{label}</span>
                             <div className={cn("w-8 h-8 rounded-lg border flex items-center justify-center", bg)}>
                                 <Icon className={cn("w-4 h-4", color)} />
                             </div>
                         </div>
-                        <span className="text-2xl font-bold text-slate-100">{value}</span>
+                        <span className="text-2xl font-bold text-foreground">{value}</span>
                     </div>
                 ))}
             </div>
 
             {/* Department Breakdown */}
-            <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-5">
-                <h2 className="text-sm font-semibold text-slate-200 mb-4 flex items-center gap-2">
-                    <Building2 className="w-4 h-4 text-slate-400" /> Department Shadow AI Exposure
+            <div className="bg-card/60 border border-border/60 rounded-xl p-5">
+                <h2 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+                    <Building2 className="w-4 h-4 text-muted-foreground" /> Department Shadow AI Exposure
                 </h2>
                 <div className="space-y-3">
                     {DEPT_BREAKDOWN.sort((a, b) => b.users - a.users).map(({ dept, count, users }) => (
                         <div key={dept} className="flex items-center gap-3">
-                            <span className="text-xs text-slate-400 w-28 shrink-0">{dept}</span>
-                            <div className="flex-1 h-5 bg-slate-800/60 rounded-full overflow-hidden">
+                            <span className="text-xs text-muted-foreground w-28 shrink-0">{dept}</span>
+                            <div className="flex-1 h-5 bg-secondary/60 rounded-full overflow-hidden">
                                 <motion.div
                                     initial={{ width: 0 }}
                                     animate={{ width: `${(users / maxDeptUsers) * 100}%` }}
@@ -166,10 +167,10 @@ export default function ShadowAIPage() {
                                 />
                             </div>
                             <div className="flex items-center gap-2 shrink-0">
-                                <span className="text-xs font-semibold text-slate-300 w-8 text-right">{users}</span>
-                                <span className="text-[10px] text-slate-500">users</span>
-                                <span className="text-[10px] text-slate-600">·</span>
-                                <span className="text-[10px] text-slate-500">{count} tool{count !== 1 ? "s" : ""}</span>
+                                <span className="text-xs font-semibold text-muted-foreground w-8 text-right">{users}</span>
+                                <span className="text-[10px] text-muted-foreground">users</span>
+                                <span className="text-[10px] text-muted-foreground/70">·</span>
+                                <span className="text-[10px] text-muted-foreground">{count} tool{count !== 1 ? "s" : ""}</span>
                             </div>
                         </div>
                     ))}
@@ -177,14 +178,14 @@ export default function ShadowAIPage() {
             </div>
 
             {/* Filters */}
-            <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
+            <div className="bg-card/60 border border-border/60 rounded-xl p-4">
                 <div className="flex flex-wrap gap-3">
                     <div className="relative flex-1 min-w-48">
-                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500 pointer-events-none" />
+                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                         <input
                             value={search} onChange={e => setSearch(e.target.value)}
                             placeholder="Search tools or departments…"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/40 transition-colors"
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl pl-9 pr-3 py-2 text-sm text-muted-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-orange-500/40 transition-colors"
                         />
                     </div>
                     <select value={filterRisk} onChange={e => setFilterRisk(e.target.value)} className={selectCls}>
@@ -196,25 +197,25 @@ export default function ShadowAIPage() {
                         {departments.map(d => <option key={d}>{d}</option>)}
                     </select>
                     {(search || filterRisk !== "all" || filterDept !== "all") && (
-                        <button onClick={() => { setSearch(""); setFilterRisk("all"); setFilterDept("all"); }}
-                            className="flex items-center gap-1.5 px-3 py-2 text-xs text-slate-400 hover:text-slate-200 bg-slate-800/50 rounded-xl border border-slate-700/40 transition-colors">
+                        <Button variant="plain" onClick={() => { setSearch(""); setFilterRisk("all"); setFilterDept("all"); }}
+                            className="flex items-center gap-1.5 px-3 py-2 text-xs text-muted-foreground hover:text-foreground bg-secondary/50 rounded-xl border border-border/40 transition-colors h-auto">
                             <X className="w-3.5 h-3.5" /> Clear
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
 
             {/* Table */}
-            <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl overflow-hidden">
-                <div className="px-5 py-3 border-b border-slate-800/60">
-                    <h2 className="text-sm font-semibold text-slate-200">Detected Unregistered AI Tools</h2>
+            <div className="bg-card/60 border border-border/60 rounded-xl overflow-hidden">
+                <div className="px-5 py-3 border-b border-border/60">
+                    <h2 className="text-sm font-semibold text-foreground">Detected Unregistered AI Tools</h2>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-slate-800/40">
+                            <tr className="border-b border-border/40">
                                 {["Tool Name", "Category", "Detected In", "Users", "Risk Level", "Data Exposure", "First Detected", "Actions"].map(h => (
-                                    <th key={h} className="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3 whitespace-nowrap">{h}</th>
+                                    <th key={h} className="text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 whitespace-nowrap">{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -222,24 +223,24 @@ export default function ShadowAIPage() {
                             <AnimatePresence initial={false}>
                                 {filtered.map(t => (
                                     <motion.tr key={t.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                        className="border-b border-slate-800/40 hover:bg-slate-800/20 transition-colors">
+                                        className="border-b border-border/40 hover:bg-secondary/20 transition-colors">
                                         <td className="px-4 py-3">
                                             <div className="flex flex-col">
-                                                <span className="font-medium text-slate-200 whitespace-nowrap">{t.name}</span>
-                                                <span className="text-[10px] text-slate-500 font-mono">{t.id}</span>
+                                                <span className="font-medium text-foreground whitespace-nowrap">{t.name}</span>
+                                                <span className="text-[10px] text-muted-foreground font-mono">{t.id}</span>
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
                                             <span className={cn("text-[10px] font-medium px-2 py-1 rounded-lg border", CATEGORY_COLORS[t.category])}>{t.category}</span>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <div className="flex items-center gap-1.5 text-slate-300 text-xs">
-                                                <Building2 className="w-3 h-3 text-slate-500" />{t.department}
+                                            <div className="flex items-center gap-1.5 text-muted-foreground text-xs">
+                                                <Building2 className="w-3 h-3 text-muted-foreground" />{t.department}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
-                                            <div className="flex items-center gap-1 text-slate-300 text-xs">
-                                                <Users className="w-3 h-3 text-slate-500" />{t.estimatedUsers}
+                                            <div className="flex items-center gap-1 text-muted-foreground text-xs">
+                                                <Users className="w-3 h-3 text-muted-foreground" />{t.estimatedUsers}
                                             </div>
                                         </td>
                                         <td className="px-4 py-3">
@@ -248,16 +249,16 @@ export default function ShadowAIPage() {
                                         <td className="px-4 py-3">
                                             <div className="flex flex-wrap gap-1">
                                                 {t.dataExposure.map(e => (
-                                                    <span key={e} className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border", EXPOSURE_COLORS[e] ?? "bg-slate-700/40 text-slate-400 border-slate-600/40")}>{e}</span>
+                                                    <span key={e} className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border", EXPOSURE_COLORS[e] ?? "bg-secondary/40 text-muted-foreground border-slate-600/40")}>{e}</span>
                                                 ))}
                                             </div>
                                         </td>
-                                        <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{t.firstDetected}</td>
+                                        <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{t.firstDetected}</td>
                                         <td className="px-4 py-3">
                                             <div className="flex items-center gap-1">
-                                                <button className="px-2 py-1 text-[10px] font-semibold bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/25 rounded-lg transition-colors whitespace-nowrap">Register</button>
-                                                <button className="px-2 py-1 text-[10px] font-semibold bg-slate-700/40 hover:bg-slate-700/60 text-slate-400 border border-slate-600/40 rounded-lg transition-colors">Investigate</button>
-                                                <button onClick={() => dismiss(t.id)} className="px-2 py-1 text-[10px] font-semibold bg-slate-700/30 hover:bg-slate-700/50 text-slate-500 border border-slate-700/40 rounded-lg transition-colors">Dismiss</button>
+                                                <Button variant="plain" className="px-2 py-1 text-[10px] font-semibold bg-blue-500/10 hover:bg-blue-500/20 text-blue-300 border border-blue-500/25 rounded-lg transition-colors whitespace-nowrap h-auto">Register</Button>
+                                                <Button variant="plain" className="px-2 py-1 text-[10px] font-semibold bg-secondary/40 hover:bg-secondary/60 text-muted-foreground border border-slate-600/40 rounded-lg transition-colors h-auto">Investigate</Button>
+                                                <Button variant="plain" onClick={() => dismiss(t.id)} className="px-2 py-1 text-[10px] font-semibold bg-secondary/30 hover:bg-secondary/50 text-muted-foreground border border-border/40 rounded-lg transition-colors h-auto">Dismiss</Button>
                                             </div>
                                         </td>
                                     </motion.tr>
@@ -265,40 +266,40 @@ export default function ShadowAIPage() {
                             </AnimatePresence>
                             {filtered.length === 0 && (
                                 <tr>
-                                    <td colSpan={8} className="px-4 py-12 text-center text-slate-500 text-sm">No tools match your filters.</td>
+                                    <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground text-sm">No tools match your filters.</td>
                                 </tr>
                             )}
                         </tbody>
                     </table>
                 </div>
-                <div className="px-4 py-3 border-t border-slate-800/40">
-                    <span className="text-xs text-slate-500">{filtered.length} of {active.length} tools</span>
+                <div className="px-4 py-3 border-t border-border/40">
+                    <span className="text-xs text-muted-foreground">{filtered.length} of {active.length} tools</span>
                 </div>
             </div>
 
             {/* Policy Enforcement */}
-            <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-5">
-                <h2 className="text-sm font-semibold text-slate-200 mb-1">Policy Enforcement</h2>
-                <p className="text-xs text-slate-500 mb-4">Configure automated controls for shadow AI governance</p>
+            <div className="bg-card/60 border border-border/60 rounded-xl p-5">
+                <h2 className="text-sm font-semibold text-foreground mb-1">Policy Enforcement</h2>
+                <p className="text-xs text-muted-foreground mb-4">Configure automated controls for shadow AI governance</p>
                 <div className="space-y-3">
                     {policies.map((p, i) => (
-                        <div key={i} className="flex items-start justify-between gap-4 p-3 bg-slate-800/30 rounded-xl border border-slate-700/30">
+                        <div key={i} className="flex items-start justify-between gap-4 p-3 bg-secondary/30 rounded-xl border border-border/30">
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm font-medium text-slate-200">{p.label}</p>
-                                <p className="text-xs text-slate-500 mt-0.5">{p.description}</p>
+                                <p className="text-sm font-medium text-foreground">{p.label}</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">{p.description}</p>
                             </div>
-                            <button
+                            <Button variant="plain"
                                 onClick={() => setPolicies(prev => prev.map((x, j) => j === i ? { ...x, enabled: !x.enabled } : x))}
-                                className={cn(
+                                className={cn("h-auto", 
                                     "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full border-2 transition-colors duration-200 focus:outline-none",
-                                    p.enabled ? "bg-orange-500 border-orange-500" : "bg-slate-700 border-slate-600"
+                                    p.enabled ? "bg-orange-500 border-orange-500" : "bg-secondary border-slate-600"
                                 )}
                             >
                                 <span className={cn(
                                     "inline-block h-4 w-4 transform rounded-full bg-white shadow-md transition-transform duration-200",
                                     p.enabled ? "translate-x-5" : "translate-x-0.5"
                                 )} />
-                            </button>
+                            </Button>
                         </div>
                     ))}
                 </div>

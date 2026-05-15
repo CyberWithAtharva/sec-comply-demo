@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Loader2, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import { severityFromScore } from "@/lib/risk-styles";
 import type { LibraryRisk } from "@/lib/risk-library";
@@ -90,7 +91,7 @@ export function AddToRegisterModal({ libraryRisk, orgId, onClose, onAdded }: Pro
                     onClick={onClose} />
                 <motion.div
                     initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95 }}
-                    className="relative w-full max-w-lg bg-slate-900 border border-slate-700/60 rounded-2xl shadow-2xl p-6 z-10"
+                    className="relative w-full max-w-lg bg-card border border-border/60 rounded-2xl shadow-2xl p-6 z-10"
                 >
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-3">
@@ -98,42 +99,42 @@ export function AddToRegisterModal({ libraryRisk, orgId, onClose, onAdded }: Pro
                                 <Plus className="w-4 h-4 text-blue-400" />
                             </div>
                             <div>
-                                <h2 className="text-base font-bold text-slate-100">Add to Register</h2>
-                                <p className="text-[11px] font-mono text-slate-500">{libraryRisk.id}</p>
+                                <h2 className="text-base font-bold text-foreground">Add to Register</h2>
+                                <p className="text-[11px] font-mono text-muted-foreground">{libraryRisk.id}</p>
                             </div>
                         </div>
-                        <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400">
+                        <Button variant="plain" size="icon-sm" onClick={onClose} className="text-muted-foreground">
                             <X className="w-4 h-4" />
-                        </button>
+                        </Button>
                     </div>
 
-                    <p className="text-sm font-medium text-slate-200 mb-1">{libraryRisk.title}</p>
-                    <p className="text-xs text-slate-500 mb-5">{libraryRisk.category}</p>
+                    <p className="text-sm font-medium text-foreground mb-1">{libraryRisk.title}</p>
+                    <p className="text-xs text-muted-foreground mb-5">{libraryRisk.category}</p>
 
-                    <div className="bg-slate-950/50 border border-slate-800 rounded-xl p-4 mb-4">
-                        <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-2">
+                    <div className="bg-background/50 border border-border rounded-xl p-4 mb-4">
+                        <p className="text-[11px] text-muted-foreground uppercase tracking-wider mb-2">
                             Adjust scores for your context
                         </p>
                         <div className="grid grid-cols-2 gap-4">
                             <div>
-                                <label className="text-[11px] text-slate-400">
-                                    Likelihood: <span className="text-slate-200">{likelihood}</span> / 5
+                                <label className="text-[11px] text-muted-foreground">
+                                    Likelihood: <span className="text-foreground">{likelihood}</span> / 5
                                 </label>
                                 <input type="range" min={1} max={5} step={1}
                                     value={likelihood}
                                     onChange={e => setLikelihood(Number(e.target.value))}
                                     className="mt-1.5 w-full accent-blue-500" />
-                                <p className="text-[10px] text-slate-600 mt-0.5">default {libraryRisk.defaultLikelihood}</p>
+                                <p className="text-[10px] text-muted-foreground/70 mt-0.5">default {libraryRisk.defaultLikelihood}</p>
                             </div>
                             <div>
-                                <label className="text-[11px] text-slate-400">
-                                    Impact: <span className="text-slate-200">{impact}</span> / 5
+                                <label className="text-[11px] text-muted-foreground">
+                                    Impact: <span className="text-foreground">{impact}</span> / 5
                                 </label>
                                 <input type="range" min={1} max={5} step={1}
                                     value={impact}
                                     onChange={e => setImpact(Number(e.target.value))}
                                     className="mt-1.5 w-full accent-blue-500" />
-                                <p className="text-[10px] text-slate-600 mt-0.5">default {libraryRisk.defaultImpact}</p>
+                                <p className="text-[10px] text-muted-foreground/70 mt-0.5">default {libraryRisk.defaultImpact}</p>
                             </div>
                         </div>
 
@@ -149,25 +150,25 @@ export function AddToRegisterModal({ libraryRisk, orgId, onClose, onAdded }: Pro
                     </div>
 
                     <div className="mb-5">
-                        <label className="text-[11px] text-slate-400 uppercase tracking-wider">Note (optional)</label>
+                        <label className="text-[11px] text-muted-foreground uppercase tracking-wider">Note (optional)</label>
                         <textarea
                             value={note}
                             onChange={e => setNote(e.target.value)}
                             rows={2}
                             placeholder="Reason for the score adjustment, or context for your team."
-                            className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-3 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 resize-none"
+                            className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40 resize-none"
                         />
                     </div>
 
                     <div className="flex gap-3">
-                        <button onClick={onClose} className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-400 hover:bg-slate-800 transition-colors">
+                        <Button variant="outline" onClick={onClose} className="flex-1 h-auto px-4 py-2.5 rounded-xl text-sm text-muted-foreground">
                             Cancel
-                        </button>
-                        <button onClick={handleConfirm} disabled={saving}
-                            className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm transition-colors disabled:opacity-70">
+                        </Button>
+                        <Button onClick={handleConfirm} disabled={saving}
+                            className="flex-1 h-auto gap-2 px-4 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold text-sm disabled:opacity-70">
                             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                             Confirm &amp; Add
-                        </button>
+                        </Button>
                     </div>
                 </motion.div>
             </div>

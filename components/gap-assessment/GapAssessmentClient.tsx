@@ -15,6 +15,7 @@ import {
     type LucideIcon,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -135,7 +136,7 @@ function getControlIconStyle(category: string): { bg: string; icon: string } {
     if (c.includes("legal") || c.includes("compli") || c.includes("govern")) return { bg: "bg-cyan-500/15 border-cyan-500/25", icon: "text-cyan-400" };
     if (c.includes("consent") || c.includes("s.6") || c.includes("s.7")) return { bg: "bg-violet-500/15 border-violet-500/25", icon: "text-violet-400" };
     if (c.includes("children") || c.includes("s.9")) return { bg: "bg-pink-500/15 border-pink-500/25", icon: "text-pink-400" };
-    return { bg: "bg-slate-700/40 border-slate-600/30", icon: "text-slate-400" };
+    return { bg: "bg-secondary/40 border-slate-600/30", icon: "text-muted-foreground" };
 }
 
 function getCategoryColor(category: string): string {
@@ -151,18 +152,18 @@ function getCategoryColor(category: string): string {
     if (c.includes("risk")) return "bg-amber-500/15 text-amber-300 border-amber-500/25";
     if (c.includes("privac") || c.includes("personal") || c.includes("consent")) return "bg-violet-500/15 text-violet-300 border-violet-500/25";
     if (c.includes("s.")) return "bg-orange-500/15 text-orange-300 border-orange-500/25";
-    return "bg-slate-500/15 text-slate-300 border-slate-500/25";
+    return "bg-slate-500/15 text-muted-foreground border-slate-500/25";
 }
 
 function responseStyle(key: ResponseType, active: boolean): string {
     if (!active) {
-        return "border border-slate-700/50 text-slate-500 hover:border-slate-500/60 hover:text-slate-300 bg-slate-800/30";
+        return "border border-border/50 text-muted-foreground hover:border-slate-500/60 hover:text-muted-foreground bg-secondary/30";
     }
     const map: Record<ResponseType, string> = {
         verified: "border border-emerald-500/60 bg-emerald-500/20 text-emerald-300 shadow-sm shadow-emerald-500/10",
         not_started: "border border-red-500/60 bg-red-500/20 text-red-300 shadow-sm shadow-red-500/10",
         in_progress: "border border-amber-500/60 bg-amber-500/20 text-amber-300 shadow-sm shadow-amber-500/10",
-        not_applicable: "border border-slate-500/60 bg-slate-500/20 text-slate-300",
+        not_applicable: "border border-slate-500/60 bg-slate-500/20 text-muted-foreground",
     };
     return map[key];
 }
@@ -198,7 +199,7 @@ function getFwPalette(name: string) {
     const key = Object.keys(FW_PALETTE).find(k => name.startsWith(k)) ?? "";
     return FW_PALETTE[key] ?? {
         accent: "#64748b", ring: "#64748b", bg: "bg-slate-500/10", border: "border-slate-500/25",
-        text: "text-slate-400", pill: "bg-slate-500/15 text-slate-300 border-slate-500/25",
+        text: "text-muted-foreground", pill: "bg-slate-500/15 text-muted-foreground border-slate-500/25",
     };
 }
 
@@ -210,7 +211,7 @@ function ScoreDonut({ score, color, size = 80 }: { score: number; color: string;
     return (
         <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
             <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-                <circle cx={cx} cy={cx} r={r} fill="none" stroke="#1e293b" strokeWidth={size * 0.1} />
+                <circle cx={cx} cy={cx} r={r} fill="none" stroke="var(--border)" strokeWidth={size * 0.1} />
                 <motion.circle
                     cx={cx} cy={cx} r={r} fill="none"
                     stroke={color} strokeWidth={size * 0.1} strokeLinecap="round"
@@ -222,7 +223,7 @@ function ScoreDonut({ score, color, size = 80 }: { score: number; color: string;
                 />
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-bold text-slate-100 leading-none" style={{ fontSize: size * 0.2 }}>{score}%</span>
+                <span className="font-bold text-foreground leading-none" style={{ fontSize: size * 0.2 }}>{score}%</span>
             </div>
         </div>
     );
@@ -284,7 +285,7 @@ function EvidenceUploadModal({
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-orange-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -292,45 +293,45 @@ function EvidenceUploadModal({
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-md shadow-2xl"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-md shadow-2xl"
             >
-                <div className="flex items-center justify-between p-5 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-5 border-b border-border/50">
                     <div>
-                        <h2 className="text-sm font-semibold text-slate-100">Upload Evidence</h2>
-                        <p className="text-xs text-slate-500 mt-0.5">{control.controlRef}: {control.title}</p>
+                        <h2 className="text-sm font-semibold text-foreground">Upload Evidence</h2>
+                        <p className="text-xs text-muted-foreground mt-0.5">{control.controlRef}: {control.title}</p>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300">
+                    <Button variant="plain" size="icon-sm" onClick={onClose} className="text-muted-foreground">
                         <XCircle className="w-5 h-5" />
-                    </button>
+                    </Button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     {error && (
                         <p className="text-xs text-red-400 bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{error}</p>
                     )}
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Evidence Name *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Evidence Name *</label>
                         <input type="text" value={name} onChange={e => setName(e.target.value)} className={inputCls} />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">File (optional)</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">File (optional)</label>
                         <input
                             type="file"
                             onChange={e => setFile(e.target.files?.[0] ?? null)}
-                            className="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-slate-700 file:text-slate-200 file:text-xs cursor-pointer"
+                            className="w-full text-xs text-muted-foreground file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:bg-secondary file:text-foreground file:text-xs cursor-pointer"
                         />
                     </div>
                     <div className="flex justify-end gap-3 pt-1">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">
+                        <Button type="button" variant="plain" onClick={onClose} className="h-auto px-4 py-2 text-sm text-muted-foreground hover:text-foreground">
                             Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                             type="submit"
                             disabled={uploading}
-                            className="px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center gap-2 transition-colors"
+                            className="h-auto px-4 py-2 bg-orange-600 hover:bg-orange-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl gap-2"
                         >
                             {uploading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <UploadCloud className="w-3.5 h-3.5" />}
                             Upload
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </motion.div>
@@ -393,7 +394,7 @@ function QuestionCard({
                 layout
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="bg-slate-900/50 border border-slate-800/60 rounded-xl p-4 hover:border-slate-700/60 transition-colors"
+                className="bg-card/50 border border-border/60 rounded-xl p-4 hover:border-border/60 transition-colors"
             >
                 <div className="flex items-start gap-3 mb-3">
                     <div className={cn(
@@ -401,7 +402,7 @@ function QuestionCard({
                         iconStyle.bg
                     )}>
                         <ControlIcon className={cn("w-4 h-4", iconStyle.icon)} />
-                        <span className="text-[8px] font-bold text-slate-500 leading-none">Q{qNum}</span>
+                        <span className="text-[8px] font-bold text-muted-foreground leading-none">Q{qNum}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -412,7 +413,7 @@ function QuestionCard({
                                 </span>
                             )}
                         </div>
-                        <p className="text-sm font-medium text-slate-200 leading-snug">{control.title}</p>
+                        <p className="text-sm font-medium text-foreground leading-snug">{control.title}</p>
                     </div>
 
                     {/* Status indicator */}
@@ -420,18 +421,18 @@ function QuestionCard({
                         {control.status === "verified" && <span className="text-[10px] font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-0.5 rounded-full">Verified</span>}
                         {control.status === "in_progress" && <span className="text-[10px] font-bold text-amber-400 bg-amber-500/10 border border-amber-500/25 px-2 py-0.5 rounded-full">Partial</span>}
                         {control.status === "not_started" && <span className="text-[10px] font-bold text-red-400 bg-red-500/10 border border-red-500/25 px-2 py-0.5 rounded-full">Open</span>}
-                        {control.status === "not_applicable" && <span className="text-[10px] font-bold text-slate-400 bg-slate-500/10 border border-slate-500/25 px-2 py-0.5 rounded-full">N/A</span>}
+                        {control.status === "not_applicable" && <span className="text-[10px] font-bold text-muted-foreground bg-slate-500/10 border border-slate-500/25 px-2 py-0.5 rounded-full">N/A</span>}
                     </div>
                 </div>
 
                 <div className="flex items-center gap-2 flex-wrap">
                     {RESPONSES.map(r => (
-                        <button
+                        <Button variant="plain"
                             key={r.key}
                             type="button"
                             onClick={() => handleResponse(r.key)}
                             disabled={loading !== null}
-                            className={cn(
+                            className={cn("h-auto", 
                                 "flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition-all",
                                 responseStyle(r.key, control.status === r.key),
                                 loading === r.key && "opacity-60"
@@ -441,27 +442,28 @@ function QuestionCard({
                                 ? <Loader2 className="w-3 h-3 animate-spin" />
                                 : r.icon}
                             {r.label}
-                        </button>
+                        </Button>
                     ))}
 
                     <div className="flex-1" />
 
                     <div className="flex items-center gap-2 shrink-0">
                         <div className="hidden sm:flex items-center gap-1.5">
-                            <Paperclip className="w-3 h-3 text-slate-600 shrink-0" />
-                            <div className="w-14 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                            <Paperclip className="w-3 h-3 text-muted-foreground/70 shrink-0" />
+                            <div className="w-14 h-1.5 bg-secondary rounded-full overflow-hidden">
                                 <div className="h-full bg-orange-500 rounded-full transition-all" style={{ width: `${evidencePct}%` }} />
                             </div>
-                            <span className="text-[11px] text-slate-500 w-4">{localEvidenceCount}</span>
+                            <span className="text-[11px] text-muted-foreground w-4">{localEvidenceCount}</span>
                         </div>
-                        <button
+                        <Button
                             type="button"
+                            variant="secondary"
                             onClick={() => setShowUpload(true)}
-                            className="flex items-center gap-1 px-2.5 py-1.5 bg-slate-800/70 hover:bg-slate-700/70 border border-slate-700/40 rounded-lg text-[11px] text-slate-400 hover:text-slate-200 transition-colors"
+                            className="h-auto gap-1 px-2.5 py-1.5 border border-border/40 rounded-lg text-[11px] text-muted-foreground hover:text-foreground"
                         >
                             <UploadCloud className="w-3 h-3" />
                             Upload
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </motion.div>
@@ -538,7 +540,7 @@ function ComplianceEngineViz({
     const engineCirc = 2 * Math.PI * engineR;
 
     return (
-        <div className="relative w-full rounded-2xl overflow-hidden border border-slate-800/60" style={{ height: 720, background: '#020617' }}>
+        <div className="relative w-full rounded-2xl overflow-hidden border border-border/60" style={{ height: 720, background: 'var(--background)' }}>
 
             {/* Bokeh background glows */}
             <div className="absolute pointer-events-none" style={{ width: 300, height: 300, borderRadius: '50%', background: 'radial-gradient(circle, rgba(20,184,166,0.10), transparent 70%)', top: '0%', left: '15%' }} />
@@ -547,8 +549,8 @@ function ComplianceEngineViz({
 
             {/* Title */}
             <div className="absolute top-3 left-4 pointer-events-none">
-                <p className="text-[10px] font-bold tracking-widest uppercase text-slate-500">Compliance Engine</p>
-                <p className="text-[9px] text-slate-700 mt-0.5">Click a framework to explore</p>
+                <p className="text-[10px] font-bold tracking-widest uppercase text-muted-foreground">Compliance Engine</p>
+                <p className="text-[9px] text-muted-foreground/50 mt-0.5">Click a framework to explore</p>
             </div>
 
             {/* Legend */}
@@ -556,7 +558,7 @@ function ComplianceEngineViz({
                 {frameworks.map(fw => (
                     <div key={fw.id} className="flex items-center gap-1.5">
                         <div className="w-2 h-2 rounded-full" style={{ background: fw.palette.accent }} />
-                        <span className="text-[9px] text-slate-500 font-mono">
+                        <span className="text-[9px] text-muted-foreground font-mono">
                             {fw.name.replace(' Type II', '').replace(':2022', '').replace(':2023', '').replace(' 2.0', '')}
                         </span>
                     </div>
@@ -602,11 +604,11 @@ function ComplianceEngineViz({
                     .replace(' Type II', '').replace(':2022', '').replace(':2023', '')
                     .replace(' 2.0', '');
                 return (
-                    <button
+                    <Button variant="plain"
                         key={fw.id}
                         type="button"
                         onClick={() => onSelectFw(fw.id)}
-                        className="absolute transform -translate-x-1/2 -translate-y-1/2"
+                        className="absolute transform -translate-x-1/2 -translate-y-1/2 h-auto"
                         style={{ left: `${(pos.x / VW) * 100}%`, top: `${(pos.y / VH) * 100}%`, zIndex: 10 }}
                     >
                         <div
@@ -621,7 +623,7 @@ function ComplianceEngineViz({
                             }}
                         >
                             <svg width="60" height="60" viewBox="0 0 56 56">
-                                <circle cx="28" cy="28" r={dr} fill="none" stroke="#1e293b" strokeWidth="6" />
+                                <circle cx="28" cy="28" r={dr} fill="none" stroke="var(--border)" strokeWidth="6" />
                                 <motion.circle
                                     cx="28" cy="28" r={dr} fill="none"
                                     stroke={pal.accent} strokeWidth="6" strokeLinecap="round"
@@ -636,11 +638,11 @@ function ComplianceEngineViz({
                                     {fw.score}%
                                 </text>
                             </svg>
-                            <span className="text-[11px] font-bold text-center leading-tight px-2 text-slate-200 mt-1" style={{ maxWidth: 116 }}>
+                            <span className="text-[11px] font-bold text-center leading-tight px-2 text-foreground mt-1" style={{ maxWidth: 116 }}>
                                 {label}
                             </span>
                         </div>
-                    </button>
+                    </Button>
                 );
             })}
 
@@ -674,7 +676,7 @@ function ComplianceEngineViz({
                                 }}
                             >
                                 <svg width="40" height="40" viewBox="0 0 40 40">
-                                    <circle cx="20" cy="20" r={dr2} fill="none" stroke="#1e293b" strokeWidth="4.5" />
+                                    <circle cx="20" cy="20" r={dr2} fill="none" stroke="var(--border)" strokeWidth="4.5" />
                                     <motion.circle
                                         cx="20" cy="20" r={dr2} fill="none"
                                         stroke={sc} strokeWidth="4.5" strokeLinecap="round"
@@ -689,7 +691,7 @@ function ComplianceEngineViz({
                                         {d.score}%
                                     </text>
                                 </svg>
-                                <span className="text-[9px] font-semibold text-slate-300 text-center leading-tight px-2 mt-0.5" style={{ maxWidth: 82 }}>
+                                <span className="text-[9px] font-semibold text-muted-foreground text-center leading-tight px-2 mt-0.5" style={{ maxWidth: 82 }}>
                                     {d.name.length > 12 ? d.name.slice(0, 11) + '…' : d.name}
                                 </span>
                             </div>
@@ -719,7 +721,7 @@ function ComplianceEngineViz({
                     </svg>
                     {/* Score donut */}
                     <svg width="176" height="176" viewBox="0 0 176 176" className="absolute inset-0">
-                        <circle cx="88" cy="88" r={engineR} fill="none" stroke="#0f172a" strokeWidth="16" />
+                        <circle cx="88" cy="88" r={engineR} fill="none" stroke="var(--card)" strokeWidth="16" />
                         <motion.circle
                             cx="88" cy="88" r={engineR} fill="none"
                             stroke="#f97316" strokeWidth="16" strokeLinecap="round"
@@ -733,8 +735,8 @@ function ComplianceEngineViz({
                     {/* Center text */}
                     <div className="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
                         <span className="text-[9px] font-bold tracking-[0.2em] text-orange-400 uppercase">Engine</span>
-                        <span className="text-3xl font-bold text-slate-100 leading-none">{overallScore}%</span>
-                        <span className="text-[9px] text-slate-500 tracking-wide">overall score</span>
+                        <span className="text-3xl font-bold text-foreground leading-none">{overallScore}%</span>
+                        <span className="text-[9px] text-muted-foreground tracking-wide">overall score</span>
                     </div>
                 </div>
             </div>
@@ -878,20 +880,21 @@ export function GapAssessmentClient({
             {/* ── Header ── */}
             <div className="flex items-start justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-100 tracking-tight">Compliance Readiness</h1>
-                    <p className="text-sm text-slate-400 mt-1">
+                    <h1 className="text-2xl font-bold text-foreground tracking-tight">Compliance Readiness</h1>
+                    <p className="text-sm text-muted-foreground mt-1">
                         Track your compliance posture across frameworks
                     </p>
                 </div>
-                <button
+                <Button
                     type="button"
+                    variant="secondary"
                     onClick={refresh}
                     disabled={isPending}
-                    className="flex items-center gap-2 px-3 py-2 bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 text-slate-400 text-sm font-medium rounded-xl transition-colors disabled:opacity-50 shrink-0"
+                    className="h-auto gap-2 px-3 py-2 border border-border/50 text-muted-foreground text-sm font-medium rounded-xl disabled:opacity-50 shrink-0"
                 >
                     <RefreshCw className={cn("w-4 h-4", isPending && "animate-spin")} />
                     Refresh
-                </button>
+                </Button>
             </div>
 
             {/* ── Compliance Engine (full height) ── */}

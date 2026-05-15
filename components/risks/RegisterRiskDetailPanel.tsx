@@ -12,6 +12,7 @@ import {
   Trash2,
 } from "lucide-react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 import {
   severityFromScore,
@@ -236,37 +237,39 @@ export function RegisterRiskDetailPanel({
         animate={{ x: 0 }}
         exit={{ x: "100%" }}
         transition={{ type: "tween", duration: 0.25 }}
-        className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[640px] bg-slate-950 border-l border-slate-800 overflow-y-auto"
+        className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[640px] bg-background border-l border-border overflow-y-auto"
       >
         {/* Header */}
-        <div className="sticky top-0 bg-slate-950/95 backdrop-blur z-10 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+        <div className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${sev.dot}`} />
             <div className="min-w-0">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-slate-500">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                 {risk.display_id ?? risk.id.slice(0, 8)} · {risk.category}
               </p>
-              <h2 className="text-base font-semibold text-slate-100 truncate">
+              <h2 className="text-base font-semibold text-foreground truncate">
                 {risk.title}
               </h2>
             </div>
           </div>
-          <button
+          <Button
+            variant="plain"
+            size="icon-sm"
             onClick={onClose}
-            className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400"
+            className="text-muted-foreground"
           >
             <X className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         <div className="p-6 space-y-6">
           {/* Description */}
           {risk.description && (
             <section>
-              <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2">
+              <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
                 Description
               </h3>
-              <p className="text-sm text-slate-300 whitespace-pre-wrap">
+              <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                 {risk.description}
               </p>
             </section>
@@ -274,7 +277,7 @@ export function RegisterRiskDetailPanel({
 
           {/* Recommendation */}
           <section>
-            <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2">
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
               Recommendation
             </h3>
             <textarea
@@ -284,13 +287,13 @@ export function RegisterRiskDetailPanel({
               }
               rows={6}
               placeholder="Specific, actionable mitigation steps for this risk."
-              className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 resize-none"
+              className="w-full bg-card/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40 resize-none"
             />
           </section>
 
           {/* Risk scoring */}
           <section className="space-y-3">
-            <h3 className="text-xs uppercase tracking-wider text-slate-500">
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground">
               Risk Scoring
             </h3>
             <div className="grid grid-cols-2 gap-4">
@@ -312,7 +315,7 @@ export function RegisterRiskDetailPanel({
               <span className={`text-sm font-bold ${sev.color}`}>
                 Inherent Score: {score} — {sev.label}
               </span>
-              <span className="text-xs text-slate-500 ml-auto">
+              <span className="text-xs text-muted-foreground ml-auto">
                 ({draft.likelihood} × {draft.impact})
               </span>
             </div>
@@ -321,7 +324,7 @@ export function RegisterRiskDetailPanel({
             {(draft.treatment === "mitigate" ||
               draft.status === "mitigated") && (
               <>
-                <p className="text-[11px] text-slate-500 uppercase tracking-wider mt-2">
+                <p className="text-[11px] text-muted-foreground uppercase tracking-wider mt-2">
                   Residual scoring (post-treatment)
                 </p>
                 <div className="grid grid-cols-2 gap-4">
@@ -377,7 +380,7 @@ export function RegisterRiskDetailPanel({
                       : null,
                   }))
                 }
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                className="w-full bg-card/50 border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40"
               >
                 <option value="">— Not set —</option>
                 {TREATMENT_OPTIONS.map((t) => (
@@ -387,7 +390,7 @@ export function RegisterRiskDetailPanel({
                 ))}
               </select>
               {draft.treatment && (
-                <p className="text-[11px] text-slate-500 mt-1">
+                <p className="text-[11px] text-muted-foreground mt-1">
                   {TREATMENT_DESCRIPTIONS[draft.treatment]}
                 </p>
               )}
@@ -402,7 +405,7 @@ export function RegisterRiskDetailPanel({
                     status: e.target.value as RiskStatus,
                   }))
                 }
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                className="w-full bg-card/50 border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40"
               >
                 {STATUS_OPTIONS.map((s) => (
                   <option key={s} value={s}>
@@ -423,7 +426,7 @@ export function RegisterRiskDetailPanel({
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, owner_id: e.target.value || null }))
                 }
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                className="w-full bg-card/50 border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40"
               >
                 <option value="">Unassigned</option>
                 {owners.map((o) => (
@@ -441,14 +444,14 @@ export function RegisterRiskDetailPanel({
                 onChange={(e) =>
                   setDraft((d) => ({ ...d, due_date: e.target.value || null }))
                 }
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-3 py-2.5 text-sm text-slate-200 focus:outline-none focus:ring-2 focus:ring-blue-500/40"
+                className="w-full bg-card/50 border border-border rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40"
               />
             </Field>
           </section>
 
           {/* Notes */}
           <section>
-            <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2">
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">
               Notes / Justification
             </h3>
             <textarea
@@ -458,14 +461,14 @@ export function RegisterRiskDetailPanel({
               }
               rows={3}
               placeholder="Treatment justification, acceptance rationale, or closing context."
-              className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/40 resize-none"
+              className="w-full bg-card/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/40 resize-none"
             />
           </section>
 
           {/* Framework mappings */}
           {frameworkMappings.length > 0 && (
             <section>
-              <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+              <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
                 <Tag className="w-3 h-3" /> Framework Controls
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -477,7 +480,7 @@ export function RegisterRiskDetailPanel({
                     <p className="font-mono font-bold">
                       {FRAMEWORK_LABELS[m.framework]} · {m.clause}
                     </p>
-                    <p className="text-slate-400 mt-0.5">{m.name}</p>
+                    <p className="text-muted-foreground mt-0.5">{m.name}</p>
                   </div>
                 ))}
               </div>
@@ -486,26 +489,26 @@ export function RegisterRiskDetailPanel({
 
           {/* Status history */}
           <section>
-            <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+            <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
               <HistoryIcon className="w-3 h-3" /> Status History
             </h3>
             {riskHistory.length === 0 ? (
-              <p className="text-xs text-slate-600">No changes recorded yet.</p>
+              <p className="text-xs text-muted-foreground/70">No changes recorded yet.</p>
             ) : (
               <ul className="space-y-2">
                 {riskHistory.map((h) => (
                   <li
                     key={h.id}
-                    className="text-xs border-l-2 border-slate-700 pl-3 py-1"
+                    className="text-xs border-l-2 border-border pl-3 py-1"
                   >
-                    <span className="font-mono text-slate-400">{h.field}</span>
-                    <span className="text-slate-600 mx-1">·</span>
-                    <span className="text-slate-500">
+                    <span className="font-mono text-muted-foreground">{h.field}</span>
+                    <span className="text-muted-foreground/70 mx-1">·</span>
+                    <span className="text-muted-foreground">
                       {h.from_value ?? "—"}
                     </span>
-                    <span className="text-slate-600 mx-1">→</span>
-                    <span className="text-slate-200">{h.to_value ?? "—"}</span>
-                    <p className="text-[10px] text-slate-600 mt-0.5">
+                    <span className="text-muted-foreground/70 mx-1">→</span>
+                    <span className="text-foreground">{h.to_value ?? "—"}</span>
+                    <p className="text-[10px] text-muted-foreground/70 mt-0.5">
                       {h.profiles?.full_name ?? "System"} ·{" "}
                       {new Date(h.changed_at).toLocaleString()}
                       {h.note ? ` · ${h.note}` : ""}
@@ -517,11 +520,12 @@ export function RegisterRiskDetailPanel({
           </section>
 
           {/* Footer actions */}
-          <div className="flex items-center justify-between pt-4 border-t border-slate-800">
-            <button
+          <div className="flex items-center justify-between pt-4 border-t border-border">
+            <Button
+              variant="plain"
               onClick={handleDelete}
               disabled={deleting}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-xs text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors disabled:opacity-50"
+              className="h-auto gap-1.5 px-3 py-1.5 text-xs text-rose-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg disabled:opacity-50"
             >
               {deleting ? (
                 <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -529,17 +533,17 @@ export function RegisterRiskDetailPanel({
                 <Trash2 className="w-3.5 h-3.5" />
               )}
               Delete
-            </button>
+            </Button>
             <div className="flex items-center gap-3">
               {dirty.length > 0 && (
                 <span className="text-[11px] text-amber-400">
                   {dirty.length} unsaved change{dirty.length === 1 ? "" : "s"}
                 </span>
               )}
-              <button
+              <Button
                 onClick={handleSave}
                 disabled={dirty.length === 0 || saving}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-600 text-white text-sm font-semibold rounded-xl transition-colors"
+                className="h-auto gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-secondary disabled:text-muted-foreground/70 text-white text-sm font-semibold rounded-xl"
               >
                 {saving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -547,7 +551,7 @@ export function RegisterRiskDetailPanel({
                   <Save className="w-4 h-4" />
                 )}
                 Save Changes
-              </button>
+              </Button>
             </div>
           </div>
         </div>
@@ -565,7 +569,7 @@ function Field({
 }) {
   return (
     <div>
-      <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wider">
+      <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">
         {label}
       </label>
       <div className="mt-1.5">{children}</div>
@@ -590,26 +594,28 @@ function ScoreSlider({
 }) {
   return (
     <div>
-      <label className="text-[11px] font-medium text-slate-500 uppercase tracking-wider flex items-center justify-between">
+      <label className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider flex items-center justify-between">
         <span>
           {label}:{" "}
-          <span className="text-slate-200">{active ? value : "—"}</span> / 5
+          <span className="text-foreground">{active ? value : "—"}</span> / 5
         </span>
         {nullable && active && onClear && (
-          <button
+          <Button
+            variant="link"
             onClick={onClear}
-            className="text-[10px] text-slate-500 hover:text-slate-300 underline"
+            className="h-auto p-0 text-[10px] text-muted-foreground hover:text-muted-foreground underline"
           >
             clear
-          </button>
+          </Button>
         )}
         {nullable && !active && (
-          <button
+          <Button
+            variant="link"
             onClick={() => onChange(value)}
-            className="text-[10px] text-blue-400 hover:text-blue-300 underline"
+            className="h-auto p-0 text-[10px] text-blue-400 hover:text-blue-300 underline"
           >
             set
-          </button>
+          </Button>
         )}
       </label>
       <input

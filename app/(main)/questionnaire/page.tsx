@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft, CheckCircle2, Circle, FileUp, ChevronDown, Calendar, Upload, ToggleLeft, ToggleRight, Minus, Plus, Zap, TrendingUp, TrendingDown, Shield, Activity, Clock } from "lucide-react";
 import Link from "next/link";
@@ -119,21 +120,21 @@ function YesNoInput({ value, onChange }: { value: any; onChange: (v: any) => voi
     return (
         <div className="flex gap-3">
             {(["yes", "no"] as const).map((opt) => (
-                <button
+                <Button variant="plain"
                     key={opt}
                     onClick={() => onChange(opt)}
-                    className={cn(
+                    className={cn("h-auto", 
                         "flex items-center gap-2 px-5 py-2.5 rounded-xl border text-sm font-medium transition-all duration-200",
                         value === opt
                             ? opt === "yes"
                                 ? "bg-emerald-500/10 border-emerald-500/40 text-emerald-400 shadow-[0_0_12px_rgba(16,185,129,0.15)]"
                                 : "bg-red-500/10 border-red-500/40 text-red-400 shadow-[0_0_12px_rgba(239,68,68,0.15)]"
-                            : "bg-slate-900/40 border-slate-700/50 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                            : "bg-card/40 border-border/50 text-muted-foreground hover:border-slate-600 hover:text-muted-foreground"
                     )}
                 >
                     {value === opt ? <CheckCircle2 className="w-4 h-4" /> : <Circle className="w-4 h-4" />}
                     {opt === "yes" ? "Yes" : "No"}
-                </button>
+                </Button>
             ))}
         </div>
     );
@@ -143,39 +144,39 @@ function DropdownInput({ value, onChange, options }: { value: any; onChange: (v:
     const [isOpen, setIsOpen] = useState(false);
     return (
         <div className="relative">
-            <button
+            <Button variant="plain"
                 onClick={() => setIsOpen(!isOpen)}
-                className={cn(
+                className={cn("h-auto", 
                     "flex items-center justify-between w-full max-w-md px-4 py-2.5 rounded-xl border text-sm transition-all",
                     value
-                        ? "bg-slate-800/60 border-blue-500/30 text-slate-200"
-                        : "bg-slate-900/40 border-slate-700/50 text-slate-500 hover:border-slate-600"
+                        ? "bg-secondary/60 border-blue-500/30 text-foreground"
+                        : "bg-card/40 border-border/50 text-muted-foreground hover:border-slate-600"
                 )}
             >
                 <span>{value || "Select an option..."}</span>
                 <ChevronDown className={cn("w-4 h-4 transition-transform", isOpen && "rotate-180")} />
-            </button>
+            </Button>
             <AnimatePresence>
                 {isOpen && (
                     <motion.div
                         initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -4 }}
-                        className="absolute z-20 mt-1 w-full max-w-md bg-slate-800/95 backdrop-blur-xl border border-slate-700/60 rounded-xl shadow-2xl overflow-hidden"
+                        className="absolute z-20 mt-1 w-full max-w-md bg-secondary/95 backdrop-blur-xl border border-border/60 rounded-xl shadow-2xl overflow-hidden"
                     >
                         {options.map((opt) => (
-                            <button
+                            <Button variant="plain"
                                 key={opt}
                                 onClick={() => { onChange(opt); setIsOpen(false); }}
-                                className={cn(
+                                className={cn("h-auto", 
                                     "w-full text-left px-4 py-2.5 text-sm transition-colors",
                                     value === opt
                                         ? "bg-blue-500/10 text-blue-400"
-                                        : "text-slate-300 hover:bg-slate-700/50 hover:text-slate-100"
+                                        : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
                                 )}
                             >
                                 {opt}
-                            </button>
+                            </Button>
                         ))}
                     </motion.div>
                 )}
@@ -191,7 +192,7 @@ function TextInput({ value, onChange, placeholder }: { value: any; onChange: (v:
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder || "Type your answer..."}
-            className="w-full max-w-md bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
+            className="w-full max-w-md bg-card/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all"
         />
     );
 }
@@ -202,7 +203,7 @@ function TextareaInput({ value, onChange, placeholder }: { value: any; onChange:
             value={value || ""}
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder || "Provide additional details..."}
-            className="w-full bg-slate-900/50 border border-slate-800 rounded-xl px-4 py-3 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all resize-none h-24"
+            className="w-full bg-card/50 border border-border rounded-xl px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all resize-none h-24"
         />
     );
 }
@@ -217,19 +218,19 @@ function MultiSelectInput({ value, onChange, options }: { value: any; onChange: 
             {options.map((opt) => {
                 const isSelected = selected.includes(opt);
                 return (
-                    <button
+                    <Button variant="plain"
                         key={opt}
                         onClick={() => toggle(opt)}
-                        className={cn(
+                        className={cn("h-auto", 
                             "flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-medium transition-all duration-200",
                             isSelected
                                 ? "bg-blue-500/10 border-blue-500/30 text-blue-400 shadow-[0_0_10px_rgba(59,130,246,0.12)]"
-                                : "bg-slate-900/40 border-slate-700/50 text-slate-400 hover:border-slate-600 hover:text-slate-300"
+                                : "bg-card/40 border-border/50 text-muted-foreground hover:border-slate-600 hover:text-muted-foreground"
                         )}
                     >
                         {isSelected ? <CheckCircle2 className="w-3.5 h-3.5" /> : <Circle className="w-3.5 h-3.5" />}
                         {opt}
-                    </button>
+                    </Button>
                 );
             })}
         </div>
@@ -240,14 +241,14 @@ function RadioInput({ value, onChange, options }: { value: any; onChange: (v: an
     return (
         <div className="flex flex-col space-y-2 max-w-md">
             {options.map((opt) => (
-                <button
+                <Button variant="plain"
                     key={opt}
                     onClick={() => onChange(opt)}
-                    className={cn(
+                    className={cn("h-auto", 
                         "flex items-center gap-3 px-4 py-3 rounded-xl border text-sm font-medium transition-all duration-200 text-left",
                         value === opt
                             ? "bg-blue-500/10 border-blue-500/30 text-blue-400"
-                            : "bg-slate-900/40 border-slate-800/50 text-slate-400 hover:border-slate-700 hover:text-slate-300"
+                            : "bg-card/40 border-border/50 text-muted-foreground hover:border-border hover:text-muted-foreground"
                     )}
                 >
                     <div className={cn(
@@ -257,7 +258,7 @@ function RadioInput({ value, onChange, options }: { value: any; onChange: (v: an
                         {value === opt && <div className="w-2 h-2 rounded-full bg-blue-400" />}
                     </div>
                     {opt}
-                </button>
+                </Button>
             ))}
         </div>
     );
@@ -268,11 +269,11 @@ function SliderInput({ value, onChange, min = 1, max = 5, labels }: { value: any
     return (
         <div className="max-w-lg">
             <div className="flex items-center justify-between mb-3">
-                <button onClick={() => onChange(Math.max(min, current - 1))} className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-colors">
-                    <Minus className="w-3.5 h-3.5 text-slate-400" />
-                </button>
+                <Button variant="plain" onClick={() => onChange(Math.max(min, current - 1))} className="p-1.5 rounded-lg bg-secondary border border-border hover:bg-secondary transition-colors h-auto">
+                    <Minus className="w-3.5 h-3.5 text-muted-foreground" />
+                </Button>
                 <div className="flex-1 mx-4 relative">
-                    <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
                         <motion.div
                             className="h-full bg-gradient-to-r from-blue-600 to-blue-400 rounded-full"
                             animate={{ width: `${((current - min) / (max - min)) * 100}%` }}
@@ -281,23 +282,23 @@ function SliderInput({ value, onChange, min = 1, max = 5, labels }: { value: any
                     </div>
                     <div className="flex justify-between mt-1">
                         {Array.from({ length: max - min + 1 }, (_, i) => i + min).map((tick) => (
-                            <button
+                            <Button variant="plain"
                                 key={tick}
                                 onClick={() => onChange(tick)}
-                                className={cn(
+                                className={cn("h-auto", 
                                     "flex flex-col items-center transition-colors cursor-pointer",
-                                    current === tick ? "text-blue-400" : "text-slate-600 hover:text-slate-400"
+                                    current === tick ? "text-blue-400" : "text-muted-foreground/70 hover:text-muted-foreground"
                                 )}
                             >
-                                <div className={cn("w-2 h-2 rounded-full mt-1 transition-all", current === tick ? "bg-blue-400 scale-125" : "bg-slate-700")} />
+                                <div className={cn("w-2 h-2 rounded-full mt-1 transition-all", current === tick ? "bg-blue-400 scale-125" : "bg-secondary")} />
                                 <span className="text-[9px] mt-1 font-mono font-bold">{tick}</span>
-                            </button>
+                            </Button>
                         ))}
                     </div>
                 </div>
-                <button onClick={() => onChange(Math.min(max, current + 1))} className="p-1.5 rounded-lg bg-slate-800 border border-slate-700 hover:bg-slate-700 transition-colors">
-                    <Plus className="w-3.5 h-3.5 text-slate-400" />
-                </button>
+                <Button variant="plain" onClick={() => onChange(Math.min(max, current + 1))} className="p-1.5 rounded-lg bg-secondary border border-border hover:bg-secondary transition-colors h-auto">
+                    <Plus className="w-3.5 h-3.5 text-muted-foreground" />
+                </Button>
             </div>
             {labels && labels[current - min] && (
                 <motion.div
@@ -318,12 +319,12 @@ function SliderInput({ value, onChange, min = 1, max = 5, labels }: { value: any
 function DateInput({ value, onChange }: { value: any; onChange: (v: any) => void }) {
     return (
         <div className="relative max-w-xs">
-            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+            <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
                 type="date"
                 value={value || ""}
                 onChange={(e) => onChange(e.target.value)}
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all [color-scheme:dark]"
+                className="w-full bg-card/50 border border-border rounded-xl pl-10 pr-4 py-2.5 text-sm text-foreground focus:outline-none focus:border-blue-500/50 focus:ring-1 focus:ring-blue-500/50 transition-all [color-scheme:dark]"
             />
         </div>
     );
@@ -337,20 +338,20 @@ function FileUploadInput({ value, onChange }: { value: any; onChange: (v: any) =
                 "border-2 border-dashed rounded-xl p-6 flex flex-col items-center justify-center cursor-pointer transition-all group max-w-md",
                 value
                     ? "bg-emerald-500/5 border-emerald-500/30"
-                    : "bg-slate-900/30 border-slate-700/50 hover:border-blue-500/40 hover:bg-slate-800/20"
+                    : "bg-card/30 border-border/50 hover:border-blue-500/40 hover:bg-secondary/20"
             )}
         >
             {value ? (
                 <>
                     <CheckCircle2 className="w-8 h-8 text-emerald-400 mb-2" />
                     <span className="text-sm font-semibold text-emerald-400">File Uploaded</span>
-                    <span className="text-xs text-slate-500 mt-1">Click to replace</span>
+                    <span className="text-xs text-muted-foreground mt-1">Click to replace</span>
                 </>
             ) : (
                 <>
-                    <Upload className="w-8 h-8 text-slate-500 mb-2 group-hover:text-blue-400 transition-colors" />
-                    <span className="text-sm font-medium text-slate-300">Drop file here or click to upload</span>
-                    <span className="text-xs text-slate-500 mt-1">PDF, DOCX, XLSX, JSON · Max 10MB</span>
+                    <Upload className="w-8 h-8 text-muted-foreground mb-2 group-hover:text-blue-400 transition-colors" />
+                    <span className="text-sm font-medium text-muted-foreground">Drop file here or click to upload</span>
+                    <span className="text-xs text-muted-foreground mt-1">PDF, DOCX, XLSX, JSON · Max 10MB</span>
                 </>
             )}
         </div>
@@ -360,13 +361,13 @@ function FileUploadInput({ value, onChange }: { value: any; onChange: (v: any) =
 function ToggleInput({ value, onChange }: { value: any; onChange: (v: any) => void }) {
     const isOn = value === true;
     return (
-        <button
+        <Button variant="plain"
             onClick={() => onChange(!isOn)}
-            className="flex items-center gap-3 group"
+            className="flex items-center gap-3 group h-auto"
         >
             <div className={cn(
                 "relative w-12 h-6 rounded-full transition-all duration-300",
-                isOn ? "bg-emerald-500/20 border border-emerald-500/40" : "bg-slate-800 border border-slate-700"
+                isOn ? "bg-emerald-500/20 border border-emerald-500/40" : "bg-secondary border border-border"
             )}>
                 <motion.div
                     className={cn("absolute top-0.5 w-5 h-5 rounded-full shadow-lg transition-colors", isOn ? "bg-emerald-400" : "bg-slate-500")}
@@ -374,10 +375,10 @@ function ToggleInput({ value, onChange }: { value: any; onChange: (v: any) => vo
                     transition={{ duration: 0.2, ease: "easeOut" }}
                 />
             </div>
-            <span className={cn("text-sm font-medium transition-colors", isOn ? "text-emerald-400" : "text-slate-500")}>
+            <span className={cn("text-sm font-medium transition-colors", isOn ? "text-emerald-400" : "text-muted-foreground")}>
                 {isOn ? "Enabled" : "Disabled"}
             </span>
-        </button>
+        </Button>
     );
 }
 
@@ -401,8 +402,8 @@ function QuestionInput({ question, value, onChange }: { question: Question; valu
 const typeBadges: Record<QuestionType, { label: string; color: string }> = {
     yes_no: { label: "Yes / No", color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
     dropdown: { label: "Dropdown", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
-    text: { label: "Text", color: "text-slate-400 bg-slate-500/10 border-slate-500/20" },
-    textarea: { label: "Long Text", color: "text-slate-400 bg-slate-500/10 border-slate-500/20" },
+    text: { label: "Text", color: "text-muted-foreground bg-slate-500/10 border-slate-500/20" },
+    textarea: { label: "Long Text", color: "text-muted-foreground bg-slate-500/10 border-slate-500/20" },
     multi_select: { label: "Multi-Select", color: "text-cyan-400 bg-cyan-500/10 border-cyan-500/20" },
     radio: { label: "Single Choice", color: "text-amber-400 bg-amber-500/10 border-amber-500/20" },
     slider: { label: "Scale", color: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20" },
@@ -419,7 +420,7 @@ function CircularProgressRing({ value, size = 56, strokeWidth = 4, color }: { va
 
     return (
         <svg width={size} height={size} className="transform -rotate-90">
-            <circle cx={size / 2} cy={size / 2} r={radius} stroke="currentColor" strokeWidth={strokeWidth} fill="none" className="text-slate-800" />
+            <circle cx={size / 2} cy={size / 2} r={radius} stroke="currentColor" strokeWidth={strokeWidth} fill="none" className="text-border" />
             <motion.circle
                 cx={size / 2}
                 cy={size / 2}
@@ -468,8 +469,8 @@ export default function QuestionnairePage() {
     return (
         <div className="w-full flex flex-col space-y-6 animate-in fade-in duration-700 h-full">
             {/* Header */}
-            <div className="flex items-center text-sm font-mono text-slate-400 tracking-wide">
-                <Link href="/" className="hover:text-slate-200 cursor-pointer transition-colors flex items-center">
+            <div className="flex items-center text-sm font-mono text-muted-foreground tracking-wide">
+                <Link href="/" className="hover:text-foreground cursor-pointer transition-colors flex items-center">
                     <ArrowLeft className="w-4 h-4 mr-2" />
                     Back to Assessment
                 </Link>
@@ -478,13 +479,13 @@ export default function QuestionnairePage() {
             <div className="flex flex-col mb-2">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h1 className="text-3xl font-bold tracking-tight text-slate-100">Questionnaire</h1>
-                        <p className="text-slate-400 mt-1">Answer questions to assess your compliance posture</p>
+                        <h1 className="text-3xl font-bold tracking-tight text-foreground">Questionnaire</h1>
+                        <p className="text-muted-foreground mt-1">Answer questions to assess your compliance posture</p>
                     </div>
                     <div className="flex items-center space-x-3">
                         <div className="text-right">
-                            <div className="text-2xl font-bold text-slate-100">{totalAnswered}<span className="text-slate-500 text-lg">/{totalQuestions}</span></div>
-                            <div className="text-[10px] text-slate-500 uppercase tracking-widest font-semibold">Completed</div>
+                            <div className="text-2xl font-bold text-foreground">{totalAnswered}<span className="text-muted-foreground text-lg">/{totalQuestions}</span></div>
+                            <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-semibold">Completed</div>
                         </div>
                         <CircularProgressRing value={(totalAnswered / totalQuestions) * 100} size={48} strokeWidth={3} color="#3b82f6" />
                     </div>
@@ -499,43 +500,43 @@ export default function QuestionnairePage() {
                         const answered = answeredCount(section.name);
                         const pct = Math.round((answered / section.questions.length) * 100);
                         return (
-                            <button
+                            <Button variant="plain"
                                 key={section.name}
                                 onClick={() => setActiveSection(section.name)}
-                                className={cn(
+                                className={cn("h-auto", 
                                     "flex flex-col text-left px-4 py-3 rounded-xl transition-all border",
                                     isActive
-                                        ? "bg-slate-800/60 border-slate-700/50 shadow-glow"
-                                        : "hover:bg-slate-800/30 border-transparent"
+                                        ? "bg-secondary/60 border-border/50 shadow-glow"
+                                        : "hover:bg-secondary/30 border-transparent"
                                 )}
                             >
-                                <span className={cn("text-sm font-medium", isActive ? "text-blue-400" : "text-slate-300")}>
+                                <span className={cn("text-sm font-medium", isActive ? "text-blue-400" : "text-muted-foreground")}>
                                     {section.name}
                                 </span>
-                                <div className="w-full bg-slate-800 h-1 mt-3 rounded-full overflow-hidden">
+                                <div className="w-full bg-secondary h-1 mt-3 rounded-full overflow-hidden">
                                     <motion.div
                                         className={cn("h-full transition-all duration-500", pct === 100 ? "bg-emerald-500" : isActive ? "bg-blue-500" : "bg-slate-600")}
                                         animate={{ width: `${pct}%` }}
                                         transition={{ duration: 0.5 }}
                                     />
                                 </div>
-                                <span className="text-[10px] font-mono mt-1 self-end text-slate-500">
+                                <span className="text-[10px] font-mono mt-1 self-end text-muted-foreground">
                                     {answered}/{section.questions.length}
                                 </span>
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>
 
                 {/* Center Canvas — Questions */}
                 <div className="flex-1 glass-panel rounded-2xl p-6 lg:p-8 flex flex-col min-h-[600px]">
-                    <div className="flex justify-between items-start mb-8 border-b border-slate-800/50 pb-6">
+                    <div className="flex justify-between items-start mb-8 border-b border-border/50 pb-6">
                         <div>
-                            <h2 className="text-xl font-semibold text-slate-100">{currentSection.name}</h2>
-                            <p className="text-sm text-slate-400 mt-1 max-w-xl">{currentSection.description}</p>
+                            <h2 className="text-xl font-semibold text-foreground">{currentSection.name}</h2>
+                            <p className="text-sm text-muted-foreground mt-1 max-w-xl">{currentSection.description}</p>
                         </div>
-                        <div className="text-xs font-mono bg-slate-800/50 px-3 py-1.5 rounded-lg border border-slate-700/50">
-                            <span className="text-slate-100">{answeredCount(activeSection)}/{currentSection.questions.length}</span> <span className="text-slate-400">answered</span>
+                        <div className="text-xs font-mono bg-secondary/50 px-3 py-1.5 rounded-lg border border-border/50">
+                            <span className="text-foreground">{answeredCount(activeSection)}/{currentSection.questions.length}</span> <span className="text-muted-foreground">answered</span>
                         </div>
                     </div>
 
@@ -549,10 +550,10 @@ export default function QuestionnairePage() {
                                 className="flex flex-col space-y-3"
                             >
                                 <div className="flex items-start gap-4">
-                                    <span className="text-xs font-mono text-slate-500 mt-1 whitespace-nowrap">{q.id}</span>
+                                    <span className="text-xs font-mono text-muted-foreground mt-1 whitespace-nowrap">{q.id}</span>
                                     <div className="flex flex-col space-y-3 w-full">
                                         <div className="flex items-start justify-between">
-                                            <p className="text-[15px] font-medium text-slate-200 leading-snug">
+                                            <p className="text-[15px] font-medium text-foreground leading-snug">
                                                 {q.text} {q.required && <span className="text-red-400">*</span>}
                                             </p>
                                             <span className={cn("text-[9px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full border ml-3 whitespace-nowrap flex-shrink-0", typeBadges[q.type].color)}>
@@ -569,7 +570,7 @@ export default function QuestionnairePage() {
                                 </div>
 
                                 {idx !== currentSection.questions.length - 1 && (
-                                    <div className="h-px w-full bg-slate-800/50 my-2" />
+                                    <div className="h-px w-full bg-secondary/50 my-2" />
                                 )}
                             </motion.div>
                         ))}
@@ -600,40 +601,40 @@ export default function QuestionnairePage() {
                                 <div key={fw.name} className="flex items-center gap-4">
                                     <div className="relative">
                                         <CircularProgressRing value={fw.progress} size={52} strokeWidth={4} color={fw.color} />
-                                        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-slate-200">
+                                        <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-foreground">
                                             {fw.progress}%
                                         </span>
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center justify-between">
-                                            <span className="text-xs font-medium text-slate-300 truncate">{fw.name}</span>
-                                            <span className={cn("text-[10px] font-bold", fw.delta.startsWith("+") ? "text-emerald-400" : "text-slate-500")}>{fw.delta}</span>
+                                            <span className="text-xs font-medium text-muted-foreground truncate">{fw.name}</span>
+                                            <span className={cn("text-[10px] font-bold", fw.delta.startsWith("+") ? "text-emerald-400" : "text-muted-foreground")}>{fw.delta}</span>
                                         </div>
-                                        <span className="text-[10px] text-slate-500">{fw.controls} controls</span>
+                                        <span className="text-[10px] text-muted-foreground">{fw.controls} controls</span>
                                     </div>
                                 </div>
                             ))}
                         </div>
 
-                        <div className="h-px bg-slate-800/50" />
+                        <div className="h-px bg-secondary/50" />
 
                         {/* Risk Score */}
                         <div>
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Risk Score</span>
+                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Risk Score</span>
                                 <span className={cn("text-xs font-bold", riskScore > 50 ? "text-amber-400" : "text-emerald-400")}>
                                     {riskScore > 50 ? "Medium" : "Low"}
                                 </span>
                             </div>
                             <div className="relative">
-                                <div className="w-full h-3 bg-slate-800 rounded-full overflow-hidden">
+                                <div className="w-full h-3 bg-secondary rounded-full overflow-hidden">
                                     <motion.div
                                         className={cn("h-full rounded-full", riskScore > 60 ? "bg-gradient-to-r from-amber-500 to-red-500" : riskScore > 30 ? "bg-gradient-to-r from-emerald-500 to-amber-400" : "bg-emerald-500")}
                                         animate={{ width: `${riskScore}%` }}
                                         transition={{ duration: 0.6 }}
                                     />
                                 </div>
-                                <div className="flex justify-between mt-1 text-[9px] text-slate-600 font-mono">
+                                <div className="flex justify-between mt-1 text-[9px] text-muted-foreground/70 font-mono">
                                     <span>0</span>
                                     <span>50</span>
                                     <span>100</span>
@@ -641,11 +642,11 @@ export default function QuestionnairePage() {
                             </div>
                         </div>
 
-                        <div className="h-px bg-slate-800/50" />
+                        <div className="h-px bg-secondary/50" />
 
                         {/* Controls Coverage */}
                         <div>
-                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 block">Controls Coverage</span>
+                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3 block">Controls Coverage</span>
                             <div className="grid grid-cols-3 gap-2">
                                 {[
                                     { label: "Satisfied", count: Math.round(totalAnswered * 1.5), color: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
@@ -660,21 +661,21 @@ export default function QuestionnairePage() {
                             </div>
                         </div>
 
-                        <div className="h-px bg-slate-800/50" />
+                        <div className="h-px bg-secondary/50" />
 
                         {/* Recent Activity */}
                         <div>
-                            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Recent Activity</span>
+                            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2 block">Recent Activity</span>
                             {recentActivity.length === 0 ? (
-                                <p className="text-xs text-slate-600 italic">No answers yet — start responding to see live updates</p>
+                                <p className="text-xs text-muted-foreground/70 italic">No answers yet — start responding to see live updates</p>
                             ) : (
                                 <div className="space-y-2">
                                     {recentActivity.map((item: any) => (
                                         <div key={item.id} className="flex items-start gap-2">
-                                            <Clock className="w-3 h-3 text-slate-600 mt-0.5 flex-shrink-0" />
+                                            <Clock className="w-3 h-3 text-muted-foreground/70 mt-0.5 flex-shrink-0" />
                                             <div className="flex flex-col min-w-0">
-                                                <span className="text-[11px] text-slate-400 truncate">{item.text}</span>
-                                                <span className="text-[9px] text-slate-600">{item.time}</span>
+                                                <span className="text-[11px] text-muted-foreground truncate">{item.text}</span>
+                                                <span className="text-[9px] text-muted-foreground/70">{item.time}</span>
                                             </div>
                                         </div>
                                     ))}

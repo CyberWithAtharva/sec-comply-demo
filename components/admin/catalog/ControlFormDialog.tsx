@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Save } from "lucide-react";
 import { toast } from "sonner";
@@ -101,88 +102,88 @@ export function ControlFormDialog({ open, frameworkId, initial, onClose, onSaved
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-lg bg-slate-900 border border-slate-700/60 rounded-2xl shadow-2xl p-6 z-10 max-h-[90vh] overflow-y-auto"
+                        className="relative w-full max-w-lg bg-card border border-border/60 rounded-2xl shadow-2xl p-6 z-10 max-h-[90vh] overflow-y-auto"
                     >
                         <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-lg font-bold text-slate-100">
+                            <h2 className="text-lg font-bold text-foreground">
                                 {editing ? "Edit Control" : "New Control"}
                             </h2>
-                            <button onClick={() => !submitting && onClose()} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors">
+                            <Button variant="plain" onClick={() => !submitting && onClose()} className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground transition-colors h-auto">
                                 <X className="w-4 h-4" />
-                            </button>
+                            </Button>
                         </div>
 
                         <form onSubmit={handleSubmit} className="space-y-4">
                             <div className="grid grid-cols-3 gap-3">
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Code</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Code</label>
                                     <input
                                         value={form.code}
                                         onChange={e => setForm(f => ({ ...f, code: e.target.value }))}
                                         required
                                         placeholder="A.5.1"
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                     />
                                 </div>
                                 <div className="col-span-2">
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Sort Order</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Sort Order</label>
                                     <input
                                         type="number"
                                         value={form.sort_order}
                                         onChange={e => setForm(f => ({ ...f, sort_order: e.target.value }))}
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 tabular-nums focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground tabular-nums focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                     />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Name</label>
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Name</label>
                                 <input
                                     value={form.name}
                                     onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                                     required
                                     placeholder="Policies for information security"
-                                    className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                    className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Domain</label>
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Domain</label>
                                 <input
                                     value={form.domain}
                                     onChange={e => setForm(f => ({ ...f, domain: e.target.value }))}
                                     placeholder="Organizational"
-                                    className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40"
+                                    className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40"
                                 />
                             </div>
 
                             <div>
-                                <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Description</label>
+                                <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Description</label>
                                 <textarea
                                     value={form.description}
                                     onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                                     rows={4}
                                     placeholder="Optional control requirement text."
-                                    className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
+                                    className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
                                 />
                             </div>
 
                             <div className="flex gap-3 pt-2">
-                                <button
+                                <Button variant="plain"
                                     type="button"
                                     onClick={() => !submitting && onClose()}
-                                    className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-400 hover:bg-slate-800 transition-colors"
+                                    className="flex-1 px-4 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:bg-secondary transition-colors h-auto"
                                 >
                                     Cancel
-                                </button>
-                                <button
+                                </Button>
+                                <Button variant="plain"
                                     type="submit"
                                     disabled={submitting}
-                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors disabled:opacity-70"
+                                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors disabled:opacity-70 h-auto"
                                 >
                                     {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                                     {editing ? "Save changes" : "Add control"}
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     </motion.div>

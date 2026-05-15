@@ -15,8 +15,8 @@ export default async function UsersPage() {
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-2xl font-bold text-slate-100">Users</h1>
-                <p className="text-sm text-slate-500 mt-1">{profiles?.length ?? 0} total users across all organizations</p>
+                <h1 className="text-2xl font-bold text-foreground">Users</h1>
+                <p className="text-sm text-muted-foreground mt-1">{profiles?.length ?? 0} total users across all organizations</p>
             </div>
 
             {/* Admins */}
@@ -24,17 +24,17 @@ export default async function UsersPage() {
                 <h2 className="text-xs font-semibold text-amber-400 uppercase tracking-wider mb-3">SecComply Admins ({admins.length})</h2>
                 <div className="rounded-2xl border border-amber-900/30 bg-amber-950/10 backdrop-blur-sm overflow-hidden">
                     {admins.length === 0 ? (
-                        <p className="px-6 py-8 text-sm text-slate-500 text-center">No admin users.</p>
+                        <p className="px-6 py-8 text-sm text-muted-foreground text-center">No admin users.</p>
                     ) : (
-                        <div className="divide-y divide-slate-800/40">
+                        <div className="divide-y divide-border/40">
                             {admins.map(u => (
                                 <div key={u.id} className="px-6 py-3.5 flex items-center gap-3">
                                     <div className="w-9 h-9 rounded-full bg-amber-900/20 border border-amber-800/30 flex items-center justify-center flex-shrink-0">
                                         <UserCircle className="w-5 h-5 text-amber-400" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold text-slate-200">{u.full_name ?? "—"}</p>
-                                        <p className="text-xs text-slate-500">Admin</p>
+                                        <p className="text-sm font-semibold text-foreground">{u.full_name ?? "—"}</p>
+                                        <p className="text-xs text-muted-foreground">Admin</p>
                                     </div>
                                     <span className="text-xs text-amber-400 font-semibold px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/20">admin</span>
                                 </div>
@@ -47,21 +47,21 @@ export default async function UsersPage() {
             {/* Clients */}
             <section>
                 <h2 className="text-xs font-semibold text-blue-400 uppercase tracking-wider mb-3">Client Users ({clients.length})</h2>
-                <div className="rounded-2xl border border-slate-800/60 bg-slate-900/30 backdrop-blur-sm overflow-hidden">
+                <div className="rounded-2xl border border-border/60 bg-card/30 backdrop-blur-sm overflow-hidden">
                     {clients.length === 0 ? (
-                        <p className="px-6 py-8 text-sm text-slate-500 text-center">No client users yet. Invite them from an organization page.</p>
+                        <p className="px-6 py-8 text-sm text-muted-foreground text-center">No client users yet. Invite them from an organization page.</p>
                     ) : (
-                        <div className="divide-y divide-slate-800/40">
+                        <div className="divide-y divide-border/40">
                             {clients.map(u => (
                                 <div key={u.id} className="px-6 py-3.5 flex items-center gap-3">
-                                    <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center flex-shrink-0">
-                                        <UserCircle className="w-5 h-5 text-slate-500" />
+                                    <div className="w-9 h-9 rounded-full bg-secondary border border-border flex items-center justify-center flex-shrink-0">
+                                        <UserCircle className="w-5 h-5 text-muted-foreground" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-semibold text-slate-200">{u.full_name ?? "—"}</p>
+                                        <p className="text-sm font-semibold text-foreground">{u.full_name ?? "—"}</p>
                                         <div className="flex items-center gap-1.5 mt-0.5">
-                                            <Building2 className="w-3 h-3 text-slate-500" />
-                                            <p className="text-xs text-slate-500">
+                                            <Building2 className="w-3 h-3 text-muted-foreground" />
+                                            <p className="text-xs text-muted-foreground">
                                                 {(u.organizations as { name: string; slug: string } | null)?.name ?? "No org"}
                                             </p>
                                         </div>

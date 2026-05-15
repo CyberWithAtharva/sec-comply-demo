@@ -18,9 +18,9 @@ export default async function ActionItemsPage() {
     if (!membership) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-                <AlertTriangle className="w-16 h-16 text-slate-600 mb-4" />
-                <h2 className="text-xl font-semibold text-slate-300 mb-2">No Organization Assigned</h2>
-                <p className="text-slate-500 text-sm max-w-md">Contact your SecComply admin to link you to an organization.</p>
+                <AlertTriangle className="w-16 h-16 text-muted-foreground/70 mb-4" />
+                <h2 className="text-xl font-semibold text-muted-foreground mb-2">No Organization Assigned</h2>
+                <p className="text-muted-foreground text-sm max-w-md">Contact your SecComply admin to link you to an organization.</p>
             </div>
         );
     }
@@ -36,9 +36,9 @@ export default async function ActionItemsPage() {
     if (!orgFrameworks || orgFrameworks.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-                <AlertTriangle className="w-16 h-16 text-slate-600 mb-4" />
-                <h2 className="text-xl font-semibold text-slate-300 mb-2">No Frameworks Assigned</h2>
-                <p className="text-slate-500 text-sm max-w-md">Ask your admin to assign compliance frameworks before viewing action items.</p>
+                <AlertTriangle className="w-16 h-16 text-muted-foreground/70 mb-4" />
+                <h2 className="text-xl font-semibold text-muted-foreground mb-2">No Frameworks Assigned</h2>
+                <p className="text-muted-foreground text-sm max-w-md">Ask your admin to assign compliance frameworks before viewing action items.</p>
             </div>
         );
     }
@@ -69,9 +69,9 @@ export default async function ActionItemsPage() {
     if (controls.length === 0) {
         return (
             <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-                <AlertTriangle className="w-16 h-16 text-slate-600 mb-4" />
-                <h2 className="text-xl font-semibold text-slate-300 mb-2">No Controls Found</h2>
-                <p className="text-slate-500 text-sm">No controls are seeded for the assigned frameworks.</p>
+                <AlertTriangle className="w-16 h-16 text-muted-foreground/70 mb-4" />
+                <h2 className="text-xl font-semibold text-muted-foreground mb-2">No Controls Found</h2>
+                <p className="text-muted-foreground text-sm">No controls are seeded for the assigned frameworks.</p>
             </div>
         );
     }

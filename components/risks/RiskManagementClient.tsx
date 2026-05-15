@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { ChevronRight, LayoutDashboard, BookOpen, Shield } from "lucide-react";
 import { OverviewTab } from "./tabs/OverviewTab";
 import { LibraryTab } from "./tabs/LibraryTab";
@@ -51,34 +52,34 @@ export function RiskManagementClient({ initialRisks, initialHistory, orgId, owne
     return (
         <div className="w-full flex flex-col space-y-6 animate-in fade-in duration-700">
             {/* Breadcrumb */}
-            <div className="flex items-center text-sm font-mono text-slate-400 tracking-wide">
-                <span className="text-slate-500">Home</span>
+            <div className="flex items-center text-sm font-mono text-muted-foreground tracking-wide">
+                <span className="text-muted-foreground">Home</span>
                 <ChevronRight className="w-4 h-4 mx-2 opacity-50" />
-                <span className="text-slate-100">Risk Management</span>
+                <span className="text-foreground">Risk Management</span>
                 <ChevronRight className="w-4 h-4 mx-2 opacity-50" />
-                <span className="text-slate-100">{TABS.find(t => t.id === tab)?.label}</span>
+                <span className="text-foreground">{TABS.find(t => t.id === tab)?.label}</span>
             </div>
 
             {/* Tab nav */}
-            <div className="border-b border-slate-800/60">
+            <div className="border-b border-border/60">
                 <div className="flex gap-1">
                     {TABS.map(t => {
                         const active = tab === t.id;
                         const Icon = t.icon;
                         return (
-                            <button
+                            <Button variant="plain"
                                 key={t.id}
                                 onClick={() => setTab(t.id)}
                                 className={
                                     "flex items-center gap-2 px-5 py-3 text-sm font-medium transition-colors border-b-2 -mb-px " +
                                     (active
-                                        ? "border-orange-500 text-slate-100"
-                                        : "border-transparent text-slate-500 hover:text-slate-300")
+                                        ? "border-orange-500 text-foreground"
+                                        : "border-transparent text-muted-foreground hover:text-muted-foreground")
                                 }
                             >
                                 <Icon className="w-4 h-4" />
                                 {t.label}
-                            </button>
+                            </Button>
                         );
                     })}
                 </div>

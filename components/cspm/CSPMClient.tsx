@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -100,14 +101,14 @@ const CLI_STEPS = [
 function CopyButton({ text }: { text: string }) {
     const [copied, setCopied] = useState(false);
     return (
-        <button
+        <Button variant="plain"
             type="button"
             onClick={() => { navigator.clipboard.writeText(text); setCopied(true); setTimeout(() => setCopied(false), 1800); }}
-            className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-700/60 hover:bg-slate-600/60 text-slate-400 hover:text-slate-200 text-[10px] font-medium transition-colors"
+            className="shrink-0 flex items-center gap-1 px-2 py-1 rounded-lg bg-secondary/60 hover:bg-slate-600/60 text-muted-foreground hover:text-foreground text-[10px] font-medium transition-colors h-auto"
         >
             {copied ? <CheckCircle2 className="w-3 h-3 text-emerald-400" /> : <Server className="w-3 h-3" />}
             {copied ? "Copied" : "Copy"}
-        </button>
+        </Button>
     );
 }
 
@@ -149,7 +150,7 @@ function ConnectAWSModal({ orgId, onClose, onConnected }: ConnectModalProps) {
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-sky-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-sky-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -157,52 +158,52 @@ function ConnectAWSModal({ orgId, onClose, onConnected }: ConnectModalProps) {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-xl shadow-2xl max-h-[90vh] overflow-y-auto"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-xl shadow-2xl max-h-[90vh] overflow-y-auto"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50 sticky top-0 bg-slate-900 z-10">
+                <div className="flex items-center justify-between p-6 border-b border-border/50 sticky top-0 bg-card z-10">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center">
                             <Cloud className="w-4 h-4 text-sky-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-100">Connect AWS Account</h2>
-                            <p className="text-xs text-slate-500">Create a read-only service account, then paste the credentials</p>
+                            <h2 className="text-base font-semibold text-foreground">Connect AWS Account</h2>
+                            <p className="text-xs text-muted-foreground">Create a read-only service account, then paste the credentials</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground h-auto"><X className="w-5 h-5" /></Button>
                 </div>
 
                 <div className="p-6 space-y-5">
                     {/* Step tabs */}
-                    <div className="flex rounded-xl bg-slate-800/50 p-1 gap-1">
+                    <div className="flex rounded-xl bg-secondary/50 p-1 gap-1">
                         {(["cli", "creds"] as const).map((s, i) => (
-                            <button
+                            <Button variant="plain"
                                 key={s}
                                 type="button"
                                 onClick={() => setStep(s)}
                                 className={`flex-1 py-2 rounded-lg text-xs font-medium transition-colors ${
-                                    step === s ? "bg-sky-600 text-white" : "text-slate-400 hover:text-slate-200"
+                                    step === s ? "bg-sky-600 text-white" : "text-muted-foreground hover:text-foreground"
                                 }`}
                             >
                                 {i + 1}. {s === "cli" ? "Run AWS CLI Commands" : "Enter Credentials"}
-                            </button>
+                            </Button>
                         ))}
                     </div>
 
                     {step === "cli" ? (
                         <div className="space-y-4">
-                            <p className="text-xs text-slate-400">
-                                Run these commands in your terminal where the <span className="text-slate-200 font-mono">aws</span> CLI is configured for your account. This creates a read-only IAM user and generates access keys.
+                            <p className="text-xs text-muted-foreground">
+                                Run these commands in your terminal where the <span className="text-foreground font-mono">aws</span> CLI is configured for your account. This creates a read-only IAM user and generates access keys.
                             </p>
 
                             {CLI_STEPS.map((s, i) => (
                                 <div key={i} className="space-y-1.5">
                                     <div className="flex items-center gap-2">
                                         <span className="w-5 h-5 rounded-full bg-sky-500/20 border border-sky-500/30 text-[10px] font-bold text-sky-400 flex items-center justify-center shrink-0">{i + 1}</span>
-                                        <span className="text-xs text-slate-300 font-medium">{s.label}</span>
+                                        <span className="text-xs text-muted-foreground font-medium">{s.label}</span>
                                     </div>
-                                    <div className="flex items-start gap-2 bg-slate-950/80 border border-slate-800 rounded-xl p-3">
+                                    <div className="flex items-start gap-2 bg-background/80 border border-border rounded-xl p-3">
                                         <pre className="flex-1 text-[11px] font-mono text-emerald-300 whitespace-pre overflow-x-auto">{s.cmd}</pre>
                                         <CopyButton text={s.cmd.replace(/\\\n\s+/g, " ")} />
                                     </div>
@@ -214,13 +215,13 @@ function ConnectAWSModal({ orgId, onClose, onConnected }: ConnectModalProps) {
                                 <span>The last command outputs <span className="font-mono font-semibold">AccessKeyId</span> and <span className="font-mono font-semibold">SecretAccessKey</span>. Copy both — the secret is only shown once.</span>
                             </div>
 
-                            <button
+                            <Button variant="plain"
                                 type="button"
                                 onClick={() => setStep("creds")}
-                                className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium rounded-xl flex items-center justify-center gap-2 transition-colors"
+                                className="w-full py-2.5 bg-sky-600 hover:bg-sky-500 text-white text-sm font-medium rounded-xl flex items-center justify-center gap-2 transition-colors h-auto"
                             >
                                 I&apos;ve run the commands — Enter credentials <ExternalLink className="w-3.5 h-3.5" />
-                            </button>
+                            </Button>
                         </div>
                     ) : (
                         <form onSubmit={handleConnect} className="space-y-4">
@@ -232,26 +233,26 @@ function ConnectAWSModal({ orgId, onClose, onConnected }: ConnectModalProps) {
 
                             <div className="grid grid-cols-2 gap-4">
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-400 mb-1.5">AWS Account ID *</label>
+                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">AWS Account ID *</label>
                                     <input type="text" value={form.account_id} onChange={e => setForm(f => ({ ...f, account_id: e.target.value }))}
                                         placeholder="123456789012" className={inputCls} />
-                                    <p className="text-[10px] text-slate-600 mt-1">From your AWS console top-right</p>
+                                    <p className="text-[10px] text-muted-foreground/70 mt-1">From your AWS console top-right</p>
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-medium text-slate-400 mb-1.5">Account Alias</label>
+                                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Account Alias</label>
                                     <input type="text" value={form.account_alias} onChange={e => setForm(f => ({ ...f, account_alias: e.target.value }))}
                                         placeholder="prod-account" className={inputCls} />
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-slate-400 mb-1.5">Access Key ID *</label>
+                                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Access Key ID *</label>
                                 <input type="text" value={form.access_key_id} onChange={e => setForm(f => ({ ...f, access_key_id: e.target.value }))}
                                     placeholder="AKIAIOSFODNN7EXAMPLE" className={`${inputCls} font-mono`} />
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-slate-400 mb-1.5">Secret Access Key *</label>
+                                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Secret Access Key *</label>
                                 <div className="relative">
                                     <input
                                         type={showSecret ? "text" : "password"}
@@ -260,26 +261,26 @@ function ConnectAWSModal({ orgId, onClose, onConnected }: ConnectModalProps) {
                                         placeholder="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
                                         className={`${inputCls} font-mono pr-10`}
                                     />
-                                    <button type="button" onClick={() => setShowSecret(v => !v)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
+                                    <Button variant="plain" type="button" onClick={() => setShowSecret(v => !v)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-muted-foreground transition-colors h-auto">
                                         <ExternalLink className="w-4 h-4" />
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
 
                             <div>
-                                <label className="block text-xs font-medium text-slate-400 mb-1.5">Regions to Scan (comma-separated)</label>
+                                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Regions to Scan (comma-separated)</label>
                                 <input type="text" value={form.regions} onChange={e => setForm(f => ({ ...f, regions: e.target.value }))}
                                     placeholder="us-east-1, us-west-2, eu-west-1" className={inputCls} />
                             </div>
 
                             <div className="flex justify-end space-x-3 pt-2">
-                                <button type="button" onClick={() => setStep("cli")} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200">Back</button>
-                                <button type="submit" disabled={verifying}
-                                    className="px-5 py-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 transition-colors">
+                                <Button variant="plain" type="button" onClick={() => setStep("cli")} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground h-auto">Back</Button>
+                                <Button variant="plain" type="submit" disabled={verifying}
+                                    className="px-5 py-2 bg-sky-600 hover:bg-sky-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center space-x-2 transition-colors h-auto">
                                     {verifying ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Link2 className="w-4 h-4" />}
                                     <span>{verifying ? "Verifying connection…" : "Connect Account"}</span>
-                                </button>
+                                </Button>
                             </div>
                         </form>
                     )}
@@ -451,53 +452,53 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center">
                         <CloudCog className="w-8 h-8 mr-3 text-sky-500" />
                         Cloud Security Posture (CSPM)
                     </h1>
-                    <p className="text-sm text-slate-400 mt-1">Monitor AWS misconfigurations and security findings in real-time.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Monitor AWS misconfigurations and security findings in real-time.</p>
                 </div>
-                <button
+                <Button variant="plain"
                     onClick={() => setShowConnect(true)}
-                    className="bg-sky-600 hover:bg-sky-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(2,132,199,0.4)] transition-colors flex items-center space-x-2"
+                    className="bg-sky-600 hover:bg-sky-500 text-white px-5 py-2.5 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(2,132,199,0.4)] transition-colors flex items-center space-x-2 h-auto"
                 >
                     <Plus className="w-4 h-4" />
                     <span>Connect AWS Account</span>
-                </button>
+                </Button>
             </div>
 
             {/* No accounts — big CTA */}
             {noAccounts ? (
-                <div className="glass-panel rounded-2xl border border-slate-800/50 p-16 flex flex-col items-center text-center">
+                <div className="glass-panel rounded-2xl border border-border/50 p-16 flex flex-col items-center text-center">
                     <div className="w-20 h-20 rounded-2xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center mb-6">
                         <Cloud className="w-10 h-10 text-sky-400" />
                     </div>
-                    <h2 className="text-xl font-semibold text-slate-100 mb-2">No AWS Accounts Connected</h2>
-                    <p className="text-sm text-slate-400 max-w-md mb-6">
+                    <h2 className="text-xl font-semibold text-foreground mb-2">No AWS Accounts Connected</h2>
+                    <p className="text-sm text-muted-foreground max-w-md mb-6">
                         Connect your AWS account using a cross-account IAM role. SecComply will scan for
                         misconfigurations, unused credentials, public resources, and compliance violations.
                     </p>
-                    <button
+                    <Button variant="plain"
                         onClick={() => setShowConnect(true)}
-                        className="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(2,132,199,0.4)] transition-colors flex items-center space-x-2"
+                        className="bg-sky-600 hover:bg-sky-500 text-white px-6 py-3 rounded-xl text-sm font-medium shadow-[0_0_15px_rgba(2,132,199,0.4)] transition-colors flex items-center space-x-2 h-auto"
                     >
                         <Link2 className="w-4 h-4" />
                         <span>Connect Your First AWS Account</span>
-                    </button>
+                    </Button>
                 </div>
             ) : (
                 <>
                     {/* Stats */}
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                         {[
-                            { label: "Total Findings", count: stats.total,    color: "text-slate-100" },
-                            { label: "Critical",        count: stats.critical, color: stats.critical > 0 ? "text-red-400" : "text-slate-400" },
-                            { label: "High",            count: stats.high,     color: stats.high > 0 ? "text-orange-400" : "text-slate-400" },
-                            { label: "Open",            count: stats.open,     color: stats.open > 0 ? "text-amber-400" : "text-slate-400" },
+                            { label: "Total Findings", count: stats.total,    color: "text-foreground" },
+                            { label: "Critical",        count: stats.critical, color: stats.critical > 0 ? "text-red-400" : "text-muted-foreground" },
+                            { label: "High",            count: stats.high,     color: stats.high > 0 ? "text-orange-400" : "text-muted-foreground" },
+                            { label: "Open",            count: stats.open,     color: stats.open > 0 ? "text-amber-400" : "text-muted-foreground" },
                         ].map((s) => (
                             <div key={s.label}
-                                className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col">
-                                <span className="text-[10px] text-slate-500 mb-1">{s.label}</span>
+                                className="glass-panel rounded-2xl p-4 border border-border/50 flex flex-col">
+                                <span className="text-[10px] text-muted-foreground mb-1">{s.label}</span>
                                 <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
                             </div>
                         ))}
@@ -512,10 +513,10 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                     const circ = 2 * Math.PI * 36;
                                     const strokeColor = acc.score >= 80 ? "#10b981" : acc.score >= 50 ? "#f59e0b" : "#ef4444";
                                     return (
-                                        <div key={acc.id} className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col items-center min-w-[140px] flex-1">
+                                        <div key={acc.id} className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col items-center min-w-[140px] flex-1">
                                             <div className="relative">
                                                 <svg width="80" height="80" viewBox="0 0 80 80">
-                                                    <circle cx="40" cy="40" r="36" fill="none" stroke="#1e293b" strokeWidth="8" />
+                                                    <circle cx="40" cy="40" r="36" fill="none" stroke="var(--border)" strokeWidth="8" />
                                                     <motion.circle
                                                         cx="40" cy="40" r="36" fill="none"
                                                         stroke={strokeColor} strokeWidth="8" strokeLinecap="round"
@@ -527,14 +528,14 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                                     />
                                                 </svg>
                                                 <div className="absolute inset-0 flex items-center justify-center">
-                                                    <span className="text-xl font-bold text-slate-100">{acc.score}</span>
+                                                    <span className="text-xl font-bold text-foreground">{acc.score}</span>
                                                 </div>
                                             </div>
-                                            <span className="text-xs font-semibold text-slate-300 truncate max-w-full mt-2 text-center">{acc.name}</span>
+                                            <span className="text-xs font-semibold text-muted-foreground truncate max-w-full mt-2 text-center">{acc.name}</span>
                                             <div className="flex items-center gap-2 mt-1 text-[10px]">
                                                 {acc.critical > 0 && <span className="text-red-400 font-medium">{acc.critical} crit</span>}
                                                 {acc.high > 0 && <span className="text-orange-400 font-medium">{acc.high} high</span>}
-                                                {acc.critical === 0 && acc.high === 0 && <span className="text-slate-500">{acc.total} total</span>}
+                                                {acc.critical === 0 && acc.high === 0 && <span className="text-muted-foreground">{acc.total} total</span>}
                                             </div>
                                         </div>
                                     );
@@ -544,8 +545,8 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                             {/* Rows 2+3: Severity Bar + Heatmap + Radar — unified 3-col row */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 {/* Severity Bar */}
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
+                                <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
+                                    <h3 className="text-sm font-semibold text-muted-foreground mb-4">Findings by Severity</h3>
                                     <div className="flex-1 min-h-[180px]">
                                         <ResponsiveContainer width="100%" height="100%">
                                             <BarChart
@@ -558,10 +559,10 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                                 margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
                                                 barCategoryGap="45%"
                                             >
-                                                <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                                                 <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
                                                 <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
-                                                <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                                <Tooltip cursor={{ fill: "var(--card)" }} contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "8px" }} />
                                                 <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={56}>
                                                     <Cell fill="#ef4444" />
                                                     <Cell fill="#f97316" />
@@ -574,25 +575,25 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                 </div>
 
                                 {/* Heatmap */}
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Severity Heatmap by Service</h3>
+                                <div className="glass-panel rounded-2xl border border-border/50 p-5">
+                                    <h3 className="text-sm font-semibold text-muted-foreground mb-4">Severity Heatmap by Service</h3>
                                     {dashboardData.services.length === 0 ? (
-                                        <div className="flex items-center justify-center h-40 text-xs text-slate-600">No service data yet</div>
+                                        <div className="flex items-center justify-center h-40 text-xs text-muted-foreground/70">No service data yet</div>
                                     ) : (
                                         <div className="overflow-x-auto">
                                             <table className="w-full text-[10px]">
                                                 <thead>
                                                     <tr>
-                                                        <th className="text-left pr-4 pb-2 text-slate-500 font-medium">Service</th>
-                                                        {["CRIT", "HIGH", "MED", "LOW"].map(h => <th key={h} className="text-center pb-2 text-slate-500 font-medium w-10">{h}</th>)}
+                                                        <th className="text-left pr-4 pb-2 text-muted-foreground font-medium">Service</th>
+                                                        {["CRIT", "HIGH", "MED", "LOW"].map(h => <th key={h} className="text-center pb-2 text-muted-foreground font-medium w-10">{h}</th>)}
                                                     </tr>
                                                 </thead>
-                                                <tbody className="divide-y divide-slate-800/30">
+                                                <tbody className="divide-y divide-border/30">
                                                     {dashboardData.services.map(([service, v]) => {
                                                         const maxV = Math.max(v.critical, v.high, v.medium, v.low, 1);
                                                         return (
                                                             <tr key={service}>
-                                                                <td className="pr-4 py-1.5 text-slate-300 font-mono truncate max-w-[100px]">{service}</td>
+                                                                <td className="pr-4 py-1.5 text-muted-foreground font-mono truncate max-w-[100px]">{service}</td>
                                                                 {([
                                                                     { count: v.critical, fill: "#ef4444" },
                                                                     { count: v.high,     fill: "#f97316" },
@@ -602,7 +603,7 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                                                     <td key={ci} className="text-center py-1.5">
                                                                         <div
                                                                             className="mx-auto w-9 h-6 rounded flex items-center justify-center text-[9px] font-bold text-white"
-                                                                            style={{ backgroundColor: cell.count > 0 ? cell.fill : "transparent", border: cell.count === 0 ? "1px solid #1e293b" : "none", opacity: cell.count > 0 ? 0.4 + 0.6 * (cell.count / maxV) : 1 }}
+                                                                            style={{ backgroundColor: cell.count > 0 ? cell.fill : "transparent", border: cell.count === 0 ? "1px solid var(--border)" : "none", opacity: cell.count > 0 ? 0.4 + 0.6 * (cell.count / maxV) : 1 }}
                                                                         >
                                                                             {cell.count > 0 ? cell.count : ""}
                                                                         </div>
@@ -618,8 +619,8 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                 </div>
 
                                 {/* Security Domain Breakdown */}
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Security Domain Issues</h3>
+                                <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
+                                    <h3 className="text-sm font-semibold text-muted-foreground mb-4">Security Domain Issues</h3>
                                     <div className="flex-1 flex flex-col justify-center gap-2.5 min-h-[180px]">
                                         {[...dashboardData.radarData]
                                             .sort((a, b) => b.count - a.count)
@@ -631,10 +632,10 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                                 return (
                                                     <div key={domain.subject}>
                                                         <div className="flex items-center justify-between text-[11px] mb-1">
-                                                            <span className="text-slate-300 font-medium">{domain.subject}</span>
+                                                            <span className="text-muted-foreground font-medium">{domain.subject}</span>
                                                             <span className="font-bold tabular-nums" style={{ color }}>{domain.count}</span>
                                                         </div>
-                                                        <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                                        <div className="w-full bg-secondary/60 rounded-full h-1.5 overflow-hidden">
                                                             <motion.div
                                                                 initial={{ width: 0 }}
                                                                 animate={{ width: `${pct}%` }}
@@ -653,8 +654,8 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                             {/* Row 4: Top Findings Feed + Remediation Progress + Account Ranking */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 {/* Top Active Findings */}
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-3">Top Active Findings</h3>
+                                <div className="glass-panel rounded-2xl border border-border/50 p-5">
+                                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Top Active Findings</h3>
                                     {dashboardData.topActive.length === 0 ? (
                                         <div className="flex flex-col items-center py-4">
                                             <Shield className="w-8 h-8 text-emerald-500/40 mb-2" />
@@ -663,11 +664,11 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                     ) : (
                                         <div className="space-y-2.5">
                                             {dashboardData.topActive.map(f => (
-                                                <div key={f.id} className="flex items-start gap-2 border-b border-slate-800/30 last:border-0 pb-2 last:pb-0">
+                                                <div key={f.id} className="flex items-start gap-2 border-b border-border/30 last:border-0 pb-2 last:pb-0">
                                                     <SeverityBadge severity={f.severity} />
                                                     <div className="min-w-0">
-                                                        <p className="text-xs text-slate-300 leading-tight line-clamp-2">{f.title}</p>
-                                                        <p className="text-[10px] text-slate-600 font-mono mt-0.5">{f.rule_id}</p>
+                                                        <p className="text-xs text-muted-foreground leading-tight line-clamp-2">{f.title}</p>
+                                                        <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5">{f.rule_id}</p>
                                                     </div>
                                                 </div>
                                             ))}
@@ -676,8 +677,8 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                 </div>
 
                                 {/* Remediation Progress */}
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-4">Remediation Progress</h3>
+                                <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
+                                    <h3 className="text-sm font-semibold text-muted-foreground mb-4">Remediation Progress</h3>
                                     <div className="flex-1 flex flex-col justify-center gap-5">
                                         {[
                                             { label: "Active",   count: dashboardData.active,   color: "bg-red-500",     textColor: "text-red-400" },
@@ -686,9 +687,9 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                             <div key={row.label}>
                                                 <div className="flex items-center justify-between text-xs mb-1.5">
                                                     <span className={row.textColor}>{row.label}</span>
-                                                    <span className="text-slate-300 font-semibold">{row.count}</span>
+                                                    <span className="text-muted-foreground font-semibold">{row.count}</span>
                                                 </div>
-                                                <div className="w-full bg-slate-800/60 rounded-full h-2 overflow-hidden">
+                                                <div className="w-full bg-secondary/60 rounded-full h-2 overflow-hidden">
                                                     <motion.div
                                                         initial={{ width: 0 }}
                                                         animate={{ width: `${findings.length > 0 ? (row.count / findings.length) * 100 : 0}%` }}
@@ -698,31 +699,31 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                                 </div>
                                             </div>
                                         ))}
-                                        <div className="text-center border-t border-slate-800/40 pt-3">
-                                            <span className="text-3xl font-bold text-slate-100">
+                                        <div className="text-center border-t border-border/40 pt-3">
+                                            <span className="text-3xl font-bold text-foreground">
                                                 {findings.length > 0 ? Math.round((dashboardData.resolved / findings.length) * 100) : 0}
-                                                <span className="text-sm font-normal text-slate-500">%</span>
+                                                <span className="text-sm font-normal text-muted-foreground">%</span>
                                             </span>
-                                            <p className="text-[10px] text-slate-500 mt-0.5">findings resolved</p>
+                                            <p className="text-[10px] text-muted-foreground mt-0.5">findings resolved</p>
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Account Risk Ranking */}
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-3">Account Risk Ranking</h3>
+                                <div className="glass-panel rounded-2xl border border-border/50 p-5">
+                                    <h3 className="text-sm font-semibold text-muted-foreground mb-3">Account Risk Ranking</h3>
                                     <div className="space-y-3">
                                         {dashboardData.accountScores.map((acc, i) => (
                                             <div key={acc.id} className="flex items-center gap-2">
-                                                <span className="text-[10px] text-slate-600 w-3">{i + 1}</span>
+                                                <span className="text-[10px] text-muted-foreground/70 w-3">{i + 1}</span>
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center justify-between mb-1">
-                                                        <span className="text-xs text-slate-300 truncate">{acc.name}</span>
+                                                        <span className="text-xs text-muted-foreground truncate">{acc.name}</span>
                                                         <span className={cn("text-[10px] font-bold tabular-nums", acc.score >= 80 ? "text-emerald-400" : acc.score >= 50 ? "text-amber-400" : "text-red-400")}>
                                                             {acc.score}
                                                         </span>
                                                     </div>
-                                                    <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                                    <div className="w-full bg-secondary/60 rounded-full h-1.5 overflow-hidden">
                                                         <div
                                                             className={cn("h-full rounded-full", acc.score >= 80 ? "bg-emerald-500" : acc.score >= 50 ? "bg-amber-500" : "bg-red-500")}
                                                             style={{ width: `${acc.score}%` }}
@@ -737,8 +738,8 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
 
                             {/* Row 5: Findings by Service — Stacked Severity Bars */}
                             {dashboardData.services.length > 0 && (
-                                <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                                    <h3 className="text-sm font-semibold text-slate-400 mb-5">Findings Distribution by Service</h3>
+                                <div className="glass-panel rounded-2xl border border-border/50 p-5">
+                                    <h3 className="text-sm font-semibold text-muted-foreground mb-5">Findings Distribution by Service</h3>
                                     <div className="space-y-3">
                                         {dashboardData.services.map(([service, v], i) => {
                                             const rowTotal = v.critical + v.high + v.medium + v.low;
@@ -746,10 +747,10 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                             const barPct = (rowTotal / maxTotal) * 100;
                                             return (
                                                 <div key={service} className="flex items-center gap-3">
-                                                    <div className="w-4 text-[10px] text-slate-600 text-right flex-shrink-0">{i + 1}</div>
-                                                    <div className="w-16 text-xs text-slate-300 font-mono truncate flex-shrink-0">{service}</div>
+                                                    <div className="w-4 text-[10px] text-muted-foreground/70 text-right flex-shrink-0">{i + 1}</div>
+                                                    <div className="w-16 text-xs text-muted-foreground font-mono truncate flex-shrink-0">{service}</div>
                                                     <div className="flex-1 min-w-0">
-                                                        <div className="w-full h-4 bg-slate-800/60 rounded-full overflow-hidden flex">
+                                                        <div className="w-full h-4 bg-secondary/60 rounded-full overflow-hidden flex">
                                                             {([
                                                                 { count: v.critical, color: "#ef4444" },
                                                                 { count: v.high,     color: "#f97316" },
@@ -769,19 +770,19 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                                             )}
                                                         </div>
                                                     </div>
-                                                    <div className="text-xs font-bold text-slate-300 tabular-nums w-6 text-right">{rowTotal}</div>
+                                                    <div className="text-xs font-bold text-muted-foreground tabular-nums w-6 text-right">{rowTotal}</div>
                                                 </div>
                                             );
                                         })}
                                     </div>
-                                    <div className="flex gap-5 mt-5 pt-3 border-t border-slate-800/40">
+                                    <div className="flex gap-5 mt-5 pt-3 border-t border-border/40">
                                         {[
                                             { label: "Critical", color: "#ef4444" },
                                             { label: "High",     color: "#f97316" },
                                             { label: "Medium",   color: "#f59e0b" },
                                             { label: "Low",      color: "#10b981" },
                                         ].map(l => (
-                                            <div key={l.label} className="flex items-center gap-1.5 text-[10px] text-slate-500">
+                                            <div key={l.label} className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
                                                 <div className="w-2 h-2 rounded-full" style={{ backgroundColor: l.color }} />
                                                 {l.label}
                                             </div>
@@ -793,24 +794,24 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                     )}
 
                     {/* Connected Accounts */}
-                    <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
+                    <div className="glass-panel rounded-2xl border border-border/50 p-5">
                         <div className="flex items-center space-x-2 mb-4">
                             <Cloud className="w-4 h-4 text-sky-400" />
-                            <h3 className="text-sm font-semibold text-slate-100">Connected Accounts</h3>
+                            <h3 className="text-sm font-semibold text-foreground">Connected Accounts</h3>
                         </div>
                         <div className="flex flex-col space-y-3">
                             {accounts.map(acc => (
-                                <div key={acc.id} className="flex flex-col rounded-xl border border-slate-800/50 overflow-hidden">
-                                <div className="flex items-center justify-between p-4 bg-slate-900/40">
+                                <div key={acc.id} className="flex flex-col rounded-xl border border-border/50 overflow-hidden">
+                                <div className="flex items-center justify-between p-4 bg-card/40">
                                     <div className="flex items-center space-x-4">
                                         <div className="w-10 h-10 rounded-xl bg-sky-500/10 border border-sky-500/20 flex items-center justify-center shrink-0">
                                             <Cloud className="w-5 h-5 text-sky-400" />
                                         </div>
                                         <div>
-                                            <p className="text-sm font-medium text-slate-200">
+                                            <p className="text-sm font-medium text-foreground">
                                                 {acc.account_alias ?? `Account ${acc.account_id}`}
                                             </p>
-                                            <p className="text-[11px] text-slate-500 font-mono">{acc.account_id}</p>
+                                            <p className="text-[11px] text-muted-foreground font-mono">{acc.account_id}</p>
                                             {acc.error_message && (
                                                 <p className="text-[11px] text-red-400 mt-0.5">{acc.error_message}</p>
                                             )}
@@ -818,8 +819,8 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                     </div>
                                     <div className="flex items-center space-x-4">
                                         <div className="text-right hidden md:block">
-                                            <p className="text-[10px] text-slate-500">Last Scan</p>
-                                            <p className="text-xs text-slate-400" suppressHydrationWarning>
+                                            <p className="text-[10px] text-muted-foreground">Last Scan</p>
+                                            <p className="text-xs text-muted-foreground" suppressHydrationWarning>
                                                 {acc.last_scan ? new Date(acc.last_scan).toLocaleString("en-GB") : "Never"}
                                             </p>
                                         </div>
@@ -831,15 +832,15 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                             {acc.status}
                                         </span>
                                         <div className="flex items-center space-x-1">
-                                            <button onClick={() => handleScan(acc.id)} disabled={scanning === acc.id}
-                                                className="p-1.5 text-slate-500 hover:text-sky-400 hover:bg-sky-500/10 rounded-lg transition-colors"
+                                            <Button variant="plain" onClick={() => handleScan(acc.id)} disabled={scanning === acc.id}
+                                                className="p-1.5 text-muted-foreground hover:text-sky-400 hover:bg-sky-500/10 rounded-lg transition-colors h-auto"
                                                 title="Trigger scan">
                                                 <RefreshCw className={cn("w-4 h-4", scanning === acc.id && "animate-spin")} />
-                                            </button>
-                                            <button onClick={() => handleDisconnect(acc.id)}
-                                                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors">
+                                            </Button>
+                                            <Button variant="plain" onClick={() => handleDisconnect(acc.id)}
+                                                className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors h-auto">
                                                 <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
                                 </div>
@@ -861,38 +862,38 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                     </div>
 
                     {/* Findings Table */}
-                    <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col">
-                        <div className="flex flex-wrap items-center gap-3 p-5 border-b border-slate-800/50">
+                    <div className="glass-panel rounded-2xl border border-border/50 flex flex-col">
+                        <div className="flex flex-wrap items-center gap-3 p-5 border-b border-border/50">
                             <div className="relative flex-1 min-w-[180px]">
-                                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                                 <input type="text" value={search} onChange={e => setSearch(e.target.value)}
                                     placeholder="Search findings…"
-                                    className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none" />
+                                    className="w-full bg-secondary/60 border border-border/50 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none" />
                             </div>
                             <select value={filterSeverity} onChange={e => setFilterSeverity(e.target.value)}
-                                className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
+                                className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none">
                                 <option value="all">All Severities</option>
                                 {["critical", "high", "medium", "low"].map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
                             </select>
                             <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
-                                className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none">
+                                className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none">
                                 <option value="all">All Statuses</option>
                                 <option value="active">Active</option>
                                 <option value="resolved">Resolved</option>
                             </select>
-                            <span className="text-xs text-slate-500 ml-auto">{filtered.length} finding{filtered.length !== 1 ? "s" : ""}</span>
+                            <span className="text-xs text-muted-foreground ml-auto">{filtered.length} finding{filtered.length !== 1 ? "s" : ""}</span>
                         </div>
 
                         {filtered.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
                                 <Shield className="w-12 h-12 text-emerald-700 mb-3" />
                                 <p className="text-sm font-medium text-emerald-400">No findings</p>
-                                <p className="text-xs text-slate-600 mt-1">Run a scan to check for misconfigurations</p>
+                                <p className="text-xs text-muted-foreground/70 mt-1">Run a scan to check for misconfigurations</p>
                             </div>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-left text-sm">
-                                    <thead className="text-[10px] text-slate-500 font-mono uppercase bg-slate-900/40">
+                                    <thead className="text-[10px] text-muted-foreground font-mono uppercase bg-card/40">
                                         <tr>
                                             <th className="px-5 py-3 font-medium">Finding</th>
                                             <th className="px-4 py-3 font-medium">Severity</th>
@@ -901,20 +902,20 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                             <th className="px-4 py-3 font-medium">Last Seen</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-800/50">
+                                    <tbody className="divide-y divide-border/50">
                                         {filtered.map(f => (
-                                            <tr key={f.id} className="hover:bg-slate-800/20 transition-colors">
+                                            <tr key={f.id} className="hover:bg-secondary/20 transition-colors">
                                                 <td className="px-5 py-3">
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm text-slate-200 font-medium">{f.title}</span>
-                                                        <span className="text-[11px] text-slate-500 font-mono">{f.rule_id}</span>
+                                                        <span className="text-sm text-foreground font-medium">{f.title}</span>
+                                                        <span className="text-[11px] text-muted-foreground font-mono">{f.rule_id}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3"><SeverityBadge severity={f.severity} /></td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex flex-col">
-                                                        <span className="text-xs text-slate-300">{f.resource_type ?? "—"}</span>
-                                                        <span className="text-[11px] text-slate-500 font-mono truncate max-w-[180px]">{f.resource_id ?? f.resource_arn ?? "—"}</span>
+                                                        <span className="text-xs text-muted-foreground">{f.resource_type ?? "—"}</span>
+                                                        <span className="text-[11px] text-muted-foreground font-mono truncate max-w-[180px]">{f.resource_id ?? f.resource_arn ?? "—"}</span>
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3">
@@ -923,7 +924,7 @@ export function CSPMClient({ initialAccounts, initialFindings, orgId }: CSPMClie
                                                     )}>{f.status}</span>
                                                 </td>
                                                 <td className="px-4 py-3">
-                                                    <span className="text-xs text-slate-400" suppressHydrationWarning>
+                                                    <span className="text-xs text-muted-foreground" suppressHydrationWarning>
                                                         {new Date(f.last_seen).toLocaleDateString("en-GB")}
                                                     </span>
                                                 </td>

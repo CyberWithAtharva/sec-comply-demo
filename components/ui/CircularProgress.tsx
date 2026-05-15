@@ -38,7 +38,7 @@ export function CircularProgress({
                 "flex items-center space-x-6 p-6 rounded-2xl cursor-pointer transition-all duration-300 relative group overflow-hidden",
                 isActive
                     ? "glass-panel border-blue-500/30 shadow-glow"
-                    : "glass-panel hover:border-slate-700",
+                    : "glass-panel hover:border-border",
                 className
             )}
         >
@@ -51,7 +51,7 @@ export function CircularProgress({
             <div className="relative flex items-center justify-center">
                 <svg className="w-24 h-24 transform -rotate-90">
                     <circle
-                        className="text-slate-800"
+                        className="text-border"
                         strokeWidth="8"
                         stroke="currentColor"
                         fill="transparent"
@@ -78,14 +78,14 @@ export function CircularProgress({
                     <span className={cn("text-2xl font-bold tracking-tighter text-glow", colorClass)}>
                         {value}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono uppercase tracking-widest">%</span>
+                    <span className="text-[10px] text-muted-foreground font-mono uppercase tracking-widest">%</span>
                 </div>
             </div>
 
             {/* Info Content */}
             <div className="flex flex-col flex-1 z-10">
                 <div className="flex items-center space-x-3 mb-1">
-                    <h2 className="text-xl font-semibold text-slate-100 tracking-tight">{title}</h2>
+                    <h2 className="text-xl font-semibold text-foreground tracking-tight">{title}</h2>
                     {status && (
                         <span
                             className={cn(
@@ -94,7 +94,7 @@ export function CircularProgress({
                                     "bg-red-500/10 text-red-400 border-red-500/20": status === "Critical",
                                     "bg-amber-500/10 text-amber-400 border-amber-500/20": status === "Warning",
                                     "bg-emerald-500/10 text-emerald-400 border-emerald-500/20": status === "Good",
-                                    "bg-slate-500/10 text-slate-400 border-slate-500/20": status === "Not Started",
+                                    "bg-slate-500/10 text-muted-foreground border-slate-500/20": status === "Not Started",
                                 }
                             )}
                         >
@@ -102,7 +102,7 @@ export function CircularProgress({
                         </span>
                     )}
                 </div>
-                <p className="text-sm text-slate-400 line-clamp-2">{subtitle}</p>
+                <p className="text-sm text-muted-foreground line-clamp-2">{subtitle}</p>
             </div>
         </motion.div>
     );

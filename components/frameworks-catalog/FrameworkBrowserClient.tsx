@@ -33,55 +33,55 @@ export function FrameworkBrowserClient({ controls }: Props) {
     return (
         <div className="space-y-4">
             <div className="relative max-w-md">
-                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                 <input
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                     placeholder="Search code, name, domain, description…"
-                    className="w-full bg-slate-950/50 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+                    className="w-full bg-background/50 border border-border rounded-xl pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/40"
                 />
             </div>
 
-            <div className="rounded-2xl border border-slate-800/60 bg-slate-900/30 backdrop-blur-sm overflow-hidden">
+            <div className="rounded-2xl border border-border/60 bg-card/30 backdrop-blur-sm overflow-hidden">
                 {filtered.length === 0 ? (
                     <div className="p-16 text-center">
-                        <ListChecks className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                        <p className="text-slate-400 font-medium">
+                        <ListChecks className="w-12 h-12 text-muted-foreground/70 mx-auto mb-4" />
+                        <p className="text-muted-foreground font-medium">
                             {controls.length === 0 ? "This framework has no controls yet." : "No controls match your search."}
                         </p>
                     </div>
                 ) : (
                     <table className="w-full text-sm">
-                        <thead className="border-b border-slate-800/60">
-                            <tr className="text-left text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+                        <thead className="border-b border-border/60">
+                            <tr className="text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">
                                 <th className="px-4 py-3 w-32">Code</th>
                                 <th className="px-4 py-3">Name</th>
                                 <th className="px-4 py-3 w-40">Domain</th>
                                 <th className="px-4 py-3 w-20 text-right tabular-nums">Sort</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800/40">
+                        <tbody className="divide-y divide-border/40">
                             {filtered.map(c => (
-                                <tr key={c.id} className="hover:bg-slate-800/20 transition-colors">
+                                <tr key={c.id} className="hover:bg-secondary/20 transition-colors">
                                     <td className="px-4 py-2.5">
-                                        <span className="inline-block px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 font-mono text-xs text-slate-200">
+                                        <span className="inline-block px-2 py-0.5 rounded-md bg-secondary/80 border border-border/60 font-mono text-xs text-foreground">
                                             {c.code}
                                         </span>
                                     </td>
                                     <td className="px-4 py-2.5">
-                                        <p className="text-slate-200 font-medium leading-tight">{c.name}</p>
+                                        <p className="text-foreground font-medium leading-tight">{c.name}</p>
                                         {c.description && (
-                                            <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{c.description}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{c.description}</p>
                                         )}
                                     </td>
                                     <td className="px-4 py-2.5">
                                         {c.domain ? (
-                                            <span className="text-[10px] font-semibold text-slate-400 px-2 py-0.5 rounded-full bg-slate-800/60 border border-slate-700/60 uppercase tracking-wider">
+                                            <span className="text-[10px] font-semibold text-muted-foreground px-2 py-0.5 rounded-full bg-secondary/60 border border-border/60 uppercase tracking-wider">
                                                 {c.domain}
                                             </span>
-                                        ) : <span className="text-slate-600">—</span>}
+                                        ) : <span className="text-muted-foreground/70">—</span>}
                                     </td>
-                                    <td className="px-4 py-2.5 text-right tabular-nums text-slate-400">
+                                    <td className="px-4 py-2.5 text-right tabular-nums text-muted-foreground">
                                         {c.sort_order}
                                     </td>
                                 </tr>

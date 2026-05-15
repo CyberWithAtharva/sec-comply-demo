@@ -18,17 +18,17 @@ export default async function FrameworksCatalogPage() {
             <div>
                 <div className="flex items-center gap-2 mb-2">
                     <Library className="w-5 h-5 text-orange-400" />
-                    <h1 className="text-2xl font-bold text-slate-100">Frameworks Catalog</h1>
+                    <h1 className="text-2xl font-bold text-foreground">Frameworks Catalog</h1>
                 </div>
-                <p className="text-sm text-slate-500">
+                <p className="text-sm text-muted-foreground">
                     Browse the library of compliance frameworks SecComply tracks. Ask your admin to assign one to your organization.
                 </p>
             </div>
 
             {list.length === 0 ? (
-                <div className="rounded-2xl border border-slate-800/60 bg-slate-900/30 p-16 text-center">
-                    <ShieldCheck className="w-12 h-12 text-slate-600 mx-auto mb-4" />
-                    <p className="text-slate-400 font-medium">No frameworks in the catalog yet</p>
+                <div className="rounded-2xl border border-border/60 bg-card/30 p-16 text-center">
+                    <ShieldCheck className="w-12 h-12 text-muted-foreground/70 mx-auto mb-4" />
+                    <p className="text-muted-foreground font-medium">No frameworks in the catalog yet</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -38,7 +38,7 @@ export default async function FrameworksCatalogPage() {
                             <Link
                                 key={fw.id}
                                 href={`/frameworks-catalog/${fw.id}`}
-                                className="group rounded-2xl border border-slate-800/60 bg-slate-900/30 hover:bg-slate-800/40 hover:border-slate-700/60 transition-all backdrop-blur-sm overflow-hidden"
+                                className="group rounded-2xl border border-border/60 bg-card/30 hover:bg-secondary/40 hover:border-border/60 transition-all backdrop-blur-sm overflow-hidden"
                                 style={{ borderLeft: `3px solid ${accent}` }}
                             >
                                 <div className="p-5">
@@ -50,21 +50,21 @@ export default async function FrameworksCatalogPage() {
                                             <ShieldCheck className="w-5 h-5" style={{ color: accent }} />
                                         </div>
                                     </div>
-                                    <h3 className="text-sm font-semibold text-slate-200 mb-0.5">
+                                    <h3 className="text-sm font-semibold text-foreground mb-0.5">
                                         {fw.name}
-                                        {fw.version && <span className="ml-2 text-xs text-slate-500">v{fw.version}</span>}
+                                        {fw.version && <span className="ml-2 text-xs text-muted-foreground">v{fw.version}</span>}
                                     </h3>
-                                    <p className="text-xs text-slate-500 font-mono mb-3 truncate">{fw.slug}</p>
+                                    <p className="text-xs text-muted-foreground font-mono mb-3 truncate">{fw.slug}</p>
                                     {fw.description && (
-                                        <p className="text-xs text-slate-400 line-clamp-2 mb-3">{fw.description}</p>
+                                        <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{fw.description}</p>
                                     )}
                                     <div className="flex items-center justify-between">
                                         {fw.category ? (
-                                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-slate-800/60 text-slate-400 border border-slate-700/60 uppercase tracking-wider">
+                                            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-secondary/60 text-muted-foreground border border-border/60 uppercase tracking-wider">
                                                 {fw.category.replace(/_/g, " ")}
                                             </span>
                                         ) : <span />}
-                                        <span className="flex items-center gap-1 text-xs text-slate-400 tabular-nums">
+                                        <span className="flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
                                             <ListChecks className="w-3 h-3" />
                                             {fw.controls_count ?? 0}
                                         </span>

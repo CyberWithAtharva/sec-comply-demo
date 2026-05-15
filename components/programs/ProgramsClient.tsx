@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronRight } from "lucide-react";
 
@@ -87,7 +88,7 @@ export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesB
         subtitle: `v${fw.version} · ${fw.verifiedControls} of ${fw.totalControls} controls verified`,
         value: fw.percentage,
         status: fw.status,
-        colorClass: STATUS_COLOR[fw.status] ?? "text-slate-400",
+        colorClass: STATUS_COLOR[fw.status] ?? "text-muted-foreground",
         gapCount: gapCounts[fw.frameworkId] ?? 0,
     }));
 
@@ -106,10 +107,10 @@ export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesB
 
             {/* Header Breadcrumb */}
             <div className="flex items-center justify-between">
-                <div className="flex items-center text-sm font-mono text-slate-400 tracking-wide">
-                    <span className="hover:text-slate-200 cursor-pointer transition-colors">Home</span>
+                <div className="flex items-center text-sm font-mono text-muted-foreground tracking-wide">
+                    <span className="hover:text-foreground cursor-pointer transition-colors">Home</span>
                     <ChevronRight className="w-4 h-4 mx-2 opacity-50" />
-                    <span className="text-slate-100">Programs</span>
+                    <span className="text-foreground">Programs</span>
                 </div>
                 <div className="flex items-center gap-3">
                     {activeGapCount > 0 && (
@@ -126,14 +127,14 @@ export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesB
 
             {/* Layout Tabs */}
             <div className="pt-8 mb-4">
-                <div className="flex space-x-8 border-b border-slate-800 pb-px relative overflow-x-auto no-scrollbar">
+                <div className="flex space-x-8 border-b border-border pb-px relative overflow-x-auto no-scrollbar">
                     {["Overview", "Controls", "Domains", "Policies", "Evidence"].map((tab) => (
-                        <button
+                        <Button variant="plain"
                             key={tab}
                             onClick={() => setActiveTab(tab)}
                             className={`pb-4 text-sm font-medium tracking-wide whitespace-nowrap transition-colors relative ${activeTab === tab
                                 ? "text-blue-400"
-                                : "text-slate-400 hover:text-slate-200"
+                                : "text-muted-foreground hover:text-foreground"
                                 }`}
                         >
                             {tab}
@@ -143,7 +144,7 @@ export function ProgramsClient({ frameworks, controls, gapCounts = {}, policiesB
                                     className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.6)]"
                                 />
                             )}
-                        </button>
+                        </Button>
                     ))}
                 </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { ShieldCheck, Server, Lock, Fingerprint, Eye, ChevronRight, CheckCircle2, AlertTriangle, AlertCircle, Maximize2, ChevronDown, FileText, FileJson, FileBadge, ArrowRight, Layers } from "lucide-react";
 import { cn } from "@/components/ui/Card";
@@ -373,9 +374,9 @@ function CategoryTree({ controlId }: { controlId: string }) {
             initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.05 }}
-            className="mb-5 bg-slate-900/30 rounded-xl border border-slate-800/40 p-4"
+            className="mb-5 bg-card/30 rounded-xl border border-border/40 p-4"
         >
-            <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-3 flex items-center space-x-2">
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-3 flex items-center space-x-2">
                 <Layers className="w-3 h-3" />
                 <span>Category → Subcategories</span>
             </span>
@@ -391,27 +392,27 @@ function CategoryTree({ controlId }: { controlId: string }) {
                             className="flex items-center gap-2.5"
                         >
                             {/* Parent Node */}
-                            <button
+                            <Button variant="plain"
                                 onClick={() => toggleNode(node.name)}
-                                className={cn(
+                                className={cn("h-auto", 
                                     "flex-shrink-0 w-44 flex items-center space-x-2 px-3 py-2 rounded-lg border transition-all text-left",
                                     isOpen
                                         ? "bg-blue-500/8 border-blue-500/25 shadow-[0_0_16px_rgba(59,130,246,0.06)]"
-                                        : "bg-slate-800/50 border-slate-700/40 hover:border-slate-600"
+                                        : "bg-secondary/50 border-border/40 hover:border-slate-600"
                                 )}
                             >
                                 <motion.div animate={{ rotate: isOpen ? 90 : 0 }} transition={{ duration: 0.2 }}>
-                                    <ChevronRight className={cn("w-3 h-3 flex-shrink-0", isOpen ? "text-blue-400" : "text-slate-500")} />
+                                    <ChevronRight className={cn("w-3 h-3 flex-shrink-0", isOpen ? "text-blue-400" : "text-muted-foreground")} />
                                 </motion.div>
-                                <span className={cn("text-[11px] font-semibold truncate", isOpen ? "text-blue-300" : "text-slate-300")}>
+                                <span className={cn("text-[11px] font-semibold truncate", isOpen ? "text-blue-300" : "text-muted-foreground")}>
                                     {node.name}
                                 </span>
-                            </button>
+                            </Button>
 
                             {/* Arrow connector */}
                             <div className="flex items-center flex-shrink-0">
-                                <div className={cn("w-5 h-[1.5px] transition-colors rounded-full", isOpen ? "bg-blue-500/40" : "bg-slate-700/60")} />
-                                <ArrowRight className={cn("w-3 h-3 -ml-0.5 transition-colors", isOpen ? "text-blue-400/60" : "text-slate-700")} />
+                                <div className={cn("w-5 h-[1.5px] transition-colors rounded-full", isOpen ? "bg-blue-500/40" : "bg-secondary/60")} />
+                                <ArrowRight className={cn("w-3 h-3 -ml-0.5 transition-colors", isOpen ? "text-blue-400/60" : "text-muted-foreground/50")} />
                             </div>
 
                             {/* Children */}
@@ -424,7 +425,7 @@ function CategoryTree({ controlId }: { controlId: string }) {
                                             animate={{ opacity: 1, scale: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.85, y: 4 }}
                                             transition={{ delay: childIdx * 0.03, duration: 0.2 }}
-                                            className="text-[10px] font-medium text-slate-300 bg-slate-800/70 border border-slate-700/40 px-2.5 py-1.5 rounded-lg hover:border-blue-500/30 hover:bg-blue-500/5 hover:text-blue-300 transition-all cursor-default whitespace-nowrap"
+                                            className="text-[10px] font-medium text-muted-foreground bg-secondary/70 border border-border/40 px-2.5 py-1.5 rounded-lg hover:border-blue-500/30 hover:bg-blue-500/5 hover:text-blue-300 transition-all cursor-default whitespace-nowrap"
                                         >
                                             {child}
                                         </motion.div>
@@ -461,20 +462,20 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-            className="mt-4 pt-4 border-t border-slate-700/40"
+            className="mt-4 pt-4 border-t border-border/40"
         >
             {/* Linked Evidence Files */}
             <div className="mb-5">
-                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Linked Evidence</span>
+                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2 block">Linked Evidence</span>
                 <div className="flex flex-wrap gap-2">
                     {files.map((file, i) => (
                         <div
                             key={i}
-                            className="flex items-center space-x-2 bg-slate-800/60 border border-slate-700/50 rounded-lg px-3 py-1.5 cursor-pointer hover:border-blue-500/30 hover:bg-slate-800 transition-all group"
+                            className="flex items-center space-x-2 bg-secondary/60 border border-border/50 rounded-lg px-3 py-1.5 cursor-pointer hover:border-blue-500/30 hover:bg-secondary transition-all group"
                         >
-                            <file.icon className="w-3.5 h-3.5 text-slate-400 group-hover:text-blue-400 transition-colors" />
-                            <span className="text-xs text-slate-300 font-medium truncate max-w-[150px]">{file.name}</span>
-                            <span className="text-[9px] text-slate-500 font-mono uppercase">{file.type}</span>
+                            <file.icon className="w-3.5 h-3.5 text-muted-foreground group-hover:text-blue-400 transition-colors" />
+                            <span className="text-xs text-muted-foreground font-medium truncate max-w-[150px]">{file.name}</span>
+                            <span className="text-[9px] text-muted-foreground font-mono uppercase">{file.type}</span>
                         </div>
                     ))}
                 </div>
@@ -486,8 +487,8 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
             {/* Heatmap Grid */}
             <div>
                 <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest">Coverage Heatmap</span>
-                    <div className="flex items-center space-x-1 text-[9px] text-slate-500">
+                    <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Coverage Heatmap</span>
+                    <div className="flex items-center space-x-1 text-[9px] text-muted-foreground">
                         <span>Gap</span>
                         <div className="flex space-x-px">
                             <div className="w-2.5 h-2.5 rounded-sm bg-red-500/35" />
@@ -507,7 +508,7 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                     {config.cols.map((sub) => (
                         <div
                             key={sub}
-                            className="text-[9px] font-medium text-slate-500 text-center px-0.5 truncate"
+                            className="text-[9px] font-medium text-muted-foreground text-center px-0.5 truncate"
                             title={sub}
                         >
                             {sub}
@@ -517,7 +518,7 @@ function EvidenceHeatmapInline({ controlId }: { controlId: string }) {
                     {/* Data Rows */}
                     {config.rows.map((cat, catIdx) => (
                         <React.Fragment key={cat}>
-                            <div className="text-[11px] font-semibold text-slate-300 flex items-center truncate" title={cat}>
+                            <div className="text-[11px] font-semibold text-muted-foreground flex items-center truncate" title={cat}>
                                 {cat}
                             </div>
                             {heatmapData[catIdx].map((value, subIdx) => (
@@ -566,36 +567,36 @@ export function ControlsBreakdownUX() {
         <div className="w-full h-full flex gap-6 animate-in fade-in zoom-in-95 duration-500">
             {/* Level 1: Domains */}
             <div className="w-64 flex-shrink-0 flex flex-col space-y-3">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest pl-2 mb-1">TSC Domains</span>
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest pl-2 mb-1">TSC Domains</span>
                 {tscDomains.map((domain) => {
                     const isActive = selectedDomain === domain.id;
                     return (
-                        <button
+                        <Button variant="plain"
                             key={domain.id}
                             onClick={() => {
                                 setSelectedDomain(domain.id);
                                 setSelectedCategory(categoriesData[domain.id]?.[0]?.id || "");
                                 setExpandedControlId(null);
                             }}
-                            className={cn(
+                            className={cn("h-auto", 
                                 "flex items-center w-full px-4 py-4 rounded-2xl transition-all duration-300 relative overflow-hidden group border",
                                 isActive
-                                    ? "bg-slate-800/80 border-slate-700 shadow-xl"
-                                    : "bg-slate-900/30 border-transparent hover:bg-slate-800/40"
+                                    ? "bg-secondary/80 border-border shadow-xl"
+                                    : "bg-card/30 border-transparent hover:bg-secondary/40"
                             )}
                         >
                             {isActive && <div className="absolute left-0 top-0 bottom-0 w-1 bg-indigo-500 shadow-[0_0_12px_rgba(99,102,241,0.8)]" />}
 
                             <domain.icon className={cn(
                                 "w-5 h-5 flex-shrink-0 mr-3 transition-colors",
-                                isActive ? "text-indigo-400" : "text-slate-500 group-hover:text-slate-400"
+                                isActive ? "text-indigo-400" : "text-muted-foreground group-hover:text-muted-foreground"
                             )} />
 
                             <div className="flex flex-col items-start w-full">
-                                <span className={cn("text-sm font-semibold tracking-wide transition-colors", isActive ? "text-slate-100" : "text-slate-400 group-hover:text-slate-200")}>
+                                <span className={cn("text-sm font-semibold tracking-wide transition-colors", isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground")}>
                                     {domain.name}
                                 </span>
-                                <div className="w-full mt-2 bg-slate-800 rounded-full h-1.5 overflow-hidden">
+                                <div className="w-full mt-2 bg-secondary rounded-full h-1.5 overflow-hidden">
                                     <div
                                         className={cn("h-full rounded-full transition-all duration-1000",
                                             domain.status === "Good" ? "bg-emerald-500" : domain.status === "Warning" ? "bg-amber-500" : "bg-red-500"
@@ -604,14 +605,14 @@ export function ControlsBreakdownUX() {
                                     />
                                 </div>
                             </div>
-                        </button>
+                        </Button>
                     )
                 })}
             </div>
 
             {/* Level 2: Categories (Sub-Domains) */}
-            <div className="w-80 flex-shrink-0 flex flex-col border-l border-slate-800/50 pl-6 space-y-3">
-                <span className="text-xs font-semibold text-slate-500 uppercase tracking-widest pl-2 mb-1">Categories</span>
+            <div className="w-80 flex-shrink-0 flex flex-col border-l border-border/50 pl-6 space-y-3">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest pl-2 mb-1">Categories</span>
                 <AnimatePresence mode="popLayout">
                     {activeCategories.map((category, idx) => {
                         const isActive = selectedCategory === category.id;
@@ -627,17 +628,17 @@ export function ControlsBreakdownUX() {
                                     "flex flex-col w-full text-left p-4 rounded-xl transition-all duration-200 border",
                                     isActive
                                         ? "bg-indigo-500/10 border-indigo-500/30 shadow-[0_4px_20px_rgba(99,102,241,0.1)]"
-                                        : "bg-slate-900/40 border-slate-800/50 hover:border-slate-700 hover:bg-slate-800/50"
+                                        : "bg-card/40 border-border/50 hover:border-border hover:bg-secondary/50"
                                 )}
                             >
                                 <div className="flex justify-between items-start w-full mb-2">
-                                    <span className={cn("text-sm font-medium", isActive ? "text-indigo-300" : "text-slate-300")}>
+                                    <span className={cn("text-sm font-medium", isActive ? "text-indigo-300" : "text-muted-foreground")}>
                                         {category.name}
                                     </span>
                                     {isActive && <ChevronRight className="w-4 h-4 text-indigo-400" />}
                                 </div>
                                 <div className="flex items-center justify-between w-full">
-                                    <span className="text-[10px] text-slate-500 font-mono font-bold tracking-widest uppercase">
+                                    <span className="text-[10px] text-muted-foreground font-mono font-bold tracking-widest uppercase">
                                         {category.passed}/{category.count} Controls
                                     </span>
                                     <span className={cn("text-[10px] font-bold", progressPct === 100 ? "text-emerald-400" : progressPct > 50 ? "text-amber-400" : "text-red-400")}>
@@ -651,15 +652,15 @@ export function ControlsBreakdownUX() {
             </div>
 
             {/* Level 3: Controls Detail Matrix */}
-            <div className="flex-1 flex flex-col border-l border-slate-800/50 pl-6 pt-2">
-                <div className="flex items-center justify-between pb-4 border-b border-slate-800/50 mb-4">
-                    <h3 className="text-lg font-bold text-slate-100 flex items-center">
+            <div className="flex-1 flex flex-col border-l border-border/50 pl-6 pt-2">
+                <div className="flex items-center justify-between pb-4 border-b border-border/50 mb-4">
+                    <h3 className="text-lg font-bold text-foreground flex items-center">
                         <span className="text-indigo-400 mr-2">{activeCategories.find(c => c.id === selectedCategory)?.name || "Sub-controls"}</span>
                         Metrics
                     </h3>
-                    <button className="text-xs flex items-center bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition">
+                    <Button variant="plain" className="text-xs flex items-center bg-secondary hover:bg-secondary text-muted-foreground px-3 py-1.5 rounded-lg border border-border transition h-auto">
                         <Maximize2 className="w-3 h-3 mr-1.5" /> Full Screen
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="flex-1 overflow-y-auto no-scrollbar pr-2 space-y-3">
@@ -677,7 +678,7 @@ export function ControlsBreakdownUX() {
                                         "glass-panel p-4 rounded-xl border flex flex-col transition-all group cursor-pointer",
                                         isExpanded
                                             ? "border-blue-500/30 bg-blue-500/[0.03] shadow-[0_0_30px_rgba(59,130,246,0.08)]"
-                                            : "border-slate-800/50 hover:border-indigo-500/20 hover:bg-slate-800/30"
+                                            : "border-border/50 hover:border-indigo-500/20 hover:bg-secondary/30"
                                     )}
                                 >
                                     <div className="flex items-start justify-between">
@@ -699,14 +700,14 @@ export function ControlsBreakdownUX() {
                                             </div>
                                             <div className="flex flex-col">
                                                 <div className="flex items-center space-x-2 mb-1">
-                                                    <span className="text-xs font-mono font-bold text-slate-300 bg-slate-900 border border-slate-700/50 px-2 py-0.5 rounded shadow-inner">
+                                                    <span className="text-xs font-mono font-bold text-muted-foreground bg-card border border-border/50 px-2 py-0.5 rounded shadow-inner">
                                                         {control.id}
                                                     </span>
                                                     <span className="text-[10px] text-indigo-400 font-bold tracking-widest uppercase bg-indigo-500/10 px-2 py-0.5 rounded-full">
                                                         {control.type}
                                                     </span>
                                                 </div>
-                                                <p className="text-sm text-slate-300 leading-relaxed font-medium">
+                                                <p className="text-sm text-muted-foreground leading-relaxed font-medium">
                                                     {control.desc}
                                                 </p>
                                             </div>
@@ -716,7 +717,7 @@ export function ControlsBreakdownUX() {
                                             "flex items-center space-x-1.5 text-xs font-semibold whitespace-nowrap px-3 py-1.5 rounded border transition-all flex-shrink-0 ml-3",
                                             isExpanded
                                                 ? "text-blue-400 bg-blue-500/10 border-blue-500/20"
-                                                : "text-slate-500 bg-slate-800/40 border-slate-700/50 group-hover:text-indigo-400 group-hover:border-indigo-500/20 group-hover:bg-indigo-500/10"
+                                                : "text-muted-foreground bg-secondary/40 border-border/50 group-hover:text-indigo-400 group-hover:border-indigo-500/20 group-hover:bg-indigo-500/10"
                                         )}>
                                             <span>{isExpanded ? "Collapse" : "Expand"}</span>
                                             <motion.div

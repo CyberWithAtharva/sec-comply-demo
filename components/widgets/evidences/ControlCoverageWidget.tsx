@@ -5,11 +5,11 @@ import { ShieldCheck } from "lucide-react";
 
 export function ControlCoverageWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50 relative overflow-hidden">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50 relative overflow-hidden">
             <div className="flex items-center justify-between mb-4 relative z-10">
                 <div className="flex items-center space-x-2">
                     <ShieldCheck className="w-5 h-5 text-emerald-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Evidence Coverage</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Evidence Coverage</h3>
                 </div>
             </div>
 
@@ -20,19 +20,19 @@ export function ControlCoverageWidget() {
                         <circle cx="64" cy="64" r="56" className="stroke-emerald-500" strokeWidth="12" fill="none" strokeDasharray="351.8" strokeDashoffset={351.8 - (351.8 * 84) / 100} strokeLinecap="round" />
                     </svg>
                     <div className="absolute flex flex-col items-center">
-                        <span className="text-3xl font-bold text-slate-100">84%</span>
+                        <span className="text-3xl font-bold text-foreground">84%</span>
                     </div>
                 </div>
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-2 text-center text-xs relative z-10">
-                <div className="bg-slate-900/40 border border-slate-800/50 p-2 rounded-lg">
-                    <span className="block text-slate-200 font-bold text-lg">312</span>
-                    <span className="text-slate-500 uppercase tracking-widest text-[9px]">Attached File</span>
+                <div className="bg-card/40 border border-border/50 p-2 rounded-lg">
+                    <span className="block text-foreground font-bold text-lg">312</span>
+                    <span className="text-muted-foreground uppercase tracking-widest text-[9px]">Attached File</span>
                 </div>
-                <div className="bg-slate-900/40 border border-slate-800/50 p-2 rounded-lg">
-                    <span className="block text-slate-200 font-bold text-lg">24</span>
-                    <span className="text-slate-500 uppercase tracking-widest text-[9px]">Missing Gaps</span>
+                <div className="bg-card/40 border border-border/50 p-2 rounded-lg">
+                    <span className="block text-foreground font-bold text-lg">24</span>
+                    <span className="text-muted-foreground uppercase tracking-widest text-[9px]">Missing Gaps</span>
                 </div>
             </div>
 

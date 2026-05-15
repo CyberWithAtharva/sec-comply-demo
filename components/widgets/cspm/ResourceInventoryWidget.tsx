@@ -15,23 +15,23 @@ const inventory = [
 
 export function ResourceInventoryWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
-                    <Server className="w-5 h-5 text-slate-300" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Resource Inventory</h3>
+                    <Server className="w-5 h-5 text-muted-foreground" />
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Resource Inventory</h3>
                 </div>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
                 {inventory.map((item, idx) => (
-                    <div key={idx} className="p-3 bg-slate-900/40 rounded-xl border border-slate-800/50 hover:bg-slate-800/40 transition-colors flex items-center space-x-3">
-                        <div className={cn("p-2 rounded-lg bg-slate-800", item.color)}>
+                    <div key={idx} className="p-3 bg-card/40 rounded-xl border border-border/50 hover:bg-secondary/40 transition-colors flex items-center space-x-3">
+                        <div className={cn("p-2 rounded-lg bg-secondary", item.color)}>
                             <item.icon className="w-4 h-4" />
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-lg font-bold text-slate-200 leading-none">{item.count}</span>
-                            <span className="text-[10px] text-slate-400 font-medium uppercase mt-0.5">{item.type}</span>
+                            <span className="text-lg font-bold text-foreground leading-none">{item.count}</span>
+                            <span className="text-[10px] text-muted-foreground font-medium uppercase mt-0.5">{item.type}</span>
                         </div>
                     </div>
                 ))}

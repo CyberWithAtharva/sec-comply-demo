@@ -1,7 +1,9 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import { Search, HelpCircle, ChevronRight } from "lucide-react";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 interface BreadcrumbConfig {
     section?: string;
@@ -50,41 +52,44 @@ export function TopBar() {
     const breadcrumb = getBreadcrumb(pathname);
 
     return (
-        <div className="h-14 flex-shrink-0 flex items-center justify-between px-6 border-b border-slate-800/70 bg-[#020617]">
+        <div className="h-14 flex-shrink-0 flex items-center justify-between px-6 border-b border-border/70 bg-background">
             {/* Breadcrumb */}
             <div className="flex items-center gap-1.5 text-sm">
                 {breadcrumb.section ? (
                     <>
-                        <span className="text-slate-500 font-medium">{breadcrumb.section}</span>
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-                        <span className="text-slate-200 font-semibold">{breadcrumb.page}</span>
+                        <span className="text-muted-foreground font-medium">{breadcrumb.section}</span>
+                        <ChevronRight className="w-3.5 h-3.5 text-muted-foreground/70" />
+                        <span className="text-foreground font-semibold">{breadcrumb.page}</span>
                     </>
                 ) : (
-                    <span className="text-slate-200 font-semibold">{breadcrumb.page}</span>
+                    <span className="text-foreground font-semibold">{breadcrumb.page}</span>
                 )}
             </div>
 
             {/* Center: Search */}
             <div className="absolute left-1/2 -translate-x-1/2">
                 <div className="relative group">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 group-focus-within:text-orange-400 transition-colors" />
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground group-focus-within:text-orange-400 transition-colors" />
                     <input
                         type="text"
                         placeholder="Search…"
-                        className="w-52 bg-slate-900/60 border border-slate-800 rounded-lg py-1.5 pl-8 pr-10 text-sm text-slate-200 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/30 transition-all"
+                        className="w-52 bg-card/60 border border-border rounded-lg py-1.5 pl-8 pr-10 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/30 transition-all"
                         readOnly
                         onFocus={(e) => e.currentTarget.blur()}
                     />
-                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-slate-600 font-mono bg-slate-800/80 px-1 py-0.5 rounded border border-slate-700/60 pointer-events-none select-none">
+                    <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground/70 font-mono bg-secondary/80 px-1 py-0.5 rounded border border-border/60 pointer-events-none select-none">
                         ⌘K
                     </span>
                 </div>
             </div>
 
-            {/* Right: Help */}
-            <button className="p-1.5 rounded-lg text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 transition-colors" title="Help">
-                <HelpCircle className="w-4.5 h-4.5" />
-            </button>
+            {/* Right: Theme + Help */}
+            <div className="flex items-center gap-1">
+                <ThemeToggle />
+                <Button variant="plain" className="p-1.5 rounded-lg text-muted-foreground hover:text-muted-foreground hover:bg-secondary/60 transition-colors h-auto" title="Help">
+                    <HelpCircle className="w-4.5 h-4.5" />
+                </Button>
+            </div>
         </div>
     );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useMemo, useRef, useState } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Loader2, Upload, FileSpreadsheet, Download, AlertTriangle, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
@@ -214,45 +215,45 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-3xl bg-slate-900 border border-slate-700/60 rounded-2xl shadow-2xl p-6 z-10 max-h-[90vh] overflow-y-auto"
+                        className="relative w-full max-w-3xl bg-card border border-border/60 rounded-2xl shadow-2xl p-6 z-10 max-h-[90vh] overflow-y-auto"
                     >
                         <div className="flex items-center justify-between mb-5">
-                            <h2 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                            <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
                                 <FileSpreadsheet className="w-5 h-5 text-amber-400" />
                                 Bulk Upload Controls
                             </h2>
-                            <button
+                            <Button variant="plain"
                                 onClick={handleClose}
                                 disabled={phase === "committing"}
-                                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors disabled:opacity-40"
+                                className="p-1.5 rounded-lg hover:bg-secondary text-muted-foreground transition-colors disabled:opacity-40 h-auto"
                             >
                                 <X className="w-4 h-4" />
-                            </button>
+                            </Button>
                         </div>
 
                         {phase === "input" && (
                             <div className="space-y-5">
-                                <div className="flex items-center justify-between rounded-xl border border-slate-800 bg-slate-950/50 p-4">
+                                <div className="flex items-center justify-between rounded-xl border border-border bg-background/50 p-4">
                                     <div className="text-sm">
-                                        <p className="font-semibold text-slate-200">Need a starting point?</p>
-                                        <p className="text-xs text-slate-500 mt-0.5">Download our XLSX template with example rows.</p>
+                                        <p className="font-semibold text-foreground">Need a starting point?</p>
+                                        <p className="text-xs text-muted-foreground mt-0.5">Download our XLSX template with example rows.</p>
                                     </div>
-                                    <button
+                                    <Button variant="plain"
                                         type="button"
                                         onClick={downloadTemplate}
-                                        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm text-slate-300 transition-colors"
+                                        className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-secondary text-sm text-muted-foreground transition-colors h-auto"
                                     >
                                         <Download className="w-4 h-4" />
                                         Template
-                                    </button>
+                                    </Button>
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Upload file</label>
-                                    <label className="mt-2 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-slate-700 hover:border-amber-500/40 bg-slate-950/30 p-8 cursor-pointer transition-colors">
-                                        <Upload className="w-8 h-8 text-slate-500 mb-2" />
-                                        <span className="text-sm text-slate-300 font-medium">Click to select a file</span>
-                                        <span className="text-xs text-slate-500 mt-1">CSV, XLSX, or XLS</span>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Upload file</label>
+                                    <label className="mt-2 flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-border hover:border-amber-500/40 bg-background/30 p-8 cursor-pointer transition-colors">
+                                        <Upload className="w-8 h-8 text-muted-foreground mb-2" />
+                                        <span className="text-sm text-muted-foreground font-medium">Click to select a file</span>
+                                        <span className="text-xs text-muted-foreground mt-1">CSV, XLSX, or XLS</span>
                                         <input
                                             ref={fileInputRef}
                                             type="file"
@@ -266,28 +267,28 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                                     </label>
                                 </div>
 
-                                <div className="flex items-center gap-3 text-xs text-slate-500">
-                                    <span className="flex-1 h-px bg-slate-800" />
+                                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                                    <span className="flex-1 h-px bg-secondary" />
                                     OR PASTE
-                                    <span className="flex-1 h-px bg-slate-800" />
+                                    <span className="flex-1 h-px bg-secondary" />
                                 </div>
 
                                 <div>
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Paste CSV / TSV</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Paste CSV / TSV</label>
                                     <textarea
                                         value={pasted}
                                         onChange={e => setPasted(e.target.value)}
                                         rows={6}
                                         placeholder={"code,name,domain\nA.5.1,Policies,Organizational"}
-                                        className="mt-1.5 w-full bg-slate-950/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-600 font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
+                                        className="mt-1.5 w-full bg-background/50 border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground font-mono focus:outline-none focus:ring-2 focus:ring-amber-500/40 resize-none"
                                     />
-                                    <button
+                                    <Button variant="plain"
                                         type="button"
                                         onClick={parsePastedText}
-                                        className="mt-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-sm text-slate-200 transition-colors"
+                                        className="mt-2 px-4 py-2 rounded-lg bg-secondary hover:bg-secondary text-sm text-foreground transition-colors h-auto"
                                     >
                                         Parse
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         )}
@@ -302,17 +303,17 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                                 </div>
 
                                 {stats.update > 0 && (
-                                    <div className="rounded-xl border border-slate-800 bg-slate-950/50 p-4">
-                                        <p className="text-xs font-medium text-slate-300 uppercase tracking-wider mb-2">
+                                    <div className="rounded-xl border border-border bg-background/50 p-4">
+                                        <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-2">
                                             How should existing codes be handled?
                                         </p>
                                         <div className="flex gap-3">
-                                            <label className={`flex-1 cursor-pointer rounded-lg border px-3 py-2 text-sm transition-colors ${mode === "skip" ? "border-amber-500/50 bg-amber-500/10 text-amber-300" : "border-slate-700 text-slate-400 hover:bg-slate-800/40"}`}>
+                                            <label className={`flex-1 cursor-pointer rounded-lg border px-3 py-2 text-sm transition-colors ${mode === "skip" ? "border-amber-500/50 bg-amber-500/10 text-amber-300" : "border-border text-muted-foreground hover:bg-secondary/40"}`}>
                                                 <input type="radio" className="hidden" checked={mode === "skip"} onChange={() => setMode("skip")} />
                                                 <span className="font-semibold">Skip existing</span>
                                                 <span className="block text-xs opacity-70 mt-0.5">Only insert new codes</span>
                                             </label>
-                                            <label className={`flex-1 cursor-pointer rounded-lg border px-3 py-2 text-sm transition-colors ${mode === "upsert" ? "border-amber-500/50 bg-amber-500/10 text-amber-300" : "border-slate-700 text-slate-400 hover:bg-slate-800/40"}`}>
+                                            <label className={`flex-1 cursor-pointer rounded-lg border px-3 py-2 text-sm transition-colors ${mode === "upsert" ? "border-amber-500/50 bg-amber-500/10 text-amber-300" : "border-border text-muted-foreground hover:bg-secondary/40"}`}>
                                                 <input type="radio" className="hidden" checked={mode === "upsert"} onChange={() => setMode("upsert")} />
                                                 <span className="font-semibold">Overwrite existing</span>
                                                 <span className="block text-xs opacity-70 mt-0.5">Replace fields on matching codes</span>
@@ -321,10 +322,10 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                                     </div>
                                 )}
 
-                                <div className="rounded-xl border border-slate-800 bg-slate-950/40 max-h-[40vh] overflow-y-auto">
+                                <div className="rounded-xl border border-border bg-background/40 max-h-[40vh] overflow-y-auto">
                                     <table className="w-full text-xs">
-                                        <thead className="sticky top-0 bg-slate-900 border-b border-slate-800">
-                                            <tr className="text-left text-slate-400 font-medium uppercase tracking-wider">
+                                        <thead className="sticky top-0 bg-card border-b border-border">
+                                            <tr className="text-left text-muted-foreground font-medium uppercase tracking-wider">
                                                 <th className="px-3 py-2 w-20">Status</th>
                                                 <th className="px-3 py-2 w-28">Code</th>
                                                 <th className="px-3 py-2">Name</th>
@@ -332,7 +333,7 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                                                 <th className="px-3 py-2 w-16 text-right">Sort</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-800/60">
+                                        <tbody className="divide-y divide-border/60">
                                             {parsed.slice(0, 500).map((r, i) => (
                                                 <tr
                                                     key={i}
@@ -342,38 +343,38 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                                                     }
                                                 >
                                                     <td className="px-3 py-1.5"><ClassChip kind={r.classification} /></td>
-                                                    <td className="px-3 py-1.5 font-mono text-slate-200">{r.code || "—"}</td>
-                                                    <td className="px-3 py-1.5 text-slate-300 truncate max-w-md" title={r.name}>{r.name || "—"}</td>
-                                                    <td className="px-3 py-1.5 text-slate-400">{r.domain || "—"}</td>
-                                                    <td className="px-3 py-1.5 text-right tabular-nums text-slate-400">{r.sortOrder}</td>
+                                                    <td className="px-3 py-1.5 font-mono text-foreground">{r.code || "—"}</td>
+                                                    <td className="px-3 py-1.5 text-muted-foreground truncate max-w-md" title={r.name}>{r.name || "—"}</td>
+                                                    <td className="px-3 py-1.5 text-muted-foreground">{r.domain || "—"}</td>
+                                                    <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">{r.sortOrder}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </table>
                                     {parsed.length > 500 && (
-                                        <div className="px-3 py-2 text-xs text-slate-500 border-t border-slate-800 bg-slate-900/40">
+                                        <div className="px-3 py-2 text-xs text-muted-foreground border-t border-border bg-card/40">
                                             Showing first 500 of {parsed.length} rows.
                                         </div>
                                     )}
                                 </div>
 
                                 <div className="flex gap-3 pt-2">
-                                    <button
+                                    <Button variant="plain"
                                         type="button"
                                         onClick={reset}
-                                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 text-sm text-slate-400 hover:bg-slate-800 transition-colors"
+                                        className="flex-1 px-4 py-2.5 rounded-xl border border-border text-sm text-muted-foreground hover:bg-secondary transition-colors h-auto"
                                     >
                                         Back
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button variant="plain"
                                         type="button"
                                         onClick={commit}
                                         disabled={stats.new + stats.update === 0}
-                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors disabled:opacity-50"
+                                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors disabled:opacity-50 h-auto"
                                     >
                                         <Upload className="w-4 h-4" />
                                         Upload {stats.new + stats.update} row{stats.new + stats.update === 1 ? "" : "s"}
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         )}
@@ -381,8 +382,8 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                         {phase === "committing" && (
                             <div className="flex flex-col items-center justify-center py-16">
                                 <Loader2 className="w-10 h-10 text-amber-400 animate-spin mb-4" />
-                                <p className="text-sm text-slate-300 font-medium">Uploading controls…</p>
-                                <p className="text-xs text-slate-500 mt-1">This usually takes a few seconds.</p>
+                                <p className="text-sm text-muted-foreground font-medium">Uploading controls…</p>
+                                <p className="text-xs text-muted-foreground mt-1">This usually takes a few seconds.</p>
                             </div>
                         )}
 
@@ -390,20 +391,20 @@ export function BulkUploadDialog({ open, frameworkId, existingCodes, onClose, on
                             <div className="space-y-5">
                                 <div className="flex flex-col items-center py-6">
                                     <CheckCircle2 className="w-12 h-12 text-emerald-400 mb-3" />
-                                    <h3 className="text-lg font-bold text-slate-100">Upload complete</h3>
+                                    <h3 className="text-lg font-bold text-foreground">Upload complete</h3>
                                 </div>
                                 <div className="grid grid-cols-3 gap-3">
                                     <ResultTile label="Created" value={result.created} accent="emerald" />
                                     <ResultTile label="Updated" value={result.updated} accent="blue" />
                                     <ResultTile label="Skipped" value={result.skipped} accent="amber" />
                                 </div>
-                                <button
+                                <Button variant="plain"
                                     type="button"
                                     onClick={handleClose}
-                                    className="w-full px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors"
+                                    className="w-full px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-black font-semibold text-sm transition-colors h-auto"
                                 >
                                     Close
-                                </button>
+                                </Button>
                             </div>
                         )}
                     </motion.div>

@@ -1,24 +1,58 @@
 @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Fira+Sans:wght@300;400;500;600;700&display=swap');
 @import "tailwindcss";
+@import "tw-animate-css";
 
-@theme {
-  --font-sans: "Fira Sans", monospace;
-  --font-mono: "Fira Code", monospace;
+/* next-themes toggles `.dark` on <html>; this drives Tailwind's `dark:` variant. */
+@custom-variant dark (&:is(.dark *));
 
-  --color-background: #020617;
-  --color-foreground: #F8FAFC;
+/*
+ * Token model (shadcn / Tailwind v4):
+ *   :root  = light theme values
+ *   .dark  = dark theme values (mapped 1:1 to the original brand palette,
+ *            so existing screens look identical until migrated)
+ *   @theme inline maps every --color-* utility to a runtime var, so all
+ *   existing utility classes (bg-primary, bg-glass, text-foreground, ...)
+ *   keep working AND become theme-switchable with no consumer changes.
+ */
 
-  --color-primary: #f97316;
-  --color-primary-light: #fb923c;
-  --color-primary-dark: #ea6c0a;
+:root {
+  /* Surfaces */
+  --background: #f8fafc;
+  --foreground: #020617;
+  --card: #ffffff;
+  --card-foreground: #020617;
+  --popover: #ffffff;
+  --popover-foreground: #020617;
 
-  --color-accent: #10B981;
-  --color-accent-2: #F59E0B;
+  /* Brand: primary (orange) — kept consistent across themes */
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --primary-light: #fb923c;
+  --primary-dark: #ea6c0a;
 
-  --color-glass: rgba(12, 16, 21, 0.85);
-  --color-glass-hover: rgba(12, 16, 21, 0.92);
-  --color-glass-border: rgba(30, 41, 59, 0.8);
-  --color-glass-border-hover: rgba(51, 65, 85, 0.9);
+  /* Neutral UI */
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  /* Brand: accent (emerald) + amber — preserved as brand tokens */
+  --accent: #10b981;
+  --accent-foreground: #022c22;
+  --accent-2: #f59e0b;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #f97316;
+
+  /* Glass panels (light) */
+  --glass: rgba(255, 255, 255, 0.7);
+  --glass-hover: rgba(255, 255, 255, 0.85);
+  --glass-border: rgba(203, 213, 225, 0.8);
+  --glass-border-hover: rgba(148, 163, 184, 0.9);
 
   --radius-sm: 0.125rem;
   --radius-md: 0.25rem;
@@ -29,11 +63,95 @@
   --shadow-glow-accent: 0 0 20px rgba(16, 185, 129, 0.15);
 }
 
+.dark {
+  /* Surfaces — original brand palette, unchanged */
+  --background: #020617;
+  --foreground: #f8fafc;
+  --card: #0f172a;
+  --card-foreground: #f1f5f9;
+  --popover: #0f172a;
+  --popover-foreground: #f1f5f9;
+
+  --primary: #f97316;
+  --primary-foreground: #ffffff;
+  --primary-light: #fb923c;
+  --primary-dark: #ea6c0a;
+
+  --secondary: #1e293b;
+  --secondary-foreground: #f1f5f9;
+  --muted: #1e293b;
+  --muted-foreground: #94a3b8;
+
+  --accent: #10b981;
+  --accent-foreground: #022c22;
+  --accent-2: #f59e0b;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #334155;
+  --input: #334155;
+  --ring: #f97316;
+
+  /* Glass panels (dark) — crisper edges so cards read on the near-black bg */
+  --glass: rgba(15, 23, 42, 0.7);
+  --glass-hover: rgba(20, 30, 54, 0.8);
+  --glass-border: rgba(71, 85, 105, 0.55);
+  --glass-border-hover: rgba(100, 116, 139, 0.7);
+
+  --shadow-glow: 0 0 20px rgba(249, 115, 22, 0.15);
+  --shadow-glow-accent: 0 0 20px rgba(16, 185, 129, 0.15);
+}
+
+@theme inline {
+  --font-sans: "Fira Sans", monospace;
+  --font-mono: "Fira Code", monospace;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-light: var(--primary-light);
+  --color-primary-dark: var(--primary-dark);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-2: var(--accent-2);
+
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-glass: var(--glass);
+  --color-glass-hover: var(--glass-hover);
+  --color-glass-border: var(--glass-border);
+  --color-glass-border-hover: var(--glass-border-hover);
+
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-glow: var(--shadow-glow);
+  --shadow-glow-accent: var(--shadow-glow-accent);
+}
+
 @layer base {
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    @apply font-sans antialiased relative min-h-screen overflow-x-hidden;
+    @apply bg-background text-foreground font-sans antialiased relative min-h-screen overflow-x-hidden;
   }
 }
 

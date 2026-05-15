@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Flame, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { severityFromScore, STATUS_LABELS, STATUS_STYLES, isActive, type RiskStatus } from "@/lib/risk-styles";
 import type { RiskRow } from "../types";
 
@@ -19,31 +20,32 @@ export function TopRisks({ risks, onJump }: Props) {
     return (
         <div className="glass-panel rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2">
+                <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
                     <Flame className="w-4 h-4 text-orange-400" />
                     Top Risks by Score
                 </h3>
-                <button
+                <Button
+                    variant="link"
                     onClick={onJump}
-                    className="text-[11px] text-slate-500 hover:text-slate-200 flex items-center gap-1"
+                    className="h-auto p-0 gap-1 text-[11px] text-muted-foreground hover:text-foreground hover:no-underline"
                 >
                     View register <ArrowRight className="w-3 h-3" />
-                </button>
+                </Button>
             </div>
 
             {top.length === 0 ? (
-                <p className="text-xs text-slate-600 py-6 text-center">No active risks.</p>
+                <p className="text-xs text-muted-foreground/70 py-6 text-center">No active risks.</p>
             ) : (
                 <ul className="space-y-2">
                     {top.map(r => {
                         const sev = severityFromScore(r.risk_score);
                         const status = (r.status as RiskStatus) ?? "open";
                         return (
-                            <li key={r.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-slate-950/40 border border-slate-800/40">
+                            <li key={r.id} className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-background/40 border border-border/40">
                                 <span className={`w-2 h-2 rounded-full flex-shrink-0 ${sev.dot}`} />
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-sm text-slate-200 truncate">{r.title}</p>
-                                    <p className="text-[10px] text-slate-600 mt-0.5 truncate">
+                                    <p className="text-sm text-foreground truncate">{r.title}</p>
+                                    <p className="text-[10px] text-muted-foreground/70 mt-0.5 truncate">
                                         {r.category}{r.profiles?.full_name ? ` · ${r.profiles.full_name}` : ""}
                                     </p>
                                 </div>

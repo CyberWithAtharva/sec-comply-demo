@@ -34,7 +34,7 @@ export function FrameworkCoverage({ risks }: Props) {
 
     return (
         <div className="glass-panel rounded-2xl p-5">
-            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 flex items-center gap-2">
+            <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-4 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 Framework Coverage
             </h3>
@@ -47,11 +47,11 @@ export function FrameworkCoverage({ risks }: Props) {
                                 <span className={`px-2 py-0.5 text-[10px] uppercase font-bold rounded border ${FRAMEWORK_BADGE_COLORS[d.fw]}`}>
                                     {FRAMEWORK_LABELS[d.fw]}
                                 </span>
-                                <span className="text-[11px] text-slate-500">{d.total} risks linked</span>
+                                <span className="text-[11px] text-muted-foreground">{d.total} risks linked</span>
                             </div>
-                            <span className="text-xs font-mono text-slate-300">{d.pct}%</span>
+                            <span className="text-xs font-mono text-muted-foreground">{d.pct}%</span>
                         </div>
-                        <div className="h-1.5 bg-slate-800/60 rounded-full overflow-hidden">
+                        <div className="h-1.5 bg-secondary/60 rounded-full overflow-hidden">
                             <div
                                 className="h-full rounded-full transition-all"
                                 style={{
@@ -60,7 +60,7 @@ export function FrameworkCoverage({ risks }: Props) {
                                 }}
                             />
                         </div>
-                        <div className="flex items-center gap-3 mt-1 text-[10px] text-slate-500">
+                        <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground">
                             <span>{d.open} open</span>
                             <span>·</span>
                             <span>{d.mitigated} mitigated</span>

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     GitBranch, AlertCircle, CheckCircle2, X, Plus,
@@ -164,7 +165,7 @@ function ConnectModal({ orgId, onClose, onConnected }: ConnectModalProps) {
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-violet-500/50 transition-colors";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
@@ -172,20 +173,20 @@ function ConnectModal({ orgId, onClose, onConnected }: ConnectModalProps) {
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl"
             >
                 {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-6 border-b border-border/50">
                     <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center">
                             <GitBranch className="w-4 h-4 text-violet-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-100">Connect GitHub</h2>
-                            <p className="text-xs text-slate-500">Connect via Personal Access Token</p>
+                            <h2 className="text-base font-semibold text-foreground">Connect GitHub</h2>
+                            <p className="text-xs text-muted-foreground">Connect via Personal Access Token</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300"><X className="w-5 h-5" /></button>
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground h-auto"><X className="w-5 h-5" /></Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-5">
@@ -196,7 +197,7 @@ function ConnectModal({ orgId, onClose, onConnected }: ConnectModalProps) {
                     )}
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">GitHub Organization / Username *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">GitHub Organization / Username *</label>
                         <input
                             type="text"
                             value={form.github_org}
@@ -204,11 +205,11 @@ function ConnectModal({ orgId, onClose, onConnected }: ConnectModalProps) {
                             placeholder="my-org or my-username"
                             className={inputCls}
                         />
-                        <p className="text-[10px] text-slate-600 mt-1">Your GitHub org name or personal username</p>
+                        <p className="text-[10px] text-muted-foreground/70 mt-1">Your GitHub org name or personal username</p>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Personal Access Token *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Personal Access Token *</label>
                         <div className="relative">
                             <input
                                 type={showToken ? "text" : "password"}
@@ -217,30 +218,30 @@ function ConnectModal({ orgId, onClose, onConnected }: ConnectModalProps) {
                                 placeholder="ghp_xxxxxxxxxxxxxxxxxxxx"
                                 className={`${inputCls} font-mono pr-16`}
                             />
-                            <button
+                            <Button variant="plain"
                                 type="button"
                                 onClick={() => setShowToken(s => !s)}
-                                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-500 hover:text-slate-300"
+                                className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground hover:text-muted-foreground h-auto"
                             >
                                 {showToken ? "Hide" : "Show"}
-                            </button>
+                            </Button>
                         </div>
-                        <div className="mt-2 bg-slate-800/40 rounded-lg p-2.5 text-[10px] text-slate-400 space-y-1">
-                            <p className="font-semibold text-slate-300">Required token scopes:</p>
-                            <p><span className="font-mono bg-slate-700/60 px-1 rounded">repo</span> — read repos &amp; branch protection</p>
-                            <p><span className="font-mono bg-slate-700/60 px-1 rounded">security_events</span> — Dependabot &amp; code scanning alerts</p>
-                            <p><span className="font-mono bg-slate-700/60 px-1 rounded">read:org</span> — list org repos (if connecting an org)</p>
+                        <div className="mt-2 bg-secondary/40 rounded-lg p-2.5 text-[10px] text-muted-foreground space-y-1">
+                            <p className="font-semibold text-muted-foreground">Required token scopes:</p>
+                            <p><span className="font-mono bg-secondary/60 px-1 rounded">repo</span> — read repos &amp; branch protection</p>
+                            <p><span className="font-mono bg-secondary/60 px-1 rounded">security_events</span> — Dependabot &amp; code scanning alerts</p>
+                            <p><span className="font-mono bg-secondary/60 px-1 rounded">read:org</span> — list org repos (if connecting an org)</p>
                         </div>
                     </div>
 
-                    <button
+                    <Button variant="plain"
                         type="submit"
                         disabled={connecting}
-                        className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center justify-center gap-2 transition-colors"
+                        className="w-full py-2.5 bg-violet-600 hover:bg-violet-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl flex items-center justify-center gap-2 transition-colors h-auto"
                     >
                         {connecting ? <RefreshCw className="w-4 h-4 animate-spin" /> : <GitBranch className="w-4 h-4" />}
                         {connecting ? "Connecting…" : "Connect GitHub"}
-                    </button>
+                    </Button>
                 </form>
             </motion.div>
         </div>
@@ -480,32 +481,32 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center">
                         <GitBranch className="w-8 h-8 mr-3 text-violet-400" />
                         SCM Security
                     </h1>
-                    <p className="text-sm text-slate-400 mt-1">Branch protection, secret scanning, code scan findings, and repository misconfigurations.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Branch protection, secret scanning, code scan findings, and repository misconfigurations.</p>
                 </div>
-                <button
+                <Button variant="plain"
                     onClick={() => setShowConnect(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors shadow-lg"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors shadow-lg h-auto"
                 >
                     <Plus className="w-4 h-4" /> Connect GitHub
-                </button>
+                </Button>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 lg:grid-cols-6 gap-4">
                 {[
-                    { label: "Total Findings", value: stats.total, color: "text-slate-100" },
+                    { label: "Total Findings", value: stats.total, color: "text-foreground" },
                     { label: "Secrets Exposed", value: stats.secrets, color: "text-red-400" },
                     { label: "Code Scan", value: stats.codeScan, color: "text-purple-400" },
                     { label: "Misconfig", value: stats.configs, color: "text-orange-400" },
                     { label: "Critical", value: stats.critical, color: "text-red-400" },
                     { label: "High", value: stats.high, color: "text-orange-400" },
                 ].map(s => (
-                    <div key={s.label} className="bg-slate-900/60 border border-slate-800/60 rounded-2xl p-4">
-                        <p className="text-xs text-slate-500 mb-1">{s.label}</p>
+                    <div key={s.label} className="bg-card/60 border border-border/60 rounded-2xl p-4">
+                        <p className="text-xs text-muted-foreground mb-1">{s.label}</p>
                         <p className={cn("text-3xl font-bold", s.color)}>{s.value}</p>
                     </div>
                 ))}
@@ -520,10 +521,10 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                             const circ = 2 * Math.PI * 36;
                             const strokeColor = inst.score >= 80 ? "#10b981" : inst.score >= 50 ? "#f59e0b" : "#ef4444";
                             return (
-                                <div key={inst.id} className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col items-center min-w-[140px] flex-1">
+                                <div key={inst.id} className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col items-center min-w-[140px] flex-1">
                                     <div className="relative">
                                         <svg width="80" height="80" viewBox="0 0 80 80">
-                                            <circle cx="40" cy="40" r="36" fill="none" stroke="#1e293b" strokeWidth="8" />
+                                            <circle cx="40" cy="40" r="36" fill="none" stroke="var(--border)" strokeWidth="8" />
                                             <motion.circle
                                                 cx="40" cy="40" r="36" fill="none"
                                                 stroke={strokeColor} strokeWidth="8" strokeLinecap="round"
@@ -535,14 +536,14 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                             />
                                         </svg>
                                         <div className="absolute inset-0 flex items-center justify-center">
-                                            <span className="text-xl font-bold text-slate-100">{inst.score}</span>
+                                            <span className="text-xl font-bold text-foreground">{inst.score}</span>
                                         </div>
                                     </div>
-                                    <span className="text-xs font-semibold text-slate-300 truncate max-w-full mt-2 text-center">{inst.name}</span>
+                                    <span className="text-xs font-semibold text-muted-foreground truncate max-w-full mt-2 text-center">{inst.name}</span>
                                     <div className="flex items-center gap-2 mt-1 text-[10px]">
                                         {inst.critical > 0 && <span className="text-red-400 font-medium">{inst.critical} crit</span>}
                                         {inst.high > 0 && <span className="text-orange-400 font-medium">{inst.high} high</span>}
-                                        {inst.critical === 0 && inst.high === 0 && <span className="text-slate-500">{inst.total} total</span>}
+                                        {inst.critical === 0 && inst.high === 0 && <span className="text-muted-foreground">{inst.total} total</span>}
                                     </div>
                                 </div>
                             );
@@ -552,8 +553,8 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                     {/* Rows 2+3: Severity Bar + Heatmap + Radar — unified 3-col row */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                         {/* Severity Bar */}
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Severity</h3>
+                        <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-4">Findings by Severity</h3>
                             <div className="flex-1 min-h-[180px]">
                                 <ResponsiveContainer width="100%" height="100%">
                                     <BarChart
@@ -566,10 +567,10 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                         margin={{ top: 0, right: 0, left: -20, bottom: 0 }}
                                         barCategoryGap="45%"
                                     >
-                                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                                         <XAxis dataKey="name" stroke="#475569" tick={{ fill: "#64748b", fontSize: 12 }} axisLine={false} tickLine={false} />
                                         <YAxis stroke="#475569" tick={{ fill: "#64748b", fontSize: 11 }} axisLine={false} tickLine={false} />
-                                        <Tooltip cursor={{ fill: "#0f172a" }} contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px" }} />
+                                        <Tooltip cursor={{ fill: "var(--card)" }} contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "8px" }} />
                                         <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={56}>
                                             <Cell fill="#ef4444" />
                                             <Cell fill="#f97316" />
@@ -582,25 +583,25 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         </div>
 
                         {/* Repo × Type Heatmap */}
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Finding Type Heatmap by Repo</h3>
+                        <div className="glass-panel rounded-2xl border border-border/50 p-5">
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-4">Finding Type Heatmap by Repo</h3>
                             {ghDashboardData.heatmapRepos.length === 0 ? (
-                                <div className="flex items-center justify-center h-40 text-xs text-slate-600">No repo data yet</div>
+                                <div className="flex items-center justify-center h-40 text-xs text-muted-foreground/70">No repo data yet</div>
                             ) : (
                                 <div className="overflow-x-auto">
                                     <table className="w-full text-[10px]">
                                         <thead>
                                             <tr>
-                                                <th className="text-left pr-4 pb-2 text-slate-500 font-medium">Repository</th>
-                                                {["Secret", "Code", "Config"].map(h => <th key={h} className="text-center pb-2 text-slate-500 font-medium w-12">{h}</th>)}
+                                                <th className="text-left pr-4 pb-2 text-muted-foreground font-medium">Repository</th>
+                                                {["Secret", "Code", "Config"].map(h => <th key={h} className="text-center pb-2 text-muted-foreground font-medium w-12">{h}</th>)}
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-slate-800/30">
+                                        <tbody className="divide-y divide-border/30">
                                             {ghDashboardData.heatmapRepos.map(([repo, v]) => {
                                                 const maxV = Math.max(v.secret, v.code_scan, v.config, 1);
                                                 return (
                                                     <tr key={repo}>
-                                                        <td className="pr-4 py-1.5 text-slate-300 font-mono truncate max-w-[120px]">{repo.split("/").pop() ?? repo}</td>
+                                                        <td className="pr-4 py-1.5 text-muted-foreground font-mono truncate max-w-[120px]">{repo.split("/").pop() ?? repo}</td>
                                                         {([
                                                             { count: v.secret,    fill: "#ef4444" },
                                                             { count: v.code_scan, fill: "#a855f7" },
@@ -609,7 +610,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                             <td key={ci} className="text-center py-1.5">
                                                                 <div
                                                                     className="mx-auto w-9 h-6 rounded flex items-center justify-center text-[9px] font-bold text-white"
-                                                                    style={{ backgroundColor: cell.count > 0 ? cell.fill : "transparent", border: cell.count === 0 ? "1px solid #1e293b" : "none", opacity: cell.count > 0 ? 0.4 + 0.6 * (cell.count / maxV) : 1 }}
+                                                                    style={{ backgroundColor: cell.count > 0 ? cell.fill : "transparent", border: cell.count === 0 ? "1px solid var(--border)" : "none", opacity: cell.count > 0 ? 0.4 + 0.6 * (cell.count / maxV) : 1 }}
                                                                 >
                                                                     {cell.count > 0 ? cell.count : ""}
                                                                 </div>
@@ -625,8 +626,8 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         </div>
 
                         {/* Custom Donut — Type Distribution */}
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                            <h3 className="text-sm font-semibold text-slate-400 mb-2">Type Distribution</h3>
+                        <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-2">Type Distribution</h3>
                             <div className="flex-1 flex items-center justify-center min-h-[180px]">
                                 {(() => {
                                     const typeRows: { label: string; count: number; color: string; Icon: React.ComponentType<{ className?: string }> }[] = [
@@ -641,7 +642,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                         <div className="flex items-center gap-6">
                                             <div className="relative flex-shrink-0">
                                                 <svg width="84" height="84" viewBox="0 0 84 84">
-                                                    <circle cx="42" cy="42" r="30" fill="none" stroke="#1e293b" strokeWidth="11" />
+                                                    <circle cx="42" cy="42" r="30" fill="none" stroke="var(--border)" strokeWidth="11" />
                                                     {typeTotal === 0 ? (
                                                         <circle cx="42" cy="42" r="30" fill="none" stroke="#334155" strokeWidth="11" strokeDasharray="4 4" />
                                                     ) : (
@@ -667,18 +668,18 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                     )}
                                                 </svg>
                                                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                                                    <span className="text-xl font-bold text-slate-100 leading-none">{typeTotal}</span>
-                                                    <span className="text-[9px] text-slate-500 mt-0.5">total</span>
+                                                    <span className="text-xl font-bold text-foreground leading-none">{typeTotal}</span>
+                                                    <span className="text-[9px] text-muted-foreground mt-0.5">total</span>
                                                 </div>
                                             </div>
                                             <div className="flex flex-col gap-2.5">
                                                 {typeRows.map(t => (
                                                     <div key={t.label} className="flex items-center gap-2 text-[11px]">
                                                         <div className="w-2.5 h-2.5 rounded-sm flex-shrink-0" style={{ backgroundColor: t.color }} />
-                                                        <span className="text-slate-400 min-w-[62px]">{t.label}</span>
+                                                        <span className="text-muted-foreground min-w-[62px]">{t.label}</span>
                                                         <span className="font-bold tabular-nums" style={{ color: t.color }}>{t.count}</span>
                                                         {typeTotal > 0 && (
-                                                            <span className="text-slate-600 text-[10px]">{Math.round((t.count / typeTotal) * 100)}%</span>
+                                                            <span className="text-muted-foreground/70 text-[10px]">{Math.round((t.count / typeTotal) * 100)}%</span>
                                                         )}
                                                     </div>
                                                 ))}
@@ -693,8 +694,8 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                     {/* Row 4: Top Findings Feed + Type Breakdown + Top Repos */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         {/* Top Findings */}
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                            <h3 className="text-sm font-semibold text-slate-400 mb-3">Top Findings</h3>
+                        <div className="glass-panel rounded-2xl border border-border/50 p-5">
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Top Findings</h3>
                             {ghDashboardData.topFindings.length === 0 ? (
                                 <div className="flex flex-col items-center py-4">
                                     <Shield className="w-8 h-8 text-emerald-500/40 mb-2" />
@@ -703,11 +704,11 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                             ) : (
                                 <div className="space-y-2.5">
                                     {ghDashboardData.topFindings.map(f => (
-                                        <div key={f.id} className="flex items-start gap-2 border-b border-slate-800/30 last:border-0 pb-2 last:pb-0">
+                                        <div key={f.id} className="flex items-start gap-2 border-b border-border/30 last:border-0 pb-2 last:pb-0">
                                             <SeverityBadge severity={f.severity} />
                                             <div className="min-w-0">
-                                                <p className="text-xs text-slate-300 leading-tight line-clamp-2">{f.title}</p>
-                                                <p className="text-[10px] text-slate-600 font-mono mt-0.5">{f.repository.split("/").pop()}</p>
+                                                <p className="text-xs text-muted-foreground leading-tight line-clamp-2">{f.title}</p>
+                                                <p className="text-[10px] text-muted-foreground/70 font-mono mt-0.5">{f.repository.split("/").pop()}</p>
                                             </div>
                                         </div>
                                     ))}
@@ -716,8 +717,8 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         </div>
 
                         {/* Type Breakdown bars */}
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
-                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings by Type</h3>
+                        <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-4">Findings by Type</h3>
                             <div className="flex-1 flex flex-col justify-center gap-4">
                                 {([
                                     { label: "Secrets",   count: ghDashboardData.typeCounts.secret,    color: "bg-red-500",    textColor: "text-red-400" },
@@ -727,9 +728,9 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                     <div key={row.label}>
                                         <div className="flex items-center justify-between text-xs mb-1.5">
                                             <span className={row.textColor}>{row.label}</span>
-                                            <span className="text-slate-300 font-semibold">{row.count}</span>
+                                            <span className="text-muted-foreground font-semibold">{row.count}</span>
                                         </div>
-                                        <div className="w-full bg-slate-800/60 rounded-full h-2 overflow-hidden">
+                                        <div className="w-full bg-secondary/60 rounded-full h-2 overflow-hidden">
                                             <motion.div
                                                 initial={{ width: 0 }}
                                                 animate={{ width: `${stats.total > 0 ? (row.count / stats.total) * 100 : 0}%` }}
@@ -743,20 +744,20 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         </div>
 
                         {/* Top Repos by Risk */}
-                        <div className="glass-panel rounded-2xl border border-slate-800/50 p-5">
-                            <h3 className="text-sm font-semibold text-slate-400 mb-3">Repo Risk Ranking</h3>
+                        <div className="glass-panel rounded-2xl border border-border/50 p-5">
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-3">Repo Risk Ranking</h3>
                             <div className="space-y-3">
                                 {ghDashboardData.topRepos.map((repo, i) => (
                                     <div key={repo.name} className="flex items-center gap-2">
-                                        <span className="text-[10px] text-slate-600 w-3">{i + 1}</span>
+                                        <span className="text-[10px] text-muted-foreground/70 w-3">{i + 1}</span>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center justify-between mb-1">
-                                                <span className="text-xs text-slate-300 truncate">{repo.name.split("/").pop()}</span>
+                                                <span className="text-xs text-muted-foreground truncate">{repo.name.split("/").pop()}</span>
                                                 <span className={cn("text-[10px] font-bold tabular-nums", repo.score >= 80 ? "text-emerald-400" : repo.score >= 50 ? "text-amber-400" : "text-red-400")}>
                                                     {repo.score}
                                                 </span>
                                             </div>
-                                            <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                            <div className="w-full bg-secondary/60 rounded-full h-1.5 overflow-hidden">
                                                 <div
                                                     className={cn("h-full rounded-full", repo.score >= 80 ? "bg-emerald-500" : repo.score >= 50 ? "bg-amber-500" : "bg-red-500")}
                                                     style={{ width: `${repo.score}%` }}
@@ -772,7 +773,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                     {/* Row 5: Finding Type Breakdown — Icon Cards with Arc */}
                     {stats.total > 0 && (
                         <div>
-                            <h3 className="text-sm font-semibold text-slate-400 mb-4">Findings Distribution by Type</h3>
+                            <h3 className="text-sm font-semibold text-muted-foreground mb-4">Findings Distribution by Type</h3>
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {([
                                     { label: "Secrets",   count: ghDashboardData.typeCounts.secret,    color: "#ef4444", border: "border-red-500/20",    Icon: Key        },
@@ -792,7 +793,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                         >
                                             <div className="relative">
                                                 <svg width="60" height="60" viewBox="0 0 60 60">
-                                                    <circle cx="30" cy="30" r={r} fill="none" stroke="#1e293b" strokeWidth="6" />
+                                                    <circle cx="30" cy="30" r={r} fill="none" stroke="var(--border)" strokeWidth="6" />
                                                     <motion.circle
                                                         cx="30" cy="30" r={r} fill="none"
                                                         stroke={t.color} strokeWidth="6" strokeLinecap="round"
@@ -807,8 +808,8 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                     <t.Icon className="w-5 h-5" />
                                                 </div>
                                             </div>
-                                            <div className="text-2xl font-bold text-slate-100">{t.count}</div>
-                                            <div className="text-[11px] text-slate-400 font-medium">{t.label}</div>
+                                            <div className="text-2xl font-bold text-foreground">{t.count}</div>
+                                            <div className="text-[11px] text-muted-foreground font-medium">{t.label}</div>
                                             <div className="text-[10px]" style={{ color: t.color }}>{Math.round(pct)}% of total</div>
                                         </motion.div>
                                     );
@@ -821,24 +822,24 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
 
             {/* Connected Installations */}
             <div>
-                <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Connected Accounts</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Connected Accounts</h2>
 
                 {noInstallations ? (
-                    <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-12 text-center">
+                    <div className="bg-card/40 border border-border/60 rounded-2xl p-12 text-center">
                         <div className="w-14 h-14 rounded-2xl bg-violet-500/10 border border-violet-500/20 flex items-center justify-center mx-auto mb-4">
                             <GitBranch className="w-7 h-7 text-violet-400" />
                         </div>
-                        <h3 className="text-base font-semibold text-slate-200 mb-1">No GitHub accounts connected</h3>
-                        <p className="text-sm text-slate-500 mb-6">Connect your GitHub organization to scan for security issues.</p>
-                        <button
+                        <h3 className="text-base font-semibold text-foreground mb-1">No GitHub accounts connected</h3>
+                        <p className="text-sm text-muted-foreground mb-6">Connect your GitHub organization to scan for security issues.</p>
+                        <Button variant="plain"
                             onClick={() => setShowConnect(true)}
-                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors"
+                            className="inline-flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-medium rounded-xl transition-colors h-auto"
                         >
                             <Plus className="w-4 h-4" /> Connect GitHub
-                        </button>
+                        </Button>
                     </div>
                 ) : (
-                    <div className="bg-slate-900/60 border border-slate-800/60 rounded-2xl overflow-hidden divide-y divide-slate-800/60">
+                    <div className="bg-card/60 border border-border/60 rounded-2xl overflow-hidden divide-y divide-border/60">
                         {installations.map(inst => {
                             const instRepos = reposByInstallation.get(inst.id) ?? [];
                             const instFindings = findings.filter(f => f.installation_id === inst.id);
@@ -856,7 +857,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <div className="flex items-center gap-2 flex-wrap">
-                                                <span className="text-sm font-semibold text-slate-100">{inst.github_org}</span>
+                                                <span className="text-sm font-semibold text-foreground">{inst.github_org}</span>
                                                 {totalIssues > 0 && (
                                                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 border border-amber-500/30 text-amber-400 font-medium">
                                                         {totalIssues} config issue{totalIssues !== 1 ? "s" : ""}
@@ -868,7 +869,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                     </span>
                                                 )}
                                             </div>
-                                            <div className="flex items-center gap-3 mt-0.5 text-[11px] text-slate-500">
+                                            <div className="flex items-center gap-3 mt-0.5 text-[11px] text-muted-foreground">
                                                 <span>{instRepos.length} repos</span>
                                                 <span>·</span>
                                                 <span>{instFindings.length} findings</span>
@@ -893,33 +894,33 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                         </span>
                                         <div className="flex items-center gap-1">
                                             {(instRepos.length > 0 || inst.org_settings) && (
-                                                <button
+                                                <Button variant="plain"
                                                     onClick={() => setExpandedRepos(s => {
                                                         const n = new Set(s);
                                                         n.has(inst.id) ? n.delete(inst.id) : n.add(inst.id);
                                                         return n;
                                                     })}
-                                                    className="p-1.5 text-slate-500 hover:text-slate-300 hover:bg-slate-800/60 rounded-lg transition-colors"
+                                                    className="p-1.5 text-muted-foreground hover:text-muted-foreground hover:bg-secondary/60 rounded-lg transition-colors h-auto"
                                                     title="View details"
                                                 >
                                                     <ChevronDown className={cn("w-4 h-4 transition-transform", isExpanded && "rotate-180")} />
-                                                </button>
+                                                </Button>
                                             )}
-                                            <button
+                                            <Button variant="plain"
                                                 onClick={() => handleSync(inst.id)}
                                                 disabled={syncing === inst.id}
-                                                className="p-1.5 text-slate-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors"
+                                                className="p-1.5 text-muted-foreground hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-colors h-auto"
                                                 title="Sync"
                                             >
                                                 <RefreshCw className={cn("w-4 h-4", syncing === inst.id && "animate-spin")} />
-                                            </button>
-                                            <button
+                                            </Button>
+                                            <Button variant="plain"
                                                 onClick={() => handleDisconnect(inst.id)}
-                                                className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors h-auto"
                                                 title="Disconnect"
                                             >
                                                 <Trash2 className="w-4 h-4" />
-                                            </button>
+                                            </Button>
                                         </div>
                                     </div>
 
@@ -944,12 +945,12 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                 initial={{ height: 0, opacity: 0 }}
                                                 animate={{ height: "auto", opacity: 1 }}
                                                 exit={{ height: 0, opacity: 0 }}
-                                                className="border-t border-slate-800/60 bg-slate-950/40"
+                                                className="border-t border-border/60 bg-background/40"
                                             >
                                                 {/* ── Org-level security settings ── */}
                                                 {os && (
                                                     <div className="px-5 pt-4 pb-3">
-                                                        <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-3">Org Security Settings</p>
+                                                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Org Security Settings</p>
                                                         <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mb-3">
                                                             {[
                                                                 {
@@ -995,7 +996,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                                         ? "bg-emerald-500/5 border-emerald-500/20"
                                                                         : "bg-red-500/5 border-red-500/20"
                                                                 )}>
-                                                                    <p className="text-slate-500 mb-0.5">{c.label}</p>
+                                                                    <p className="text-muted-foreground mb-0.5">{c.label}</p>
                                                                     <p className={cn("font-semibold", c.ok ? "text-emerald-400" : "text-red-400")}>
                                                                         {c.ok ? c.good : c.bad}
                                                                     </p>
@@ -1003,8 +1004,8 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                             ))}
                                                         </div>
                                                         {/* Org plan + public/private counts */}
-                                                        <div className="flex items-center gap-3 text-[10px] text-slate-500">
-                                                            {os.plan && <span>Plan: <span className="text-slate-400 capitalize">{os.plan}</span></span>}
+                                                        <div className="flex items-center gap-3 text-[10px] text-muted-foreground">
+                                                            {os.plan && <span>Plan: <span className="text-muted-foreground capitalize">{os.plan}</span></span>}
                                                             <span>{os.public_repos} public · {os.private_repos} private repos</span>
                                                         </div>
                                                     </div>
@@ -1012,8 +1013,8 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
 
                                                 {/* ── Per-repo list ── */}
                                                 {instRepos.length > 0 && (
-                                                    <div className={cn("px-5 py-3 space-y-2", os && "border-t border-slate-800/40")}>
-                                                        <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider mb-2">Repositories</p>
+                                                    <div className={cn("px-5 py-3 space-y-2", os && "border-t border-border/40")}>
+                                                        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Repositories</p>
                                                         {instRepos.map(repo => {
                                                             const issues = getComplianceEntries(repo.compliance_issues);
                                                             const bp = repo.settings?.branch_protection as {
@@ -1024,16 +1025,16 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                             } | undefined;
                                                             const archived = repo.settings?.archived as boolean | undefined;
                                                             return (
-                                                                <div key={repo.id} className="flex items-start gap-3 py-2 border-b border-slate-800/30 last:border-0">
-                                                                    <GitBranch className="w-3.5 h-3.5 text-slate-600 shrink-0 mt-0.5" />
+                                                                <div key={repo.id} className="flex items-start gap-3 py-2 border-b border-border/30 last:border-0">
+                                                                    <GitBranch className="w-3.5 h-3.5 text-muted-foreground/70 shrink-0 mt-0.5" />
                                                                     <div className="flex-1 min-w-0">
                                                                         <div className="flex items-center gap-2 flex-wrap">
-                                                                            <span className="text-xs font-medium text-slate-300 truncate">{repo.repo_name}</span>
-                                                                            {archived && <span className="text-[9px] text-slate-600 border border-slate-700/50 rounded px-1">archived</span>}
+                                                                            <span className="text-xs font-medium text-muted-foreground truncate">{repo.repo_name}</span>
+                                                                            {archived && <span className="text-[9px] text-muted-foreground/70 border border-border/50 rounded px-1">archived</span>}
                                                                         </div>
                                                                         <div className="flex items-center gap-2 mt-0.5 flex-wrap">
                                                                             {bp?.enabled
-                                                                                ? <span className="text-[10px] text-slate-500">{bp.required_reviews ?? 0} PR review{(bp.required_reviews ?? 0) !== 1 ? "s" : ""} · {bp.signed_commits ? "Signed ✓" : "Not signed"} · {bp.required_status_checks ? "Status checks ✓" : "No status checks"}</span>
+                                                                                ? <span className="text-[10px] text-muted-foreground">{bp.required_reviews ?? 0} PR review{(bp.required_reviews ?? 0) !== 1 ? "s" : ""} · {bp.signed_commits ? "Signed ✓" : "Not signed"} · {bp.required_status_checks ? "Status checks ✓" : "No status checks"}</span>
                                                                                 : <span className="text-[10px] text-amber-500">No branch protection</span>
                                                                             }
                                                                         </div>
@@ -1047,7 +1048,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                                                     </div>
                                                                     <div className="flex items-center gap-2 shrink-0">
                                                                         {repo.private
-                                                                            ? <span className="flex items-center gap-1 text-[10px] text-slate-500"><Lock className="w-3 h-3" />Private</span>
+                                                                            ? <span className="flex items-center gap-1 text-[10px] text-muted-foreground"><Lock className="w-3 h-3" />Private</span>
                                                                             : <span className="text-[10px] text-amber-400">Public</span>
                                                                         }
                                                                         {issues.length === 0
@@ -1073,35 +1074,35 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
             {/* Findings Table */}
             {!noInstallations && (
                 <div>
-                    <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-3">Security Findings</h2>
+                    <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Security Findings</h2>
 
                     {/* Filters */}
                     <div className="flex flex-wrap items-center gap-3 mb-4">
                         {/* Search */}
                         <div className="relative flex-1 min-w-[200px]">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                             <input
                                 type="text"
                                 placeholder="Search findings or repos…"
                                 value={search}
                                 onChange={e => setSearch(e.target.value)}
-                                className="w-full pl-9 pr-4 py-2.5 bg-slate-900/60 border border-slate-800/60 rounded-xl text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-violet-500/50 transition-colors"
+                                className="w-full pl-9 pr-4 py-2.5 bg-card/60 border border-border/60 rounded-xl text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-violet-500/50 transition-colors"
                             />
                         </div>
 
                         {/* Type filter */}
-                        <div className="flex items-center gap-1 bg-slate-900/60 border border-slate-800/60 rounded-xl p-1">
+                        <div className="flex items-center gap-1 bg-card/60 border border-border/60 rounded-xl p-1">
                             {(["all", "secret", "code_scan", "config"] as const).map(t => (
-                                <button
+                                <Button variant="plain"
                                     key={t}
                                     onClick={() => setFilterType(t)}
-                                    className={cn(
+                                    className={cn("h-auto", 
                                         "px-3 py-1.5 rounded-lg text-xs font-medium transition-colors",
-                                        filterType === t ? "bg-violet-600 text-white" : "text-slate-400 hover:text-slate-200"
+                                        filterType === t ? "bg-violet-600 text-white" : "text-muted-foreground hover:text-foreground"
                                     )}
                                 >
                                     {t === "all" ? "All Types" : t === "code_scan" ? "Code Scan" : t === "config" ? "Misconfig" : "Secrets"}
-                                </button>
+                                </Button>
                             ))}
                         </div>
 
@@ -1109,7 +1110,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                         <select
                             value={filterSev}
                             onChange={e => setFilterSev(e.target.value)}
-                            className="bg-slate-900/60 border border-slate-800/60 rounded-xl px-3 py-2.5 text-sm text-slate-300 focus:outline-none focus:border-violet-500/50"
+                            className="bg-card/60 border border-border/60 rounded-xl px-3 py-2.5 text-sm text-muted-foreground focus:outline-none focus:border-violet-500/50"
                         >
                             <option value="all">All Severities</option>
                             <option value="critical">Critical</option>
@@ -1121,52 +1122,52 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
 
                     {/* Table */}
                     {filtered.length === 0 ? (
-                        <div className="bg-slate-900/40 border border-slate-800/60 rounded-2xl p-12 text-center">
+                        <div className="bg-card/40 border border-border/60 rounded-2xl p-12 text-center">
                             <ShieldAlert className="w-10 h-10 text-emerald-500/50 mx-auto mb-3" />
                             <p className="text-base font-semibold text-emerald-400">
                                 {stats.total === 0 ? "No findings yet" : "No findings match filters"}
                             </p>
-                            <p className="text-sm text-slate-500 mt-1">
+                            <p className="text-sm text-muted-foreground mt-1">
                                 {stats.total === 0 ? "Run a sync to check for security issues." : "Try adjusting your filters."}
                             </p>
                         </div>
                     ) : (
-                        <div className="bg-slate-900/60 border border-slate-800/60 rounded-2xl overflow-hidden">
+                        <div className="bg-card/60 border border-border/60 rounded-2xl overflow-hidden">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead>
-                                        <tr className="border-b border-slate-800/60">
-                                            <th className="text-left px-5 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Finding</th>
-                                            <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Repository</th>
-                                            <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Type</th>
-                                            <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Severity</th>
-                                            <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase tracking-wider">Details</th>
+                                        <tr className="border-b border-border/60">
+                                            <th className="text-left px-5 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Finding</th>
+                                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Repository</th>
+                                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Type</th>
+                                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Severity</th>
+                                            <th className="text-left px-4 py-3 text-xs font-medium text-muted-foreground uppercase tracking-wider">Details</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-slate-800/40">
+                                    <tbody className="divide-y divide-border/40">
                                         {filtered.map(f => {
                                             const url = (f.details?.url ?? f.details?.html_url) as string | undefined;
                                             const pkg = f.details?.package as string | undefined;
                                             const cve = f.details?.cve_id as string | undefined;
                                             const tool = f.details?.tool as string | undefined;
                                             return (
-                                                <tr key={f.id} className="hover:bg-slate-800/20 transition-colors">
+                                                <tr key={f.id} className="hover:bg-secondary/20 transition-colors">
                                                     <td className="px-5 py-3.5">
-                                                        <p className="text-slate-200 font-medium text-sm leading-snug">{f.title}</p>
-                                                        {cve && <p className="text-[10px] text-slate-500 mt-0.5 font-mono">{cve}</p>}
+                                                        <p className="text-foreground font-medium text-sm leading-snug">{f.title}</p>
+                                                        {cve && <p className="text-[10px] text-muted-foreground mt-0.5 font-mono">{cve}</p>}
                                                     </td>
                                                     <td className="px-4 py-3.5">
-                                                        <span className="text-xs text-slate-400 font-mono">{f.repository}</span>
+                                                        <span className="text-xs text-muted-foreground font-mono">{f.repository}</span>
                                                     </td>
                                                     <td className="px-4 py-3.5">
                                                         <TypeBadge type={f.type} />
-                                                        {tool && <p className="text-[10px] text-slate-600 mt-1">{tool}</p>}
+                                                        {tool && <p className="text-[10px] text-muted-foreground/70 mt-1">{tool}</p>}
                                                     </td>
                                                     <td className="px-4 py-3.5">
                                                         <SeverityBadge severity={f.severity} />
                                                     </td>
                                                     <td className="px-4 py-3.5">
-                                                        <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                                                        <div className="flex items-center gap-2 text-[11px] text-muted-foreground">
                                                             {pkg && <span className="flex items-center gap-1"><Bug className="w-3 h-3" />{pkg}</span>}
                                                             {url && (
                                                                 <a href={url} target="_blank" rel="noopener noreferrer"
@@ -1182,7 +1183,7 @@ export function GitHubClient({ initialInstallations, initialRepos, initialFindin
                                     </tbody>
                                 </table>
                             </div>
-                            <div className="px-5 py-3 border-t border-slate-800/40 text-xs text-slate-600">
+                            <div className="px-5 py-3 border-t border-border/40 text-xs text-muted-foreground/70">
                                 {filtered.length} of {stats.total} findings
                             </div>
                         </div>

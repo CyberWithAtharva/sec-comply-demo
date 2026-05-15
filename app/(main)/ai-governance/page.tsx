@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
     BrainCircuit, AlertTriangle, CheckCircle2, XCircle, Clock,
     TrendingUp, Eye, ShieldCheck, Users, Plus, ChevronRight,
@@ -89,23 +90,23 @@ export default function AIGovernancePage() {
                     </div>
                     <div>
                         <div className="flex items-center gap-3">
-                            <h1 className="text-2xl font-bold text-slate-100 tracking-tight">AI Governance</h1>
+                            <h1 className="text-2xl font-bold text-foreground tracking-tight">AI Governance</h1>
                             <span className="text-[10px] font-bold px-2 py-1 rounded-md bg-amber-500/15 text-amber-400 border border-amber-500/20 flex items-center gap-1">
                                 <Sparkles className="w-2.5 h-2.5" /> PREVIEW
                             </span>
                         </div>
-                        <p className="text-sm text-slate-400 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                             Track AI models, map to regulations, and maintain human oversight across your AI systems
                         </p>
                     </div>
                 </div>
-                <button
+                <Button variant="plain"
                     type="button"
-                    className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-300 text-sm font-medium rounded-xl transition-colors shrink-0"
+                    className="flex items-center gap-2 px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 text-purple-300 text-sm font-medium rounded-xl transition-colors shrink-0 h-auto"
                     onClick={() => {}}
                 >
                     <Plus className="w-4 h-4" /> Register Model
-                </button>
+                </Button>
             </div>
 
             {/* ── Stats Row ── */}
@@ -118,13 +119,13 @@ export default function AIGovernancePage() {
                 ].map(stat => {
                     const Icon = stat.icon;
                     return (
-                        <div key={stat.label} className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
+                        <div key={stat.label} className="bg-card/60 border border-border/60 rounded-xl p-4">
                             <div className="flex items-start justify-between mb-1">
                                 <p className={cn("text-3xl font-bold", stat.color)}>{stat.value}</p>
                                 <Icon className={cn("w-4 h-4 mt-1.5", stat.iconColor)} />
                             </div>
-                            <p className="text-xs font-semibold text-slate-300">{stat.label}</p>
-                            <p className="text-[11px] text-slate-500 mt-0.5">{stat.sub}</p>
+                            <p className="text-xs font-semibold text-muted-foreground">{stat.label}</p>
+                            <p className="text-[11px] text-muted-foreground mt-0.5">{stat.sub}</p>
                         </div>
                     );
                 })}
@@ -134,20 +135,20 @@ export default function AIGovernancePage() {
             <div className="grid grid-cols-3 gap-4">
 
                 {/* Model Registry Table */}
-                <div className="col-span-2 bg-slate-900/60 border border-slate-800/60 rounded-2xl overflow-hidden">
-                    <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800/60">
+                <div className="col-span-2 bg-card/60 border border-border/60 rounded-2xl overflow-hidden">
+                    <div className="flex items-center justify-between px-5 py-4 border-b border-border/60">
                         <div className="flex items-center gap-2">
-                            <ClipboardList className="w-4 h-4 text-slate-400" />
-                            <h2 className="text-sm font-semibold text-slate-200">Model Registry</h2>
+                            <ClipboardList className="w-4 h-4 text-muted-foreground" />
+                            <h2 className="text-sm font-semibold text-foreground">Model Registry</h2>
                         </div>
-                        <span className="text-xs text-slate-500">{AI_MODELS.length} models</span>
+                        <span className="text-xs text-muted-foreground">{AI_MODELS.length} models</span>
                     </div>
                     <div className="overflow-x-auto">
                         <table className="w-full text-xs">
                             <thead>
-                                <tr className="border-b border-slate-800/40">
+                                <tr className="border-b border-border/40">
                                     {["ID", "Model", "Type", "Vendor", "Risk Tier", "Status", "Oversight", "Last Assessed"].map(h => (
-                                        <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">{h}</th>
+                                        <th key={h} className="px-4 py-3 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider whitespace-nowrap">{h}</th>
                                     ))}
                                 </tr>
                             </thead>
@@ -157,19 +158,19 @@ export default function AIGovernancePage() {
                                         key={m.id}
                                         onClick={() => setSelectedModel(selectedModel === m.id ? null : m.id)}
                                         className={cn(
-                                            "border-b border-slate-800/30 cursor-pointer transition-colors",
-                                            i % 2 === 0 ? "bg-slate-800/10" : "",
-                                            selectedModel === m.id ? "bg-purple-500/5 border-purple-500/20" : "hover:bg-slate-800/30"
+                                            "border-b border-border/30 cursor-pointer transition-colors",
+                                            i % 2 === 0 ? "bg-secondary/10" : "",
+                                            selectedModel === m.id ? "bg-purple-500/5 border-purple-500/20" : "hover:bg-secondary/30"
                                         )}
                                     >
-                                        <td className="px-4 py-3 font-mono text-slate-500">{m.id}</td>
-                                        <td className="px-4 py-3 font-medium text-slate-200 whitespace-nowrap">{m.name}</td>
+                                        <td className="px-4 py-3 font-mono text-muted-foreground">{m.id}</td>
+                                        <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">{m.name}</td>
                                         <td className="px-4 py-3">
-                                            <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap", TYPE_STYLE[m.type] ?? "text-slate-400 bg-slate-500/10 border-slate-500/20")}>
+                                            <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-full border whitespace-nowrap", TYPE_STYLE[m.type] ?? "text-muted-foreground bg-slate-500/10 border-slate-500/20")}>
                                                 {m.type}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 text-slate-400">{m.vendor}</td>
+                                        <td className="px-4 py-3 text-muted-foreground">{m.vendor}</td>
                                         <td className="px-4 py-3">
                                             <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full border", RISK_TIER_STYLE[m.riskTier])}>
                                                 {m.riskTier}
@@ -185,7 +186,7 @@ export default function AIGovernancePage() {
                                                 ? <CheckCircle2 className="w-4 h-4 text-emerald-400" />
                                                 : <XCircle className="w-4 h-4 text-red-400" />}
                                         </td>
-                                        <td className="px-4 py-3 text-slate-500 whitespace-nowrap">{m.lastAssessed}</td>
+                                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap">{m.lastAssessed}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -197,10 +198,10 @@ export default function AIGovernancePage() {
                         const m = AI_MODELS.find(x => x.id === selectedModel)!;
                         return (
                             <div className="px-5 py-4 border-t border-purple-500/20 bg-purple-500/5">
-                                <p className="text-xs font-semibold text-slate-300 mb-2">{m.name} — Framework Coverage</p>
+                                <p className="text-xs font-semibold text-muted-foreground mb-2">{m.name} — Framework Coverage</p>
                                 <div className="flex flex-wrap gap-2">
                                     {m.frameworks.map(fw => (
-                                        <span key={fw} className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-slate-800 border border-slate-700/60 text-slate-300">
+                                        <span key={fw} className="text-[10px] font-semibold px-2.5 py-1 rounded-lg bg-secondary border border-border/60 text-muted-foreground">
                                             {fw}
                                         </span>
                                     ))}
@@ -217,33 +218,33 @@ export default function AIGovernancePage() {
 
                 {/* Regulation Coverage Panel */}
                 <div className="flex flex-col gap-4">
-                    <div className="bg-slate-900/60 border border-slate-800/60 rounded-2xl p-5 flex-1">
+                    <div className="bg-card/60 border border-border/60 rounded-2xl p-5 flex-1">
                         <div className="flex items-center gap-2 mb-5">
-                            <TrendingUp className="w-4 h-4 text-slate-400" />
-                            <h2 className="text-sm font-semibold text-slate-200">Regulation Coverage</h2>
+                            <TrendingUp className="w-4 h-4 text-muted-foreground" />
+                            <h2 className="text-sm font-semibold text-foreground">Regulation Coverage</h2>
                         </div>
                         <div className="space-y-5">
                             {REGULATIONS.map(reg => (
                                 <div key={reg.name}>
                                     <div className="flex items-center justify-between mb-1.5">
-                                        <span className="text-xs font-semibold text-slate-300">{reg.name}</span>
+                                        <span className="text-xs font-semibold text-muted-foreground">{reg.name}</span>
                                         <span className={cn("text-xs font-bold", REG_TEXT_COLOR[reg.color])}>{reg.score}%</span>
                                     </div>
-                                    <div className="h-2 bg-slate-800 rounded-full overflow-hidden">
+                                    <div className="h-2 bg-secondary rounded-full overflow-hidden">
                                         <div
                                             className={cn("h-full rounded-full transition-all duration-700", REG_BAR_COLOR[reg.color])}
                                             style={{ width: `${reg.score}%` }}
                                         />
                                     </div>
-                                    <p className="text-[11px] text-slate-600 mt-1">{reg.verified}/{reg.controls} controls verified</p>
+                                    <p className="text-[11px] text-muted-foreground/70 mt-1">{reg.verified}/{reg.controls} controls verified</p>
                                 </div>
                             ))}
                         </div>
                     </div>
 
                     {/* Risk Tier summary */}
-                    <div className="bg-slate-900/60 border border-slate-800/60 rounded-2xl p-5">
-                        <h2 className="text-sm font-semibold text-slate-200 mb-4">Risk Distribution</h2>
+                    <div className="bg-card/60 border border-border/60 rounded-2xl p-5">
+                        <h2 className="text-sm font-semibold text-foreground mb-4">Risk Distribution</h2>
                         <div className="space-y-2">
                             {[
                                 { tier: "High",    count: AI_MODELS.filter(m => m.riskTier === "High").length,    style: "bg-red-500" },
@@ -252,11 +253,11 @@ export default function AIGovernancePage() {
                             ].map(({ tier, count, style }) => (
                                 <div key={tier} className="flex items-center gap-3">
                                     <div className={cn("w-2.5 h-2.5 rounded-full shrink-0", style)} />
-                                    <span className="text-xs text-slate-400 flex-1">{tier}</span>
-                                    <div className="w-24 h-1.5 bg-slate-800 rounded-full overflow-hidden">
+                                    <span className="text-xs text-muted-foreground flex-1">{tier}</span>
+                                    <div className="w-24 h-1.5 bg-secondary rounded-full overflow-hidden">
                                         <div className={cn("h-full rounded-full", style)} style={{ width: `${(count / AI_MODELS.length) * 100}%` }} />
                                     </div>
-                                    <span className="text-xs font-bold text-slate-300 w-4 text-right">{count}</span>
+                                    <span className="text-xs font-bold text-muted-foreground w-4 text-right">{count}</span>
                                 </div>
                             ))}
                         </div>
@@ -265,24 +266,24 @@ export default function AIGovernancePage() {
             </div>
 
             {/* ── Pending Actions ── */}
-            <div className="bg-slate-900/60 border border-slate-800/60 rounded-2xl overflow-hidden">
-                <div className="flex items-center gap-2 px-5 py-4 border-b border-slate-800/60">
+            <div className="bg-card/60 border border-border/60 rounded-2xl overflow-hidden">
+                <div className="flex items-center gap-2 px-5 py-4 border-b border-border/60">
                     <FileWarning className="w-4 h-4 text-amber-400" />
-                    <h2 className="text-sm font-semibold text-slate-200">Pending Actions</h2>
-                    <span className="ml-auto text-xs text-slate-500">{RISK_ACTIONS.length} open</span>
+                    <h2 className="text-sm font-semibold text-foreground">Pending Actions</h2>
+                    <span className="ml-auto text-xs text-muted-foreground">{RISK_ACTIONS.length} open</span>
                 </div>
-                <div className="divide-y divide-slate-800/40">
+                <div className="divide-y divide-border/40">
                     {RISK_ACTIONS.map((action, i) => (
-                        <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-slate-800/20 transition-colors">
+                        <div key={i} className="flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/20 transition-colors">
                             <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-full border shrink-0", SEV_STYLE[action.severity])}>
                                 {action.severity}
                             </span>
-                            <span className="text-sm font-medium text-slate-300 shrink-0">{action.model}</span>
-                            <span className="text-xs text-slate-500 flex-1 truncate">{action.action}</span>
-                            <span className="flex items-center gap-1.5 text-xs text-slate-500 shrink-0">
+                            <span className="text-sm font-medium text-muted-foreground shrink-0">{action.model}</span>
+                            <span className="text-xs text-muted-foreground flex-1 truncate">{action.action}</span>
+                            <span className="flex items-center gap-1.5 text-xs text-muted-foreground shrink-0">
                                 <Clock className="w-3 h-3" /> {action.due}
                             </span>
-                            <ChevronRight className="w-4 h-4 text-slate-600 shrink-0" />
+                            <ChevronRight className="w-4 h-4 text-muted-foreground/70 shrink-0" />
                         </div>
                     ))}
                 </div>

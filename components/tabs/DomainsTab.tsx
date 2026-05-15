@@ -76,9 +76,9 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                 exit={{ opacity: 0, scale: 0.98 }}
                 className="flex flex-col items-center justify-center py-24 text-center"
             >
-                <Layers className="w-12 h-12 text-slate-600 mb-4" />
-                <p className="text-slate-300 font-medium mb-1">No controls loaded</p>
-                <p className="text-slate-500 text-sm">Select a framework to see domain breakdown.</p>
+                <Layers className="w-12 h-12 text-muted-foreground/70 mb-4" />
+                <p className="text-muted-foreground font-medium mb-1">No controls loaded</p>
+                <p className="text-muted-foreground text-sm">Select a framework to see domain breakdown.</p>
             </motion.div>
         );
     }
@@ -115,15 +115,15 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: i * 0.05 }}
-                        className="glass-panel p-4 rounded-xl border border-slate-800/50 flex flex-col"
+                        className="glass-panel p-4 rounded-xl border border-border/50 flex flex-col"
                     >
                         <div className="flex items-center justify-between mb-2">
                             <div className={cn("p-1.5 rounded-lg", `bg-${stat.color}-500/10`)}>
                                 <stat.icon className={cn("w-3.5 h-3.5", `text-${stat.color}-400`)} />
                             </div>
                         </div>
-                        <span className="text-xl font-bold text-slate-100">{stat.value}</span>
-                        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-medium mt-1">{stat.label}</span>
+                        <span className="text-xl font-bold text-foreground">{stat.value}</span>
+                        <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium mt-1">{stat.label}</span>
                     </motion.div>
                 ))}
             </div>
@@ -138,7 +138,7 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                 onClick={() => setExpandedDomain(isExpanded ? null : domain.name)}
                                 className={cn(
                                     "glass-panel p-6 rounded-2xl border transition-all group cursor-pointer",
-                                    isExpanded ? "border-blue-500/30 ring-1 ring-blue-500/20" : "border-slate-800/50 hover:border-slate-700"
+                                    isExpanded ? "border-blue-500/30 ring-1 ring-blue-500/20" : "border-border/50 hover:border-border"
                                 )}
                             >
                                 <div className="flex items-center justify-between mb-4">
@@ -152,17 +152,17 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <div className="text-right">
-                                            <span className="text-3xl font-bold text-slate-100 tracking-tight">{domain.score}</span>
-                                            <span className="text-sm font-medium text-slate-500 ml-1">/ 100</span>
+                                            <span className="text-3xl font-bold text-foreground tracking-tight">{domain.score}</span>
+                                            <span className="text-sm font-medium text-muted-foreground ml-1">/ 100</span>
                                         </div>
                                         <motion.div animate={{ rotate: isExpanded ? 180 : 0 }} transition={{ duration: 0.3 }}>
-                                            <ChevronDown className={cn("w-4 h-4", isExpanded ? "text-blue-400" : "text-slate-500")} />
+                                            <ChevronDown className={cn("w-4 h-4", isExpanded ? "text-blue-400" : "text-muted-foreground")} />
                                         </motion.div>
                                     </div>
                                 </div>
 
                                 <div className="flex items-center justify-between mb-4">
-                                    <h3 className="text-base font-semibold text-slate-200 truncate pr-2">{domain.name}</h3>
+                                    <h3 className="text-base font-semibold text-foreground truncate pr-2">{domain.name}</h3>
                                     <span className={cn(
                                         "text-[10px] font-bold uppercase px-2 py-0.5 rounded border flex-shrink-0",
                                         domain.status === "Good" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" :
@@ -171,7 +171,7 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                     )}>{domain.status}</span>
                                 </div>
 
-                                <div className="w-full bg-slate-800/50 h-1.5 rounded-full overflow-hidden">
+                                <div className="w-full bg-secondary/50 h-1.5 rounded-full overflow-hidden">
                                     <motion.div
                                         initial={{ width: 0 }}
                                         animate={{ width: `${domain.score}%` }}
@@ -185,10 +185,10 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                 </div>
 
                                 {/* Quick stats bar */}
-                                <div className="flex items-center justify-between mt-3 pt-3 border-t border-slate-800/50 text-[10px]">
-                                    <span className="text-slate-500">{domain.subcategories.length} categories</span>
-                                    <span className="text-slate-500">{domain.total} controls</span>
-                                    <span className={cn(domain.verified === domain.total ? "text-emerald-400" : "text-slate-500")}>
+                                <div className="flex items-center justify-between mt-3 pt-3 border-t border-border/50 text-[10px]">
+                                    <span className="text-muted-foreground">{domain.subcategories.length} categories</span>
+                                    <span className="text-muted-foreground">{domain.total} controls</span>
+                                    <span className={cn(domain.verified === domain.total ? "text-emerald-400" : "text-muted-foreground")}>
                                         {domain.verified} verified
                                     </span>
                                 </div>
@@ -207,17 +207,17 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                         <div className="mt-2 glass-panel rounded-xl border border-blue-500/20 p-4 space-y-4">
                                             {/* Subcategory Breakdown */}
                                             <div>
-                                                <span className="text-[10px] font-semibold text-slate-500 uppercase tracking-widest mb-2 block">Categories</span>
+                                                <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest mb-2 block">Categories</span>
                                                 <div className="space-y-2">
                                                     {domain.subcategories.map((sub, j) => {
                                                         const pct = sub.controls > 0 ? Math.round((sub.passed / sub.controls) * 100) : 0;
                                                         return (
-                                                            <div key={j} className="flex items-center justify-between p-2.5 bg-slate-900/40 rounded-lg border border-slate-800/50">
+                                                            <div key={j} className="flex items-center justify-between p-2.5 bg-card/40 rounded-lg border border-border/50">
                                                                 <div className="flex items-center space-x-2">
                                                                     {pct === 100 ? <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" /> : <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />}
-                                                                    <span className="text-xs font-medium text-slate-200">{sub.name}</span>
+                                                                    <span className="text-xs font-medium text-foreground">{sub.name}</span>
                                                                 </div>
-                                                                <div className="flex items-center space-x-4 text-[10px] text-slate-500">
+                                                                <div className="flex items-center space-x-4 text-[10px] text-muted-foreground">
                                                                     <span className={cn("font-bold", pct >= 90 ? "text-emerald-400" : pct >= 60 ? "text-amber-400" : "text-red-400")}>{pct}%</span>
                                                                     <span>{sub.passed}/{sub.controls} controls</span>
                                                                 </div>
@@ -228,10 +228,10 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                             </div>
 
                                             {/* Control Coverage Bar */}
-                                            <div className="bg-slate-900/40 rounded-xl border border-slate-800/50 p-4">
+                                            <div className="bg-card/40 rounded-xl border border-border/50 p-4">
                                                 <div className="flex items-center space-x-2 mb-3">
                                                     <Layers className="w-4 h-4 text-indigo-400" />
-                                                    <span className="text-xs font-semibold text-slate-300 uppercase tracking-wider">Control Coverage</span>
+                                                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Control Coverage</span>
                                                 </div>
                                                 <div className="space-y-3">
                                                     {domain.subcategories.map((sub, j) => {
@@ -239,12 +239,12 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                                         return (
                                                             <div key={j}>
                                                                 <div className="flex justify-between text-[11px] mb-1">
-                                                                    <span className="text-slate-300 font-medium truncate pr-2">{sub.name}</span>
+                                                                    <span className="text-muted-foreground font-medium truncate pr-2">{sub.name}</span>
                                                                     <span className={cn("font-bold flex-shrink-0", pct === 100 ? "text-emerald-400" : pct >= 60 ? "text-amber-400" : "text-red-400")}>
                                                                         {pct}%
                                                                     </span>
                                                                 </div>
-                                                                <div className="w-full bg-slate-800/60 rounded-full h-1.5 overflow-hidden">
+                                                                <div className="w-full bg-secondary/60 rounded-full h-1.5 overflow-hidden">
                                                                     <motion.div
                                                                         initial={{ width: 0 }}
                                                                         animate={{ width: `${pct}%` }}
@@ -267,14 +267,14 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
             </div>
 
             {/* ─── Domain Comparison Table ─── */}
-            <div className="glass-panel p-6 rounded-2xl border border-slate-800/50">
+            <div className="glass-panel p-6 rounded-2xl border border-border/50">
                 <div className="flex items-center space-x-2 mb-4">
-                    <Activity className="w-5 h-5 text-slate-400" />
-                    <h3 className="text-sm font-semibold text-slate-200 uppercase tracking-wider">Domain Comparison</h3>
+                    <Activity className="w-5 h-5 text-muted-foreground" />
+                    <h3 className="text-sm font-semibold text-foreground uppercase tracking-wider">Domain Comparison</h3>
                 </div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-left text-sm">
-                        <thead className="text-[10px] text-slate-500 font-mono uppercase bg-slate-900/40">
+                        <thead className="text-[10px] text-muted-foreground font-mono uppercase bg-card/40">
                             <tr>
                                 <th className="px-4 py-3 font-medium rounded-tl-lg">Domain</th>
                                 <th className="px-4 py-3 font-medium text-center">Score</th>
@@ -284,16 +284,16 @@ export function DomainsTab({ frameworkId, controls = [] }: { frameworkId: string
                                 <th className="px-4 py-3 font-medium text-center rounded-tr-lg">Status</th>
                             </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-800/50">
+                        <tbody className="divide-y divide-border/50">
                             {domains.map((d) => (
-                                <tr key={d.name} className="hover:bg-slate-800/20 transition-colors">
-                                    <td className="px-4 py-3 text-slate-200 font-medium">{d.name}</td>
+                                <tr key={d.name} className="hover:bg-secondary/20 transition-colors">
+                                    <td className="px-4 py-3 text-foreground font-medium">{d.name}</td>
                                     <td className="px-4 py-3 text-center">
                                         <span className={cn("font-bold", d.score >= 80 ? "text-emerald-400" : d.score >= 60 ? "text-amber-400" : "text-red-400")}>{d.score}%</span>
                                     </td>
                                     <td className="px-4 py-3 text-center text-emerald-400 text-xs font-semibold">{d.verified}</td>
                                     <td className="px-4 py-3 text-center text-blue-400 text-xs font-semibold">{d.inProgress}</td>
-                                    <td className="px-4 py-3 text-center text-slate-400 text-xs">{d.notStarted}</td>
+                                    <td className="px-4 py-3 text-center text-muted-foreground text-xs">{d.notStarted}</td>
                                     <td className="px-4 py-3 text-center">
                                         <span className={cn(
                                             "text-[10px] font-bold uppercase px-2 py-0.5 rounded border",

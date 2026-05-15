@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
     GraduationCap, PlayCircle, Users, Clock, BookOpen,
     CheckCircle2, ChevronRight, X, Send, Shield,
@@ -175,8 +176,8 @@ const COLOR_MAP: Record<string, { bg: string; border: string; icon: string; badg
     slate: {
         bg: "from-slate-500/5 to-slate-500/0",
         border: "border-slate-500/20 hover:border-slate-600/40",
-        icon: "text-slate-300 bg-slate-500/10",
-        badge: "bg-slate-500/10 text-slate-300",
+        icon: "text-muted-foreground bg-slate-500/10",
+        badge: "bg-slate-500/10 text-muted-foreground",
         btn: "bg-slate-600 hover:bg-slate-500 shadow-slate-500/20",
     },
     red: {
@@ -219,11 +220,11 @@ export default function TrainingPage() {
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center">
                         <GraduationCap className="w-8 h-8 mr-3 text-emerald-500" />
                         Security Awareness Training
                     </h1>
-                    <p className="text-sm text-slate-400 mt-2">
+                    <p className="text-sm text-muted-foreground mt-2">
                         Assign compliance training modules to employees. Track acknowledgement and completion.
                     </p>
                 </div>
@@ -244,13 +245,13 @@ export default function TrainingPage() {
                     { label: "Assigned to Org", value: totalAssigned, icon: Users, color: "text-emerald-400" },
                     { label: "Total Training Time", value: "92 min", icon: Clock, color: "text-purple-400" },
                 ].map(stat => (
-                    <div key={stat.label} className="bg-slate-900/60 border border-slate-800 rounded-xl p-4 flex items-center gap-4">
-                        <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center flex-shrink-0">
+                    <div key={stat.label} className="bg-card/60 border border-border rounded-xl p-4 flex items-center gap-4">
+                        <div className="w-10 h-10 rounded-lg bg-secondary flex items-center justify-center flex-shrink-0">
                             <stat.icon className={`w-5 h-5 ${stat.color}`} />
                         </div>
                         <div>
-                            <div className="text-xl font-bold text-slate-100">{stat.value}</div>
-                            <div className="text-xs text-slate-500">{stat.label}</div>
+                            <div className="text-xl font-bold text-foreground">{stat.value}</div>
+                            <div className="text-xs text-muted-foreground">{stat.label}</div>
                         </div>
                     </div>
                 ))}
@@ -258,7 +259,7 @@ export default function TrainingPage() {
 
             {/* Course Library */}
             <div>
-                <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-widest mb-4">Course Library</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-widest mb-4">Course Library</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
                     {MODULES.map(mod => {
                         const c = COLOR_MAP[mod.color];
@@ -266,7 +267,7 @@ export default function TrainingPage() {
                         return (
                             <div
                                 key={mod.id}
-                                className={`relative bg-gradient-to-br ${c.bg} bg-slate-900/60 border ${c.border} rounded-2xl p-5 flex flex-col gap-4 transition-all duration-200`}
+                                className={`relative bg-gradient-to-br ${c.bg} bg-card/60 border ${c.border} rounded-2xl p-5 flex flex-col gap-4 transition-all duration-200`}
                             >
                                 {/* Assigned badge */}
                                 {isAssigned && (
@@ -282,12 +283,12 @@ export default function TrainingPage() {
                                         <mod.icon className="w-5 h-5" />
                                     </div>
                                     <div className="flex-1 min-w-0 pr-16">
-                                        <h3 className="text-sm font-semibold text-slate-100 leading-snug">{mod.title}</h3>
+                                        <h3 className="text-sm font-semibold text-foreground leading-snug">{mod.title}</h3>
                                         <div className="flex items-center gap-3 mt-1">
-                                            <span className="text-xs text-slate-500 flex items-center gap-1">
+                                            <span className="text-xs text-muted-foreground flex items-center gap-1">
                                                 <Clock className="w-3 h-3" />{mod.duration}
                                             </span>
-                                            <span className="text-xs text-slate-500 flex items-center gap-1">
+                                            <span className="text-xs text-muted-foreground flex items-center gap-1">
                                                 <BookOpen className="w-3 h-3" />{mod.slides} slides
                                             </span>
                                         </div>
@@ -295,7 +296,7 @@ export default function TrainingPage() {
                                 </div>
 
                                 {/* Description */}
-                                <p className="text-xs text-slate-400 leading-relaxed">{mod.description}</p>
+                                <p className="text-xs text-muted-foreground leading-relaxed">{mod.description}</p>
 
                                 {/* Topic tags */}
                                 <div className="flex flex-wrap gap-1.5">
@@ -308,20 +309,20 @@ export default function TrainingPage() {
 
                                 {/* Actions */}
                                 <div className="flex gap-2 mt-auto pt-1">
-                                    <button
+                                    <Button variant="plain"
                                         onClick={() => openPreview(mod)}
-                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-slate-300 text-xs font-medium transition-colors"
+                                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-border hover:bg-secondary text-muted-foreground text-xs font-medium transition-colors h-auto"
                                     >
                                         <PlayCircle className="w-3.5 h-3.5" />
                                         Preview
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button variant="plain"
                                         onClick={() => handleAssign(mod)}
                                         className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-white text-xs font-medium transition-all shadow-lg ${c.btn}`}
                                     >
                                         <Users className="w-3.5 h-3.5" />
                                         {isAssigned ? "Re-assign" : "Assign to All"}
-                                    </button>
+                                    </Button>
                                 </div>
                             </div>
                         );
@@ -336,25 +337,25 @@ export default function TrainingPage() {
                 const isLast = currentSlide === previewModule.slides - 1;
                 return (
                     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-                        <div className="w-full max-w-2xl bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+                        <div className="w-full max-w-2xl bg-card border border-border rounded-2xl shadow-2xl flex flex-col overflow-hidden">
                             {/* Modal header */}
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+                            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
                                 <div className="flex items-center gap-3">
                                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${c.icon}`}>
                                         <previewModule.icon className="w-4 h-4" />
                                     </div>
                                     <div>
-                                        <div className="text-sm font-semibold text-slate-100">{previewModule.title}</div>
-                                        <div className="text-xs text-slate-500">Slide {currentSlide + 1} of {previewModule.slides}</div>
+                                        <div className="text-sm font-semibold text-foreground">{previewModule.title}</div>
+                                        <div className="text-xs text-muted-foreground">Slide {currentSlide + 1} of {previewModule.slides}</div>
                                     </div>
                                 </div>
-                                <button onClick={() => setPreviewModule(null)} className="text-slate-500 hover:text-slate-300 transition-colors">
+                                <Button variant="plain" onClick={() => setPreviewModule(null)} className="text-muted-foreground hover:text-muted-foreground transition-colors h-auto">
                                     <X className="w-5 h-5" />
-                                </button>
+                                </Button>
                             </div>
 
                             {/* Progress bar */}
-                            <div className="h-1 bg-slate-800">
+                            <div className="h-1 bg-secondary">
                                 <div
                                     className="h-full bg-blue-500 transition-all duration-300"
                                     style={{ width: `${((currentSlide + 1) / previewModule.slides) * 100}%` }}
@@ -366,42 +367,42 @@ export default function TrainingPage() {
                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-5 ${c.icon}`}>
                                     <previewModule.icon className="w-6 h-6" />
                                 </div>
-                                <h2 className="text-xl font-bold text-slate-100 mb-3">{slide.title}</h2>
-                                <p className="text-slate-400 text-sm leading-relaxed max-w-lg">{slide.body}</p>
+                                <h2 className="text-xl font-bold text-foreground mb-3">{slide.title}</h2>
+                                <p className="text-muted-foreground text-sm leading-relaxed max-w-lg">{slide.body}</p>
                             </div>
 
                             {/* Navigation */}
-                            <div className="flex items-center justify-between px-6 py-4 border-t border-slate-800">
-                                <button
+                            <div className="flex items-center justify-between px-6 py-4 border-t border-border">
+                                <Button variant="plain"
                                     onClick={() => setCurrentSlide(s => Math.max(0, s - 1))}
                                     disabled={currentSlide === 0}
-                                    className="px-4 py-2 rounded-lg border border-slate-700 text-slate-400 text-sm disabled:opacity-30 hover:bg-slate-800 transition-colors"
+                                    className="px-4 py-2 rounded-lg border border-border text-muted-foreground text-sm disabled:opacity-30 hover:bg-secondary transition-colors h-auto"
                                 >
                                     Back
-                                </button>
+                                </Button>
                                 <div className="flex gap-1.5">
                                     {Array.from({ length: previewModule.slides }).map((_, i) => (
-                                        <button
+                                        <Button variant="plain"
                                             key={i}
                                             onClick={() => setCurrentSlide(i)}
-                                            className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentSlide ? "bg-blue-400 w-4" : "bg-slate-700 hover:bg-slate-500"}`}
+                                            className={`w-1.5 h-1.5 rounded-full transition-all ${i === currentSlide ? "bg-blue-400 w-4" : "bg-secondary hover:bg-slate-500"}`}
                                         />
                                     ))}
                                 </div>
                                 {isLast ? (
-                                    <button
+                                    <Button variant="plain"
                                         onClick={() => { setPreviewModule(null); handleAssign(previewModule); }}
-                                        className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium flex items-center gap-1.5 transition-colors"
+                                        className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white text-sm font-medium flex items-center gap-1.5 transition-colors h-auto"
                                     >
                                         <Users className="w-4 h-4" /> Assign to All
-                                    </button>
+                                    </Button>
                                 ) : (
-                                    <button
+                                    <Button variant="plain"
                                         onClick={() => setCurrentSlide(s => Math.min(previewModule.slides - 1, s + 1))}
-                                        className="px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm flex items-center gap-1.5 transition-colors"
+                                        className="px-4 py-2 rounded-lg bg-secondary hover:bg-secondary text-foreground text-sm flex items-center gap-1.5 transition-colors h-auto"
                                     >
                                         Next <ChevronRight className="w-4 h-4" />
-                                    </button>
+                                    </Button>
                                 )}
                             </div>
                         </div>
@@ -412,56 +413,56 @@ export default function TrainingPage() {
             {/* ── Assign Confirmation Modal ── */}
             {assignTarget && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-                    <div className="w-full max-w-md bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl p-6">
+                    <div className="w-full max-w-md bg-card border border-border rounded-2xl shadow-2xl p-6">
                         {assignSent ? (
                             <div className="text-center py-4">
                                 <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-4">
                                     <CheckCircle2 className="w-7 h-7 text-emerald-400" />
                                 </div>
-                                <h3 className="text-lg font-semibold text-slate-100">Training Assigned!</h3>
-                                <p className="text-sm text-slate-400 mt-1">
-                                    All employees have been notified about <span className="text-slate-200 font-medium">{assignTarget.title}</span>.
+                                <h3 className="text-lg font-semibold text-foreground">Training Assigned!</h3>
+                                <p className="text-sm text-muted-foreground mt-1">
+                                    All employees have been notified about <span className="text-foreground font-medium">{assignTarget.title}</span>.
                                 </p>
                             </div>
                         ) : (
                             <>
                                 <div className="flex items-center justify-between mb-5">
-                                    <h3 className="text-base font-semibold text-slate-100">Assign Training to All Employees</h3>
-                                    <button onClick={() => setAssignTarget(null)} className="text-slate-500 hover:text-slate-300">
+                                    <h3 className="text-base font-semibold text-foreground">Assign Training to All Employees</h3>
+                                    <Button variant="plain" onClick={() => setAssignTarget(null)} className="text-muted-foreground hover:text-muted-foreground h-auto">
                                         <X className="w-5 h-5" />
-                                    </button>
+                                    </Button>
                                 </div>
 
-                                <div className="bg-slate-800/60 rounded-xl p-4 mb-5">
+                                <div className="bg-secondary/60 rounded-xl p-4 mb-5">
                                     <div className="flex items-center gap-3">
                                         <div className={`w-9 h-9 rounded-lg flex items-center justify-center ${COLOR_MAP[assignTarget.color].icon}`}>
                                             <assignTarget.icon className="w-4 h-4" />
                                         </div>
                                         <div>
-                                            <div className="text-sm font-medium text-slate-100">{assignTarget.title}</div>
-                                            <div className="text-xs text-slate-500">{assignTarget.duration} · {assignTarget.slides} slides</div>
+                                            <div className="text-sm font-medium text-foreground">{assignTarget.title}</div>
+                                            <div className="text-xs text-muted-foreground">{assignTarget.duration} · {assignTarget.slides} slides</div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <p className="text-sm text-slate-400 mb-6">
+                                <p className="text-sm text-muted-foreground mb-6">
                                     This will notify all members of your organization to complete this training module. They will receive an email with a link to the training.
                                 </p>
 
                                 <div className="flex gap-3">
-                                    <button
+                                    <Button variant="plain"
                                         onClick={() => setAssignTarget(null)}
-                                        className="flex-1 px-4 py-2.5 rounded-xl border border-slate-700 hover:bg-slate-800 text-slate-300 text-sm font-medium transition-colors"
+                                        className="flex-1 px-4 py-2.5 rounded-xl border border-border hover:bg-secondary text-muted-foreground text-sm font-medium transition-colors h-auto"
                                     >
                                         Cancel
-                                    </button>
-                                    <button
+                                    </Button>
+                                    <Button variant="plain"
                                         onClick={confirmAssign}
-                                        className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20"
+                                        className="flex-1 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium flex items-center justify-center gap-2 transition-colors shadow-lg shadow-emerald-500/20 h-auto"
                                     >
                                         <Send className="w-4 h-4" />
                                         Publish & Notify
-                                    </button>
+                                    </Button>
                                 </div>
                             </>
                         )}

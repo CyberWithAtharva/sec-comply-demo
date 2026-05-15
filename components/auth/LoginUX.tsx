@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { ShieldCheck, Lock, Mail, ChevronRight, Fingerprint, Activity, Server, FileLock2, AlertTriangle } from "lucide-react";
 import { signIn } from "@/lib/auth/actions";
@@ -25,7 +26,7 @@ export function LoginUX() {
     }
 
     return (
-        <div className="min-h-screen w-full flex items-center justify-center relative bg-[#020617] overflow-hidden selection:bg-blue-500/30">
+        <div className="min-h-screen w-full flex items-center justify-center relative bg-background overflow-hidden selection:bg-blue-500/30">
 
             {/* Background Ambience */}
             <div className="absolute inset-0 pointer-events-none z-0">
@@ -59,13 +60,13 @@ export function LoginUX() {
                         <span className="text-3xl font-bold bg-gradient-to-r from-slate-100 to-slate-400 bg-clip-text text-transparent">SecComply</span>
                     </div>
 
-                    <h1 className="text-4xl lg:text-5xl font-extrabold text-slate-100 leading-tight mb-6">
+                    <h1 className="text-4xl lg:text-5xl font-extrabold text-foreground leading-tight mb-6">
                         Intelligent <br />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-emerald-400">Compliance</span> <br />
                         Engine
                     </h1>
 
-                    <p className="text-slate-400 text-lg mb-10 max-w-sm leading-relaxed">
+                    <p className="text-muted-foreground text-lg mb-10 max-w-sm leading-relaxed">
                         Unify your security posture, automate evidence collection, and achieve continuous compliance across SOC2, ISO27001, and more.
                     </p>
 
@@ -80,7 +81,7 @@ export function LoginUX() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3 + (i * 0.1), duration: 0.5 }}
-                                className="flex items-center space-x-3 text-slate-300"
+                                className="flex items-center space-x-3 text-muted-foreground"
                             >
                                 <div className="w-8 h-8 rounded-lg bg-blue-900/30 flex items-center justify-center border border-blue-800/40">
                                     <item.icon className="w-4 h-4 text-blue-400" />
@@ -100,18 +101,18 @@ export function LoginUX() {
                 >
                     <div className="absolute -inset-0.5 bg-gradient-to-b from-blue-500/20 to-emerald-500/0 rounded-3xl blur-md opacity-50 group-hover:opacity-100 transition duration-1000" />
 
-                    <div className="relative backdrop-blur-xl bg-slate-900/60 border border-slate-700/50 p-8 sm:p-10 rounded-3xl shadow-2xl flex flex-col">
+                    <div className="relative backdrop-blur-xl bg-card/60 border border-border/50 p-8 sm:p-10 rounded-3xl shadow-2xl flex flex-col">
 
                         <div className="md:hidden flex items-center justify-center space-x-2 mb-8">
                             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
                                 <ShieldCheck className="w-4 h-4 text-white" />
                             </div>
-                            <span className="text-xl font-bold text-slate-100">SecComply</span>
+                            <span className="text-xl font-bold text-foreground">SecComply</span>
                         </div>
 
                         <div className="mb-8 text-center md:text-left">
-                            <h2 className="text-2xl font-bold text-slate-100 mb-2 tracking-tight">Welcome back</h2>
-                            <p className="text-sm text-slate-400">Securely sign in to your dashboard</p>
+                            <h2 className="text-2xl font-bold text-foreground mb-2 tracking-tight">Welcome back</h2>
+                            <p className="text-sm text-muted-foreground">Securely sign in to your dashboard</p>
                         </div>
 
                         {error && (
@@ -128,17 +129,17 @@ export function LoginUX() {
                         <form onSubmit={handleLogin} className="flex flex-col space-y-5 flex-1">
 
                             <div className="space-y-1.5">
-                                <label className="text-xs font-medium text-slate-400 ml-1 uppercase tracking-wider">Work Email</label>
+                                <label className="text-xs font-medium text-muted-foreground ml-1 uppercase tracking-wider">Work Email</label>
                                 <div className="relative group/input">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Mail className="h-5 w-5 text-slate-500 group-focus-within/input:text-blue-400 transition-colors" />
+                                        <Mail className="h-5 w-5 text-muted-foreground group-focus-within/input:text-blue-400 transition-colors" />
                                     </div>
                                     <input
                                         type="email"
                                         name="email"
                                         required
                                         autoComplete="email"
-                                        className="w-full bg-slate-950/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all font-medium"
+                                        className="w-full bg-background/50 border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all font-medium"
                                         placeholder="name@company.com"
                                     />
                                 </div>
@@ -146,28 +147,28 @@ export function LoginUX() {
 
                             <div className="space-y-1.5">
                                 <div className="flex justify-between items-center ml-1">
-                                    <label className="text-xs font-medium text-slate-400 uppercase tracking-wider">Password</label>
+                                    <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Password</label>
                                 </div>
                                 <div className="relative group/input">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Lock className="h-5 w-5 text-slate-500 group-focus-within/input:text-blue-400 transition-colors" />
+                                        <Lock className="h-5 w-5 text-muted-foreground group-focus-within/input:text-blue-400 transition-colors" />
                                     </div>
                                     <input
                                         type="password"
                                         name="password"
                                         required
                                         autoComplete="current-password"
-                                        className="w-full bg-slate-950/50 border border-slate-800 rounded-xl py-3 pl-11 pr-4 text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all font-medium tracking-widest"
+                                        className="w-full bg-background/50 border border-border rounded-xl py-3 pl-11 pr-4 text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all font-medium tracking-widest"
                                         placeholder="••••••••"
                                     />
                                 </div>
                             </div>
 
                             <div className="pt-2">
-                                <button
+                                <Button variant="plain"
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full relative group/btn overflow-hidden rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 px-4 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-80 disabled:cursor-not-allowed border border-blue-500 hover:border-blue-400 shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)]"
+                                    className="w-full relative group/btn overflow-hidden rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 px-4 transition-all focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-slate-900 disabled:opacity-80 disabled:cursor-not-allowed border border-blue-500 hover:border-blue-400 shadow-[0_0_20px_rgba(37,99,235,0.2)] hover:shadow-[0_0_25px_rgba(37,99,235,0.4)] h-auto"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-emerald-600 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-500" />
                                     <div className="flex items-center justify-center space-x-2 relative z-10 transition-transform duration-300 group-active/btn:scale-[0.98]">
@@ -184,13 +185,13 @@ export function LoginUX() {
                                             </>
                                         )}
                                     </div>
-                                </button>
+                                </Button>
                             </div>
 
                         </form>
 
-                        <div className="mt-8 pt-8 border-t border-slate-800/50">
-                            <div className="flex items-center justify-center space-x-1.5 text-xs text-slate-500 font-medium">
+                        <div className="mt-8 pt-8 border-t border-border/50">
+                            <div className="flex items-center justify-center space-x-1.5 text-xs text-muted-foreground font-medium">
                                 <Fingerprint className="w-3.5 h-3.5" />
                                 <span>Protected by SOC2 Type II Certified Infrastructure</span>
                             </div>

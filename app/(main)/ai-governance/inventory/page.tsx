@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import {
     Database, Plus, Search, X, CheckCircle2, Clock,
@@ -85,7 +86,7 @@ const RISK_CONFIG: Record<AISystem["riskTier"], { label: string; cls: string }> 
 const STATUS_CONFIG: Record<AISystem["status"], { label: string; cls: string; icon: React.ReactNode }> = {
     Active:        { label: "Active",        cls: "bg-emerald-500/15 text-emerald-300 border-emerald-500/30", icon: <CheckCircle2 className="w-3 h-3" /> },
     "Under Review": { label: "Under Review", cls: "bg-amber-500/15 text-amber-300 border-amber-500/30",    icon: <Clock className="w-3 h-3" /> },
-    Decommissioned: { label: "Decommissioned", cls: "bg-slate-500/15 text-slate-400 border-slate-500/30", icon: <X className="w-3 h-3" /> },
+    Decommissioned: { label: "Decommissioned", cls: "bg-slate-500/15 text-muted-foreground border-slate-500/30", icon: <X className="w-3 h-3" /> },
 };
 
 const FW_COLORS: Record<string, string> = {
@@ -122,45 +123,45 @@ function RegisterModal({ onClose, onRegister }: { onClose: () => void; onRegiste
         onClose();
     };
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-orange-500/50 transition-colors";
     const selectCls = inputCls + " cursor-pointer appearance-none";
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
             <motion.div
                 initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] overflow-y-auto"
             >
-                <div className="flex items-center justify-between p-5 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-5 border-b border-border/50">
                     <div>
-                        <h2 className="text-sm font-semibold text-slate-100">Register New AI System</h2>
-                        <p className="text-xs text-slate-500 mt-0.5">Add an AI system to your governance inventory</p>
+                        <h2 className="text-sm font-semibold text-foreground">Register New AI System</h2>
+                        <p className="text-xs text-muted-foreground mt-0.5">Add an AI system to your governance inventory</p>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors"><X className="w-5 h-5" /></button>
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground transition-colors h-auto"><X className="w-5 h-5" /></Button>
                 </div>
                 <form onSubmit={handleSubmit} className="p-5 space-y-4">
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">System Name *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">System Name *</label>
                         <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="e.g. Customer Churn Predictor" className={inputCls} />
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Description</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Description</label>
                         <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} rows={2} placeholder="What does this AI system do?" className={inputCls + " resize-none"} />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">System Type</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">System Type</label>
                             <div className="relative">
                                 <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as AISystem["type"] }))} className={selectCls}>
                                     <option>Internal Model</option>
                                     <option>Third-Party API</option>
                                     <option>SaaS with AI</option>
                                 </select>
-                                <ChevronDown className="absolute right-3 top-3 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                                <ChevronDown className="absolute right-3 top-3 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Risk Tier</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Risk Tier</label>
                             <div className="relative">
                                 <select value={form.riskTier} onChange={e => setForm(f => ({ ...f, riskTier: e.target.value as AISystem["riskTier"] }))} className={selectCls}>
                                     <option>Unacceptable</option>
@@ -168,47 +169,47 @@ function RegisterModal({ onClose, onRegister }: { onClose: () => void; onRegiste
                                     <option>Medium</option>
                                     <option>Low</option>
                                 </select>
-                                <ChevronDown className="absolute right-3 top-3 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                                <ChevronDown className="absolute right-3 top-3 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                             </div>
                         </div>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Business Owner *</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Business Owner *</label>
                             <input value={form.owner} onChange={e => setForm(f => ({ ...f, owner: e.target.value }))} placeholder="e.g. Priya Mehta" className={inputCls} />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Status</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Status</label>
                             <div className="relative">
                                 <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value as AISystem["status"] }))} className={selectCls}>
                                     <option>Active</option>
                                     <option>Under Review</option>
                                     <option>Decommissioned</option>
                                 </select>
-                                <ChevronDown className="absolute right-3 top-3 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
+                                <ChevronDown className="absolute right-3 top-3 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
                             </div>
                         </div>
                     </div>
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-2">Frameworks</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-2">Frameworks</label>
                         <div className="flex flex-wrap gap-2">
                             {allFrameworks.map(fw => (
-                                <button key={fw} type="button" onClick={() => toggleFw(fw)}
-                                    className={cn("text-xs px-2.5 py-1 rounded-lg border font-medium transition-all",
+                                <Button variant="plain" key={fw} type="button" onClick={() => toggleFw(fw)}
+                                    className={cn("h-auto", "text-xs px-2.5 py-1 rounded-lg border font-medium transition-all",
                                         form.frameworks.includes(fw)
                                             ? "bg-orange-500/20 text-orange-300 border-orange-500/40"
-                                            : "bg-slate-800/50 text-slate-500 border-slate-700/50 hover:border-slate-600"
+                                            : "bg-secondary/50 text-muted-foreground border-border/50 hover:border-slate-600"
                                     )}>
                                     {fw}
-                                </button>
+                                </Button>
                             ))}
                         </div>
                     </div>
                     <div className="flex justify-end gap-3 pt-1">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">Cancel</button>
-                        <button type="submit" className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium rounded-xl flex items-center gap-2 transition-colors">
+                        <Button variant="plain" type="button" onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors h-auto">Cancel</Button>
+                        <Button variant="plain" type="submit" className="px-4 py-2 bg-orange-600 hover:bg-orange-500 text-white text-sm font-medium rounded-xl flex items-center gap-2 transition-colors h-auto">
                             <Database className="w-3.5 h-3.5" /> Register System
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </motion.div>
@@ -241,7 +242,7 @@ export default function AIInventoryPage() {
         unmapped: systems.filter(s => s.frameworks.length === 0).length,
     }), [systems]);
 
-    const selectCls = "bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-orange-500/40 transition-colors cursor-pointer";
+    const selectCls = "bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none focus:border-orange-500/40 transition-colors cursor-pointer";
 
     return (
         <div className="w-full flex flex-col space-y-5 animate-in fade-in duration-700">
@@ -251,17 +252,17 @@ export default function AIInventoryPage() {
                 <div>
                     <div className="flex items-center gap-2 mb-1">
                         <Database className="w-5 h-5 text-orange-400" />
-                        <h1 className="text-2xl font-bold text-slate-100 tracking-tight">AI System Inventory</h1>
+                        <h1 className="text-2xl font-bold text-foreground tracking-tight">AI System Inventory</h1>
                         <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/20">PREVIEW</span>
                     </div>
-                    <p className="text-sm text-slate-400">Register and manage all AI systems in your organization</p>
+                    <p className="text-sm text-muted-foreground">Register and manage all AI systems in your organization</p>
                 </div>
-                <button
+                <Button variant="plain"
                     onClick={() => setShowModal(true)}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-sm font-semibold rounded-xl transition-colors shrink-0 shadow-lg shadow-orange-900/30"
+                    className="flex items-center gap-2 px-4 py-2.5 bg-orange-600 hover:bg-orange-500 text-white text-sm font-semibold rounded-xl transition-colors shrink-0 shadow-lg shadow-orange-900/30 h-auto"
                 >
                     <Plus className="w-4 h-4" /> Register New AI System
-                </button>
+                </Button>
             </div>
 
             {/* Stats */}
@@ -272,27 +273,27 @@ export default function AIInventoryPage() {
                     { label: "Pending Review", value: stats.pending, icon: Clock, color: "text-amber-400", bg: "bg-amber-500/10 border-amber-500/20" },
                     { label: "No Framework Mapped", value: stats.unmapped, icon: Eye, color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
                 ].map(({ label, value, icon: Icon, color, bg }) => (
-                    <div key={label} className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
+                    <div key={label} className="bg-card/60 border border-border/60 rounded-xl p-4">
                         <div className="flex items-center justify-between mb-3">
-                            <span className="text-xs text-slate-500 font-medium">{label}</span>
+                            <span className="text-xs text-muted-foreground font-medium">{label}</span>
                             <div className={cn("w-8 h-8 rounded-lg border flex items-center justify-center", bg)}>
                                 <Icon className={cn("w-4 h-4", color)} />
                             </div>
                         </div>
-                        <span className="text-2xl font-bold text-slate-100">{value}</span>
+                        <span className="text-2xl font-bold text-foreground">{value}</span>
                     </div>
                 ))}
             </div>
 
             {/* Filters */}
-            <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl p-4">
+            <div className="bg-card/60 border border-border/60 rounded-xl p-4">
                 <div className="flex flex-wrap gap-3">
                     <div className="relative flex-1 min-w-48">
-                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-slate-500 pointer-events-none" />
+                        <Search className="absolute left-3 top-2.5 w-4 h-4 text-muted-foreground pointer-events-none" />
                         <input
                             value={search} onChange={e => setSearch(e.target.value)}
                             placeholder="Search by name or owner…"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-300 placeholder:text-slate-600 focus:outline-none focus:border-orange-500/40 transition-colors"
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl pl-9 pr-3 py-2 text-sm text-muted-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-orange-500/40 transition-colors"
                         />
                     </div>
                     <select value={filterRisk} onChange={e => setFilterRisk(e.target.value)} className={selectCls}>
@@ -308,22 +309,22 @@ export default function AIInventoryPage() {
                         <option>Active</option><option>Under Review</option><option>Decommissioned</option>
                     </select>
                     {(search || filterRisk !== "all" || filterType !== "all" || filterStatus !== "all") && (
-                        <button onClick={() => { setSearch(""); setFilterRisk("all"); setFilterType("all"); setFilterStatus("all"); }}
-                            className="flex items-center gap-1.5 px-3 py-2 text-xs text-slate-400 hover:text-slate-200 bg-slate-800/50 rounded-xl border border-slate-700/40 transition-colors">
+                        <Button variant="plain" onClick={() => { setSearch(""); setFilterRisk("all"); setFilterType("all"); setFilterStatus("all"); }}
+                            className="flex items-center gap-1.5 px-3 py-2 text-xs text-muted-foreground hover:text-foreground bg-secondary/50 rounded-xl border border-border/40 transition-colors h-auto">
                             <X className="w-3.5 h-3.5" /> Clear
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
 
             {/* Table */}
-            <div className="bg-slate-900/60 border border-slate-800/60 rounded-xl overflow-hidden">
+            <div className="bg-card/60 border border-border/60 rounded-xl overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
-                            <tr className="border-b border-slate-800/60">
+                            <tr className="border-b border-border/60">
                                 {["System Name", "Type", "Risk Tier", "Owner", "Frameworks", "Last Reviewed", "Status", "Actions"].map(h => (
-                                    <th key={h} className="text-left text-[11px] font-semibold text-slate-500 uppercase tracking-wider px-4 py-3 whitespace-nowrap">{h}</th>
+                                    <th key={h} className="text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 whitespace-nowrap">{h}</th>
                                 ))}
                             </tr>
                         </thead>
@@ -336,32 +337,32 @@ export default function AIInventoryPage() {
                                         <motion.tr
                                             key={s.id}
                                             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-                                            className="border-b border-slate-800/40 hover:bg-slate-800/20 transition-colors"
+                                            className="border-b border-border/40 hover:bg-secondary/20 transition-colors"
                                         >
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-col">
-                                                    <span className="font-medium text-slate-200 whitespace-nowrap">{s.name}</span>
-                                                    <span className="text-[10px] text-slate-500 font-mono">{s.id}</span>
+                                                    <span className="font-medium text-foreground whitespace-nowrap">{s.name}</span>
+                                                    <span className="text-[10px] text-muted-foreground font-mono">{s.id}</span>
                                                 </div>
                                             </td>
                                             <td className="px-4 py-3 whitespace-nowrap">
-                                                <span className="text-xs text-slate-400 bg-slate-800/50 border border-slate-700/40 rounded-lg px-2 py-1">{s.type}</span>
+                                                <span className="text-xs text-muted-foreground bg-secondary/50 border border-border/40 rounded-lg px-2 py-1">{s.type}</span>
                                             </td>
                                             <td className="px-4 py-3">
                                                 <span className={cn("text-xs font-semibold px-2.5 py-1 rounded-lg border", risk.cls)}>{risk.label}</span>
                                             </td>
-                                            <td className="px-4 py-3 text-slate-300 whitespace-nowrap text-xs">{s.owner}</td>
+                                            <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{s.owner}</td>
                                             <td className="px-4 py-3">
                                                 <div className="flex flex-wrap gap-1 max-w-[200px]">
                                                     {s.frameworks.length === 0
-                                                        ? <span className="text-xs text-slate-600 italic">None mapped</span>
+                                                        ? <span className="text-xs text-muted-foreground/70 italic">None mapped</span>
                                                         : s.frameworks.map(fw => (
-                                                            <span key={fw} className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border", FW_COLORS[fw] ?? "bg-slate-700/40 text-slate-400 border-slate-600/40")}>{fw}</span>
+                                                            <span key={fw} className={cn("text-[10px] font-medium px-1.5 py-0.5 rounded border", FW_COLORS[fw] ?? "bg-secondary/40 text-muted-foreground border-slate-600/40")}>{fw}</span>
                                                         ))
                                                     }
                                                 </div>
                                             </td>
-                                            <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{s.lastReviewed}</td>
+                                            <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">{s.lastReviewed}</td>
                                             <td className="px-4 py-3">
                                                 <span className={cn("inline-flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-lg border", status.cls)}>
                                                     {status.icon}{status.label}
@@ -370,10 +371,10 @@ export default function AIInventoryPage() {
                                             <td className="px-4 py-3">
                                                 <div className="flex items-center gap-1">
                                                     {[{ icon: Eye, tip: "View" }, { icon: Edit2, tip: "Edit" }, { icon: PlayCircle, tip: "Run Assessment" }].map(({ icon: Icon, tip }) => (
-                                                        <button key={tip} title={tip}
-                                                            className="p-1.5 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-slate-700/50 transition-colors">
+                                                        <Button variant="plain" key={tip} title={tip}
+                                                            className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors h-auto">
                                                             <Icon className="w-3.5 h-3.5" />
-                                                        </button>
+                                                        </Button>
                                                     ))}
                                                 </div>
                                             </td>
@@ -383,7 +384,7 @@ export default function AIInventoryPage() {
                             </AnimatePresence>
                             {filtered.length === 0 && (
                                 <tr>
-                                    <td colSpan={8} className="px-4 py-12 text-center text-slate-500 text-sm">
+                                    <td colSpan={8} className="px-4 py-12 text-center text-muted-foreground text-sm">
                                         No AI systems match your filters.
                                     </td>
                                 </tr>
@@ -391,8 +392,8 @@ export default function AIInventoryPage() {
                         </tbody>
                     </table>
                 </div>
-                <div className="px-4 py-3 border-t border-slate-800/40 flex items-center justify-between">
-                    <span className="text-xs text-slate-500">{filtered.length} of {systems.length} systems</span>
+                <div className="px-4 py-3 border-t border-border/40 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">{filtered.length} of {systems.length} systems</span>
                 </div>
             </div>
 

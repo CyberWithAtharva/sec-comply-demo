@@ -22,7 +22,7 @@ export function RadarWidget({ frameworkId = "soc2", data: propData, label = "Dom
     const data = React.useMemo(() => propData ?? RADAR_DATA.map(d => ({ ...d, A: Math.min(150, d.A * getMult(frameworkId)) })), [propData, frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center">
-            <h3 className="text-sm font-semibold text-slate-400 self-start mb-2">{label}</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground self-start mb-2">{label}</h3>
             <div className="w-full h-64">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadarChart cx="50%" cy="50%" outerRadius="70%" data={data}>
@@ -31,7 +31,7 @@ export function RadarWidget({ frameworkId = "soc2", data: propData, label = "Dom
                         <PolarRadiusAxis angle={30} domain={[0, 150]} tick={false} axisLine={false} />
                         <Radar name="Current" dataKey="A" stroke="#3b82f6" fill="#3b82f6" fillOpacity={0.3} />
                         <Radar name="Target" dataKey="B" stroke="#10b981" fill="#10b981" fillOpacity={0.1} />
-                        <Tooltip contentStyle={{ backgroundColor: '#020617', borderColor: '#1e293b', borderRadius: '8px' }} itemStyle={{ color: '#fff' }} />
+                        <Tooltip contentStyle={{ backgroundColor: 'var(--background)', borderColor: 'var(--border)', borderRadius: '8px' }} itemStyle={{ color: '#fff' }} />
                     </RadarChart>
                 </ResponsiveContainer>
             </div>
@@ -55,7 +55,7 @@ export function TimelineWidget({ frameworkId = "soc2" }: { frameworkId?: string 
     const data = React.useMemo(() => AREA_DATA.map(d => ({ ...d, score: Math.min(100, d.score * getMult(frameworkId)) })), [frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col">
-            <h3 className="text-sm font-semibold text-slate-400 mb-4">Historical Progress vs Risk</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-4">Historical Progress vs Risk</h3>
             <div className="w-full h-56">
                 <ResponsiveContainer width="100%" height="100%">
                     <AreaChart data={data} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
@@ -70,7 +70,7 @@ export function TimelineWidget({ frameworkId = "soc2" }: { frameworkId?: string 
                             </linearGradient>
                         </defs>
                         <XAxis dataKey="name" stroke="#475569" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }} />
                         <Area type="monotone" dataKey="score" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#colorScore)" />
                         <Area type="monotone" dataKey="risk" stroke="#ef4444" strokeWidth={2} fillOpacity={1} fill="url(#colorRisk)" />
                     </AreaChart>
@@ -96,7 +96,7 @@ export function ScatterWidget({ frameworkId = "soc2" }: { frameworkId?: string }
     const data = React.useMemo(() => SCATTER_DATA.map(d => ({ ...d, x: Math.min(100, d.x * getMult(frameworkId)) })), [frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between">
-            <h3 className="text-sm font-semibold text-slate-400 mb-2">Risk Impact Mapping</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-2">Risk Impact Mapping</h3>
             <div className="w-full h-56">
                 <ResponsiveContainer width="100%" height="100%">
                     <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
@@ -105,7 +105,7 @@ export function ScatterWidget({ frameworkId = "soc2" }: { frameworkId?: string }
                         <ZAxis type="number" dataKey="z" range={[60, 400]} name="Density" />
                         <Tooltip
                             cursor={{ strokeDasharray: '3 3', stroke: '#334155' }}
-                            contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px', color: '#f8fafc', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
+                            contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px', color: '#f8fafc', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.5)' }}
                             itemStyle={{ color: '#94a3b8' }}
                         />
                         <Scatter name="Controls" data={data} fill="#f59e0b" shape="circle">
@@ -124,7 +124,7 @@ export function ScatterWidget({ frameworkId = "soc2" }: { frameworkId?: string }
 // 4. Radial Bar (Sub-framework metrics)
 // -------------------------
 const RADIAL_DATA = [
-    { name: 'CC1', uv: 31, fill: '#1e293b' },
+    { name: 'CC1', uv: 31, fill: 'var(--border)' },
     { name: 'CC2', uv: 26, fill: '#3b82f6' },
     { name: 'CC3', uv: 15, fill: '#60a5fa' },
     { name: 'CC4', uv: 15, fill: '#93c5fd' },
@@ -134,12 +134,12 @@ export function RadialWidget({ frameworkId = "soc2" }: { frameworkId?: string })
     const data = React.useMemo(() => RADIAL_DATA.map(d => ({ ...d, uv: Math.min(100, d.uv * getMult(frameworkId)) })), [frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col items-center">
-            <h3 className="text-sm font-semibold text-slate-400 self-start mb-2">Sub-domain Velocity</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground self-start mb-2">Sub-domain Velocity</h3>
             <div className="w-full h-56">
                 <ResponsiveContainer width="100%" height="100%">
                     <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="100%" barSize={8} data={data}>
-                        <RadialBar background={{ fill: '#0f172a' }} dataKey="uv" cornerRadius={10} />
-                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }} />
+                        <RadialBar background={{ fill: 'var(--card)' }} dataKey="uv" cornerRadius={10} />
+                        <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }} />
                     </RadialBarChart>
                 </ResponsiveContainer>
             </div>
@@ -154,10 +154,10 @@ export function GaugeWidget({ frameworkId = "soc2", value }: { frameworkId?: str
     const percent = value !== undefined ? value : Math.min(100, Math.round(82 * getMult(frameworkId)));
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col justify-center items-center relative">
-            <div className="absolute top-6 left-6 text-sm font-semibold text-slate-400">Readiness</div>
+            <div className="absolute top-6 left-6 text-sm font-semibold text-muted-foreground">Readiness</div>
 
             <svg className="w-32 h-32" viewBox="0 0 100 100">
-                <path d="M 20 80 A 40 40 0 1 1 80 80" fill="none" stroke="#1e293b" strokeWidth="12" strokeLinecap="round" />
+                <path d="M 20 80 A 40 40 0 1 1 80 80" fill="none" stroke="var(--border)" strokeWidth="12" strokeLinecap="round" />
                 <motion.path
                     d="M 20 80 A 40 40 0 1 1 80 80"
                     fill="none"
@@ -171,7 +171,7 @@ export function GaugeWidget({ frameworkId = "soc2", value }: { frameworkId?: str
                 />
             </svg>
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-[20%] text-center">
-                <span className="text-3xl font-bold text-slate-100">{percent}</span><span className="text-sm text-slate-500">%</span>
+                <span className="text-3xl font-bold text-foreground">{percent}</span><span className="text-sm text-muted-foreground">%</span>
             </div>
         </div>
     );
@@ -191,13 +191,13 @@ export function BarWidget({ frameworkId = "soc2", data: propData, label = "Categ
     const data = React.useMemo(() => propData ?? BAR_DATA.map(d => ({ ...d, val: d.val * getMult(frameworkId) })), [propData, frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col">
-            <h3 className="text-sm font-semibold text-slate-400 mb-4">{label}</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground mb-4">{label}</h3>
             <div className="w-full h-56">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
-                        <CartesianGrid strokeDasharray="3 3" stroke="#1e293b" vertical={false} />
+                        <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
                         <XAxis dataKey="name" stroke="#475569" tick={{ fill: '#64748b', fontSize: 12 }} axisLine={false} tickLine={false} />
-                        <Tooltip cursor={{ fill: '#0f172a' }} contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }} />
+                        <Tooltip cursor={{ fill: 'var(--card)' }} contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }} />
                         <Bar dataKey="val" fill="#3b82f6" radius={[4, 4, 0, 0]} />
                     </BarChart>
                 </ResponsiveContainer>
@@ -220,16 +220,16 @@ export function TreemapWidget({ frameworkId = "soc2", data: propData, label = "C
     const data = React.useMemo(() => propData ?? TREE_DATA.map(d => ({ ...d, size: d.size * getMult(frameworkId) })), [propData, frameworkId]);
     return (
         <div className="glass-panel p-6 rounded-2xl flex flex-col items-center justify-center relative col-span-1 md:col-span-2 lg:col-span-1">
-            <h3 className="text-sm font-semibold text-slate-400 absolute top-6 left-6 z-10">{label}</h3>
+            <h3 className="text-sm font-semibold text-muted-foreground absolute top-6 left-6 z-10">{label}</h3>
             <div className="w-full h-56 mt-6">
                 <ResponsiveContainer width="100%" height="100%">
                     <Treemap
                         data={data}
                         dataKey="size"
-                        stroke="#020617"
+                        stroke="var(--background)"
                         fill="#3b82f6"
                     >
-                        <Tooltip contentStyle={{ backgroundColor: '#0f172a', borderColor: '#1e293b', borderRadius: '8px' }} />
+                        <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderColor: 'var(--border)', borderRadius: '8px' }} />
                     </Treemap>
                 </ResponsiveContainer>
             </div>

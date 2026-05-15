@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useMemo, useCallback } from "react";
+import { Button } from "@/components/ui/button";
 import { motion, AnimatePresence } from "framer-motion";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -61,14 +62,14 @@ const SEVERITY_CONFIG: Record<string, { label: string; color: string; bg: string
     high:          { label: "High",          color: "text-orange-400",  bg: "bg-orange-500/10",  border: "border-orange-500/30",  chart: "#f97316" },
     medium:        { label: "Medium",        color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   chart: "#f59e0b" },
     low:           { label: "Low",           color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", chart: "#10b981" },
-    informational: { label: "Info",          color: "text-slate-400",   bg: "bg-slate-500/10",   border: "border-slate-500/30",   chart: "#64748b" },
+    informational: { label: "Info",          color: "text-muted-foreground",   bg: "bg-slate-500/10",   border: "border-slate-500/30",   chart: "#64748b" },
 };
 
 const STATUS_CONFIG: Record<string, { label: string; color: string; bg: string; border: string; next: string | null }> = {
     open:        { label: "Open",          color: "text-red-400",     bg: "bg-red-500/10",     border: "border-red-500/30",     next: "in_progress" },
     in_progress: { label: "In Progress",   color: "text-amber-400",   bg: "bg-amber-500/10",   border: "border-amber-500/30",   next: "resolved" },
     resolved:    { label: "Resolved",      color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30", next: null },
-    accepted:    { label: "Accepted Risk", color: "text-slate-400",   bg: "bg-slate-500/10",   border: "border-slate-500/30",   next: null },
+    accepted:    { label: "Accepted Risk", color: "text-muted-foreground",   bg: "bg-slate-500/10",   border: "border-slate-500/30",   next: null },
 };
 
 function SeverityBadge({ severity }: { severity: string }) {
@@ -157,21 +158,21 @@ function UploadReportModal({ orgId, onClose, onCreated }: UploadReportModalProps
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50">
+                <div className="flex items-center justify-between p-6 border-b border-border/50">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center">
                             <Upload className="w-4 h-4 text-blue-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-100">Upload VAPT Report</h2>
-                            <p className="text-xs text-slate-500">Add a new penetration test report</p>
+                            <h2 className="text-base font-semibold text-foreground">Upload VAPT Report</h2>
+                            <p className="text-xs text-muted-foreground">Add a new penetration test report</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground transition-colors h-auto">
                         <X className="w-5 h-5" />
-                    </button>
+                    </Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4">
@@ -183,55 +184,55 @@ function UploadReportModal({ orgId, onClose, onCreated }: UploadReportModalProps
                     )}
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Report Title *</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Report Title *</label>
                         <input
                             type="text"
                             value={form.title}
                             onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
                             placeholder="Q1 2025 External Pentest"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors"
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 transition-colors"
                         />
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Conducted By</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Conducted By</label>
                             <input
                                 type="text"
                                 value={form.conducted_by}
                                 onChange={e => setForm(f => ({ ...f, conducted_by: e.target.value }))}
                                 placeholder="Security firm name"
-                                className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors"
+                                className="w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 transition-colors"
                             />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-400 mb-1.5">Report Date</label>
+                            <label className="block text-xs font-medium text-muted-foreground mb-1.5">Report Date</label>
                             <input
                                 type="date"
                                 value={form.report_date}
                                 onChange={e => setForm(f => ({ ...f, report_date: e.target.value }))}
-                                className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 focus:outline-none focus:border-blue-500/50 transition-colors"
+                                className="w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Scope</label>
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Scope</label>
                         <textarea
                             rows={2}
                             value={form.scope}
                             onChange={e => setForm(f => ({ ...f, scope: e.target.value }))}
                             placeholder="e.g. External web apps, VPN endpoint, AWS environment"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 transition-colors resize-none"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-medium text-slate-400 mb-1.5">Report PDF (optional)</label>
-                        <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-slate-700/50 rounded-xl cursor-pointer hover:border-slate-600/50 transition-colors bg-slate-800/30">
+                        <label className="block text-xs font-medium text-muted-foreground mb-1.5">Report PDF (optional)</label>
+                        <label className="flex items-center justify-center w-full h-20 border-2 border-dashed border-border/50 rounded-xl cursor-pointer hover:border-slate-600/50 transition-colors bg-secondary/30">
                             <div className="flex flex-col items-center space-y-1">
-                                <Upload className="w-5 h-5 text-slate-500" />
-                                <span className="text-xs text-slate-500">
+                                <Upload className="w-5 h-5 text-muted-foreground" />
+                                <span className="text-xs text-muted-foreground">
                                     {file ? file.name : "Click to upload PDF"}
                                 </span>
                             </div>
@@ -245,21 +246,21 @@ function UploadReportModal({ orgId, onClose, onCreated }: UploadReportModalProps
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-2">
-                        <button
+                        <Button variant="plain"
                             type="button"
                             onClick={onClose}
-                            className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors"
+                            className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors h-auto"
                         >
                             Cancel
-                        </button>
-                        <button
+                        </Button>
+                        <Button variant="plain"
                             type="submit"
                             disabled={uploading}
-                            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors flex items-center space-x-2"
+                            className="px-5 py-2 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-medium rounded-xl transition-colors flex items-center space-x-2 h-auto"
                         >
                             {uploading ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                             <span>{uploading ? "Creating…" : "Create Report"}</span>
-                        </button>
+                        </Button>
                     </div>
                 </form>
             </motion.div>
@@ -352,12 +353,12 @@ function FindingModal({ orgId, reports, owners, editing, defaultReportId, onClos
 
     const field = (label: string, node: React.ReactNode) => (
         <div>
-            <label className="block text-xs font-medium text-slate-400 mb-1.5">{label}</label>
+            <label className="block text-xs font-medium text-muted-foreground mb-1.5">{label}</label>
             {node}
         </div>
     );
 
-    const inputCls = "w-full bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2.5 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors";
+    const inputCls = "w-full bg-secondary/60 border border-border/50 rounded-xl px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 transition-colors";
     const selectCls = inputCls;
 
     return (
@@ -366,21 +367,21 @@ function FindingModal({ orgId, reports, owners, editing, defaultReportId, onClos
                 initial={{ opacity: 0, scale: 0.95 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="bg-slate-900 border border-slate-700/50 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col"
+                className="bg-card border border-border/50 rounded-2xl w-full max-w-lg shadow-2xl max-h-[90vh] flex flex-col"
             >
-                <div className="flex items-center justify-between p-6 border-b border-slate-800/50 shrink-0">
+                <div className="flex items-center justify-between p-6 border-b border-border/50 shrink-0">
                     <div className="flex items-center space-x-3">
                         <div className="w-9 h-9 rounded-xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
                             <AlertTriangle className="w-4 h-4 text-red-400" />
                         </div>
                         <div>
-                            <h2 className="text-base font-semibold text-slate-100">{editing ? "Edit Finding" : "Log Finding"}</h2>
-                            <p className="text-xs text-slate-500">{editing ? "Update vulnerability details" : "Add a new vulnerability finding"}</p>
+                            <h2 className="text-base font-semibold text-foreground">{editing ? "Edit Finding" : "Log Finding"}</h2>
+                            <p className="text-xs text-muted-foreground">{editing ? "Update vulnerability details" : "Add a new vulnerability finding"}</p>
                         </div>
                     </div>
-                    <button onClick={onClose} className="text-slate-500 hover:text-slate-300 transition-colors">
+                    <Button variant="plain" onClick={onClose} className="text-muted-foreground hover:text-muted-foreground transition-colors h-auto">
                         <X className="w-5 h-5" />
-                    </button>
+                    </Button>
                 </div>
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
@@ -467,16 +468,16 @@ function FindingModal({ orgId, reports, owners, editing, defaultReportId, onClos
                     </div>
                 </form>
 
-                <div className="flex justify-end space-x-3 p-6 border-t border-slate-800/50 shrink-0">
-                    <button type="button" onClick={onClose} className="px-4 py-2 text-sm text-slate-400 hover:text-slate-200 transition-colors">Cancel</button>
-                    <button
+                <div className="flex justify-end space-x-3 p-6 border-t border-border/50 shrink-0">
+                    <Button variant="plain" type="button" onClick={onClose} className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors h-auto">Cancel</Button>
+                    <Button variant="plain"
                         onClick={handleSubmit as unknown as React.MouseEventHandler}
                         disabled={saving}
-                        className="px-5 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors flex items-center space-x-2"
+                        className="px-5 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition-colors flex items-center space-x-2 h-auto"
                     >
                         {saving ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                         <span>{saving ? "Saving…" : editing ? "Save Changes" : "Log Finding"}</span>
-                    </button>
+                    </Button>
                 </div>
             </motion.div>
         </div>
@@ -582,34 +583,34 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
             {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h1 className="text-3xl font-bold text-slate-100 tracking-tight flex items-center">
+                    <h1 className="text-3xl font-bold text-foreground tracking-tight flex items-center">
                         <ShieldAlert className="w-8 h-8 mr-3 text-red-500" />
                         VAPT Tracker
                     </h1>
-                    <p className="text-sm text-slate-400 mt-1">Manage penetration test reports and track finding remediation.</p>
+                    <p className="text-sm text-muted-foreground mt-1">Manage penetration test reports and track finding remediation.</p>
                 </div>
                 <div className="flex space-x-3">
-                    <button
+                    <Button variant="plain"
                         onClick={() => openFinding(null)}
-                        className="bg-slate-800 hover:bg-slate-700 text-slate-200 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2 border border-slate-700/50"
+                        className="bg-secondary hover:bg-secondary text-foreground px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2 border border-border/50 h-auto"
                     >
                         <Plus className="w-4 h-4" />
                         <span>Log Finding</span>
-                    </button>
-                    <button
+                    </Button>
+                    <Button variant="plain"
                         onClick={() => setShowUpload(true)}
-                        className="bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600/30 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2"
+                        className="bg-blue-600/20 text-blue-400 border border-blue-500/30 hover:bg-blue-600/30 px-4 py-2.5 rounded-xl text-sm font-medium transition-colors flex items-center space-x-2 h-auto"
                     >
                         <Upload className="w-4 h-4" />
                         <span>Upload Report</span>
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             {/* Stat Cards */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
                 {[
-                    { label: "Total", count: stats.total, color: "text-slate-100" },
+                    { label: "Total", count: stats.total, color: "text-foreground" },
                     { label: "Critical", count: stats.critical, color: "text-red-400" },
                     { label: "High", count: stats.high, color: "text-orange-400" },
                     { label: "Medium", count: stats.medium, color: "text-amber-400" },
@@ -618,9 +619,9 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                 ].map((s) => (
                     <div
                         key={s.label}
-                        className="glass-panel rounded-2xl p-4 border border-slate-800/50 flex flex-col"
+                        className="glass-panel rounded-2xl p-4 border border-border/50 flex flex-col"
                     >
-                        <span className="text-xs text-slate-500 mb-1">{s.label}</span>
+                        <span className="text-xs text-muted-foreground mb-1">{s.label}</span>
                         <span className={cn("text-2xl font-bold tracking-tight", s.color)}>{s.count}</span>
                     </div>
                 ))}
@@ -630,11 +631,11 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
             {reports.length > 0 && (
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* VAPT Reports list */}
-                    <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
+                    <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
                         <div className="flex items-center space-x-2 mb-4">
                             <FileText className="w-4 h-4 text-blue-400" />
-                            <h3 className="text-sm font-semibold text-slate-100">VAPT Reports</h3>
-                            <span className="ml-auto text-[10px] text-slate-500">{reports.length} report{reports.length !== 1 ? "s" : ""}</span>
+                            <h3 className="text-sm font-semibold text-foreground">VAPT Reports</h3>
+                            <span className="ml-auto text-[10px] text-muted-foreground">{reports.length} report{reports.length !== 1 ? "s" : ""}</span>
                         </div>
                         <div className="flex flex-col space-y-2 overflow-y-auto max-h-48">
                             {reports.map(r => (
@@ -645,12 +646,12 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                                         "flex items-center justify-between p-3 rounded-xl border cursor-pointer transition-colors",
                                         filterReport === r.id
                                             ? "bg-blue-500/10 border-blue-500/30"
-                                            : "bg-slate-900/40 border-slate-800/50 hover:bg-slate-800/40"
+                                            : "bg-card/40 border-border/50 hover:bg-secondary/40"
                                     )}
                                 >
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-xs font-medium text-slate-200 truncate">{r.title}</p>
-                                        <p className="text-[10px] text-slate-500">
+                                        <p className="text-xs font-medium text-foreground truncate">{r.title}</p>
+                                        <p className="text-[10px] text-muted-foreground">
                                             {r.conducted_by ?? "Unknown"} · {r.report_date ? new Date(r.report_date).toLocaleDateString() : "No date"}
                                         </p>
                                     </div>
@@ -661,12 +662,12 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 onClick={e => e.stopPropagation()}
-                                                className="text-slate-500 hover:text-blue-400 transition-colors"
+                                                className="text-muted-foreground hover:text-blue-400 transition-colors"
                                             >
                                                 <Download className="w-3.5 h-3.5" />
                                             </a>
                                         )}
-                                        <span className="text-[10px] text-slate-500">{r.finding_count} findings</span>
+                                        <span className="text-[10px] text-muted-foreground">{r.finding_count} findings</span>
                                     </div>
                                 </div>
                             ))}
@@ -674,17 +675,17 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                     </div>
 
                     {/* Severity bar chart */}
-                    <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
+                    <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
                         <div className="flex items-center space-x-2 mb-4">
                             <BarChart3 className="w-4 h-4 text-orange-400" />
-                            <h3 className="text-sm font-semibold text-slate-100">Findings by Severity</h3>
+                            <h3 className="text-sm font-semibold text-foreground">Findings by Severity</h3>
                         </div>
                         <ResponsiveContainer width="100%" height={150}>
                             <BarChart data={barData} barSize={28}>
                                 <XAxis dataKey="name" tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} />
                                 <YAxis tick={{ fontSize: 10, fill: "#64748b" }} axisLine={false} tickLine={false} />
                                 <Tooltip
-                                    contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 8, fontSize: 11 }}
+                                    contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 11 }}
                                     cursor={{ fill: "rgba(255,255,255,0.03)" }}
                                 />
                                 <Bar dataKey="count" radius={[4, 4, 0, 0]}>
@@ -697,10 +698,10 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                     </div>
 
                     {/* Open vs Resolved donut */}
-                    <div className="glass-panel rounded-2xl border border-slate-800/50 p-5 flex flex-col">
+                    <div className="glass-panel rounded-2xl border border-border/50 p-5 flex flex-col">
                         <div className="flex items-center space-x-2 mb-4">
                             <TrendingUp className="w-4 h-4 text-emerald-400" />
-                            <h3 className="text-sm font-semibold text-slate-100">Open vs Resolved</h3>
+                            <h3 className="text-sm font-semibold text-foreground">Open vs Resolved</h3>
                         </div>
                         <ResponsiveContainer width="100%" height={150}>
                             <PieChart>
@@ -718,7 +719,7 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                                     ))}
                                 </Pie>
                                 <Tooltip
-                                    contentStyle={{ background: "#0f172a", border: "1px solid #1e293b", borderRadius: 8, fontSize: 11 }}
+                                    contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 11 }}
                                 />
                                 <Legend iconSize={8} wrapperStyle={{ fontSize: 10, color: "#64748b" }} />
                             </PieChart>
@@ -728,24 +729,24 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
             )}
 
             {/* Findings Table */}
-            <div className="glass-panel rounded-2xl border border-slate-800/50 flex flex-col">
+            <div className="glass-panel rounded-2xl border border-border/50 flex flex-col">
                 {/* Table header / filters */}
-                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-slate-800/50">
+                <div className="flex flex-wrap items-center gap-3 p-5 border-b border-border/50">
                     <div className="relative flex-1 min-w-[180px]">
-                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                        <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                         <input
                             type="text"
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             placeholder="Search findings…"
-                            className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-9 pr-3 py-2 text-sm text-slate-100 placeholder:text-slate-600 focus:outline-none focus:border-blue-500/50 transition-colors"
+                            className="w-full bg-secondary/60 border border-border/50 rounded-xl pl-9 pr-3 py-2 text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none focus:border-blue-500/50 transition-colors"
                         />
                     </div>
 
                     <select
                         value={filterReport}
                         onChange={e => setFilterReport(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-blue-500/50 transition-colors"
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
                     >
                         <option value="all">All Reports</option>
                         {reports.map(r => <option key={r.id} value={r.id}>{r.title}</option>)}
@@ -754,7 +755,7 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                     <select
                         value={filterSeverity}
                         onChange={e => setFilterSeverity(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-blue-500/50 transition-colors"
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
                     >
                         <option value="all">All Severities</option>
                         {Object.entries(SEVERITY_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
@@ -763,25 +764,25 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                     <select
                         value={filterStatus}
                         onChange={e => setFilterStatus(e.target.value)}
-                        className="bg-slate-800/60 border border-slate-700/50 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-blue-500/50 transition-colors"
+                        className="bg-secondary/60 border border-border/50 rounded-xl px-3 py-2 text-sm text-muted-foreground focus:outline-none focus:border-blue-500/50 transition-colors"
                     >
                         <option value="all">All Statuses</option>
                         {Object.entries(STATUS_CONFIG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
                     </select>
 
-                    <span className="text-xs text-slate-500 ml-auto">{filtered.length} finding{filtered.length !== 1 ? "s" : ""}</span>
+                    <span className="text-xs text-muted-foreground ml-auto">{filtered.length} finding{filtered.length !== 1 ? "s" : ""}</span>
                 </div>
 
                 {filtered.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-20 text-center">
-                        <ShieldAlert className="w-12 h-12 text-slate-700 mb-3" />
-                        <p className="text-sm font-medium text-slate-400">No findings found</p>
-                        <p className="text-xs text-slate-600 mt-1">Upload a VAPT report and log your first finding</p>
+                        <ShieldAlert className="w-12 h-12 text-muted-foreground/50 mb-3" />
+                        <p className="text-sm font-medium text-muted-foreground">No findings found</p>
+                        <p className="text-xs text-muted-foreground/70 mt-1">Upload a VAPT report and log your first finding</p>
                     </div>
                 ) : (
                     <div className="overflow-x-auto">
                         <table className="w-full text-left text-sm">
-                            <thead className="text-[10px] text-slate-500 font-mono uppercase bg-slate-900/40">
+                            <thead className="text-[10px] text-muted-foreground font-mono uppercase bg-card/40">
                                 <tr>
                                     <th className="px-5 py-3 font-medium">Finding</th>
                                     <th className="px-4 py-3 font-medium">Severity</th>
@@ -791,7 +792,7 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                                     <th className="px-4 py-3 font-medium">Actions</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-800/50">
+                            <tbody className="divide-y divide-border/50">
                                 <AnimatePresence initial={false}>
                                     {filtered.map(f => {
                                         const overdue = isOverdue(f);
@@ -802,56 +803,56 @@ export function VaptClient({ initialReports, initialFindings, orgId, owners }: V
                                                 initial={{ opacity: 0 }}
                                                 animate={{ opacity: 1 }}
                                                 exit={{ opacity: 0 }}
-                                                className="hover:bg-slate-800/20 transition-colors group"
+                                                className="hover:bg-secondary/20 transition-colors group"
                                             >
                                                 <td className="px-5 py-3">
                                                     <div className="flex flex-col">
-                                                        <span className="text-sm text-slate-200 font-medium group-hover:text-white transition-colors">{f.title}</span>
+                                                        <span className="text-sm text-foreground font-medium group-hover:text-white transition-colors">{f.title}</span>
                                                         {f.description && (
-                                                            <span className="text-[11px] text-slate-500 mt-0.5 truncate max-w-xs">{f.description}</span>
+                                                            <span className="text-[11px] text-muted-foreground mt-0.5 truncate max-w-xs">{f.description}</span>
                                                         )}
                                                     </div>
                                                 </td>
                                                 <td className="px-4 py-3"><SeverityBadge severity={f.severity} /></td>
                                                 <td className="px-4 py-3"><StatusBadge status={f.status} /></td>
                                                 <td className="px-4 py-3">
-                                                    <span className="text-xs text-slate-400">
+                                                    <span className="text-xs text-muted-foreground">
                                                         {f.assignee?.full_name ?? "Unassigned"}
                                                     </span>
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     {f.due_date ? (
-                                                        <span className={cn("text-xs", overdue ? "text-red-400 font-medium" : "text-slate-400")}>
+                                                        <span className={cn("text-xs", overdue ? "text-red-400 font-medium" : "text-muted-foreground")}>
                                                             {overdue && <AlertTriangle className="w-3 h-3 inline mr-1" />}
                                                             {new Date(f.due_date).toLocaleDateString()}
                                                         </span>
                                                     ) : (
-                                                        <span className="text-xs text-slate-600">—</span>
+                                                        <span className="text-xs text-muted-foreground/70">—</span>
                                                     )}
                                                 </td>
                                                 <td className="px-4 py-3">
                                                     <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                                         {statusCfg?.next && (
-                                                            <button
+                                                            <Button variant="plain"
                                                                 onClick={() => handleAdvanceStatus(f)}
                                                                 title={`Advance to ${STATUS_CONFIG[statusCfg.next!]?.label}`}
-                                                                className="p-1.5 text-slate-500 hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors"
+                                                                className="p-1.5 text-muted-foreground hover:text-emerald-400 hover:bg-emerald-500/10 rounded-lg transition-colors h-auto"
                                                             >
                                                                 <CheckCircle2 className="w-4 h-4" />
-                                                            </button>
+                                                            </Button>
                                                         )}
-                                                        <button
+                                                        <Button variant="plain"
                                                             onClick={() => openFinding(f)}
-                                                            className="p-1.5 text-slate-500 hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors"
+                                                            className="p-1.5 text-muted-foreground hover:text-blue-400 hover:bg-blue-500/10 rounded-lg transition-colors h-auto"
                                                         >
                                                             <Edit2 className="w-4 h-4" />
-                                                        </button>
-                                                        <button
+                                                        </Button>
+                                                        <Button variant="plain"
                                                             onClick={() => handleDelete(f.id)}
-                                                            className="p-1.5 text-slate-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors"
+                                                            className="p-1.5 text-muted-foreground hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors h-auto"
                                                         >
                                                             <Trash2 className="w-4 h-4" />
-                                                        </button>
+                                                        </Button>
                                                     </div>
                                                 </td>
                                             </motion.tr>

@@ -8,6 +8,7 @@ import {
     X, Info, Calendar, Hash,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
+import { Button } from "@/components/ui/button";
 
 interface DomainSection {
     label: string;
@@ -132,44 +133,44 @@ export function ControlRequirementsClient({
                     </div>
                     <div>
                         <h1 className="text-xl font-bold text-white">Control Requirements</h1>
-                        <p className="text-sm text-slate-400 mt-0.5">Track your compliance posture and answer gap assessment questions</p>
+                        <p className="text-sm text-muted-foreground mt-0.5">Track your compliance posture and answer gap assessment questions</p>
                     </div>
                 </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center gap-1 border-b border-slate-800">
+            <div className="flex items-center gap-1 border-b border-border">
                 {TABS.map(tab => (
-                    <button
+                    <Button variant="plain"
                         key={tab}
                         onClick={() => setActiveTab(tab)}
-                        className={cn(
+                        className={cn("h-auto", 
                             "px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors",
                             activeTab === tab
                                 ? "border-orange-500 text-orange-400"
-                                : "border-transparent text-slate-500 hover:text-slate-300"
+                                : "border-transparent text-muted-foreground hover:text-muted-foreground"
                         )}
                     >
                         {tab}
-                    </button>
+                    </Button>
                 ))}
             </div>
 
             {frameworks.length > 1 && (
-                <div className="flex flex-wrap items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-lg p-1 w-fit">
+                <div className="flex flex-wrap items-center gap-1 bg-card/50 border border-border rounded-lg p-1 w-fit">
                     {frameworks.map((framework) => (
-                        <button
+                        <Button variant="plain"
                             key={framework.id}
                             onClick={() => setActiveFrameworkId(framework.id)}
-                            className={cn(
+                            className={cn("h-auto", 
                                 "px-3 py-1.5 rounded-md text-sm font-medium transition-all",
                                 framework.id === activeFrameworkId
                                     ? "bg-orange-600 text-white shadow-sm"
-                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
                             )}
                         >
                             {framework.name} {framework.version ? `v${framework.version}` : ""}
-                        </button>
+                        </Button>
                     ))}
                 </div>
             )}
@@ -177,12 +178,12 @@ export function ControlRequirementsClient({
             {activeTab === "Overview" && (
                 <div className="space-y-5">
                     {/* Overall compliance hero card */}
-                    <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-6">
+                    <div className="bg-card/60 border border-border rounded-xl p-6">
                         <div className="flex items-center gap-8">
                             {/* Circular progress */}
                             <div className="relative flex-shrink-0">
                                 <svg width="140" height="140" viewBox="0 0 140 140">
-                                    <circle cx="70" cy="70" r={radius} fill="none" stroke="#1e293b" strokeWidth="10" />
+                                    <circle cx="70" cy="70" r={radius} fill="none" stroke="var(--border)" strokeWidth="10" />
                                     <circle
                                         cx="70" cy="70" r={radius}
                                         fill="none"
@@ -203,7 +204,7 @@ export function ControlRequirementsClient({
                                     {fulfilledControls} of {totalControls} controls fulfilled
                                 </p>
                                 {activeFramework && (
-                                    <p className="text-sm text-slate-500">
+                                    <p className="text-sm text-muted-foreground">
                                         {activeFramework.name} {activeFramework.version ? `v${activeFramework.version}` : ""}
                                     </p>
                                 )}
@@ -216,7 +217,7 @@ export function ControlRequirementsClient({
                                         <span className="w-2 h-2 rounded-full bg-amber-500" />
                                         {evidencePending} Evidence Pending
                                     </span>
-                                    <span className="flex items-center gap-1.5 text-xs text-slate-400">
+                                    <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
                                         <span className="w-2 h-2 rounded-full bg-slate-500" />
                                         {notStarted} Not Started
                                     </span>
@@ -235,11 +236,11 @@ export function ControlRequirementsClient({
                             { label: "Overall Score", value: `${overallScore}%`, icon: BarChart3, color: "text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
                             { label: "Auto-Fulfilled", value: autoFulfilled, icon: CheckCircle2, color: "text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
                             { label: "Critical Pending", value: criticalPending, icon: AlertTriangle, color: "text-red-400", bg: "bg-red-500/10 border-red-500/20" },
-                            { label: "Not Started", value: notStarted, icon: XCircle, color: "text-slate-400", bg: "bg-slate-800/50 border-slate-700/50" },
+                            { label: "Not Started", value: notStarted, icon: XCircle, color: "text-muted-foreground", bg: "bg-secondary/50 border-border/50" },
                         ].map(stat => (
-                            <div key={stat.label} className={cn("bg-slate-900/60 border rounded-xl p-4", stat.bg.split(" ")[1] ? "border-slate-800" : "")}>
+                            <div key={stat.label} className={cn("bg-card/60 border rounded-xl p-4", stat.bg.split(" ")[1] ? "border-border" : "")}>
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-xs text-slate-500 uppercase tracking-wide">{stat.label}</span>
+                                    <span className="text-xs text-muted-foreground uppercase tracking-wide">{stat.label}</span>
                                     <stat.icon className={cn("w-4 h-4", stat.color)} />
                                 </div>
                                 <p className={cn("text-2xl font-bold", stat.color)}>{stat.value}</p>
@@ -248,24 +249,24 @@ export function ControlRequirementsClient({
                     </div>
 
                     {/* Section Coverage */}
-                    <div className="bg-slate-900/60 border border-slate-800 rounded-xl overflow-hidden">
-                        <div className="flex items-center justify-between px-5 py-4 border-b border-slate-800">
+                    <div className="bg-card/60 border border-border rounded-xl overflow-hidden">
+                        <div className="flex items-center justify-between px-5 py-4 border-b border-border">
                             <div className="flex items-center gap-2">
-                                <Layers className="w-4 h-4 text-slate-400" />
-                                <span className="text-sm font-semibold text-slate-200">Section Coverage</span>
+                                <Layers className="w-4 h-4 text-muted-foreground" />
+                                <span className="text-sm font-semibold text-foreground">Section Coverage</span>
                             </div>
-                            <div className="flex gap-3 text-xs text-slate-500">
+                            <div className="flex gap-3 text-xs text-muted-foreground">
                                 <span>Select source ↕ Highest</span>
                             </div>
                         </div>
 
                         {domainSections.length === 0 ? (
                             <div className="flex flex-col items-center justify-center py-16 text-center">
-                                <Target className="w-10 h-10 text-slate-700 mb-3" />
-                                <p className="text-slate-400 text-sm">No control sections found</p>
+                                <Target className="w-10 h-10 text-muted-foreground/50 mb-3" />
+                                <p className="text-muted-foreground text-sm">No control sections found</p>
                             </div>
                         ) : (
-                            <div className="divide-y divide-slate-800/60">
+                            <div className="divide-y divide-border/60">
                                 {domainSections.map(domain => {
                                     const pct = domain.total > 0 ? Math.round((domain.fulfilled / domain.total) * 100) : 0;
                                     const isExpanded = expandedDomains.has(domain.label);
@@ -279,15 +280,15 @@ export function ControlRequirementsClient({
                                         });
                                     return (
                                         <div key={domain.label}>
-                                            <button
+                                            <Button variant="plain"
                                                 onClick={() => toggleDomain(domain.label)}
-                                                className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-slate-800/30 transition-colors text-left"
+                                                className="w-full flex items-center gap-4 px-5 py-3.5 hover:bg-secondary/30 transition-colors text-left h-auto"
                                             >
                                                 <div className="flex-1 min-w-0">
-                                                    <span className="text-sm font-medium text-slate-200 truncate">{domain.label}</span>
+                                                    <span className="text-sm font-medium text-foreground truncate">{domain.label}</span>
                                                 </div>
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-32 bg-slate-800 rounded-full h-1.5">
+                                                    <div className="w-32 bg-secondary rounded-full h-1.5">
                                                         <div
                                                             className={cn(
                                                                 "h-1.5 rounded-full",
@@ -296,18 +297,18 @@ export function ControlRequirementsClient({
                                                             style={{ width: `${pct}%` }}
                                                         />
                                                     </div>
-                                                    <span className="text-xs text-slate-400 w-12 text-right tabular-nums">{domain.fulfilled}/{domain.total}</span>
+                                                    <span className="text-xs text-muted-foreground w-12 text-right tabular-nums">{domain.fulfilled}/{domain.total}</span>
                                                     <span className={cn(
                                                         "text-xs font-semibold w-10 text-right tabular-nums",
                                                         pct >= 80 ? "text-emerald-400" : pct >= 40 ? "text-amber-400" : "text-red-400"
                                                     )}>{pct}%</span>
                                                     {isExpanded ? (
-                                                        <ChevronDown className="w-4 h-4 text-slate-500" />
+                                                        <ChevronDown className="w-4 h-4 text-muted-foreground" />
                                                     ) : (
-                                                        <ChevronRight className="w-4 h-4 text-slate-500" />
+                                                        <ChevronRight className="w-4 h-4 text-muted-foreground" />
                                                     )}
                                                 </div>
-                                            </button>
+                                            </Button>
                                             <AnimatePresence initial={false}>
                                                 {isExpanded && (
                                                     <motion.div
@@ -316,31 +317,31 @@ export function ControlRequirementsClient({
                                                         animate={{ height: "auto", opacity: 1 }}
                                                         exit={{ height: 0, opacity: 0 }}
                                                         transition={{ duration: 0.18, ease: "easeOut" }}
-                                                        className="overflow-hidden bg-slate-950/40 border-t border-slate-800/60"
+                                                        className="overflow-hidden bg-background/40 border-t border-border/60"
                                                     >
                                                         {domainControls.length === 0 ? (
-                                                            <div className="px-5 py-4 text-xs text-slate-500">No controls in this section.</div>
+                                                            <div className="px-5 py-4 text-xs text-muted-foreground">No controls in this section.</div>
                                                         ) : (
-                                                            <div className="divide-y divide-slate-800/40">
+                                                            <div className="divide-y divide-border/40">
                                                                 {domainControls.map(c => {
                                                                     const s = statusMap.get(c.id);
                                                                     const statusKey: StatusKey = (s?.status ?? "not_started") as StatusKey;
                                                                     const meta = STATUS_META[statusKey];
                                                                     const StatusIcon = meta.icon;
                                                                     return (
-                                                                        <button
+                                                                        <Button variant="plain"
                                                                             key={c.id}
                                                                             type="button"
                                                                             onClick={() => setDetailControlId(c.id)}
-                                                                            className="w-full flex items-center gap-4 px-5 py-2.5 hover:bg-slate-800/30 transition-colors text-left"
+                                                                            className="w-full flex items-center gap-4 px-5 py-2.5 hover:bg-secondary/30 transition-colors text-left h-auto"
                                                                         >
-                                                                            <span className="inline-block min-w-[64px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 font-mono text-[11px] text-slate-200 text-center">
+                                                                            <span className="inline-block min-w-[64px] px-2 py-0.5 rounded-md bg-secondary/80 border border-border/60 font-mono text-[11px] text-foreground text-center">
                                                                                 {c.code}
                                                                             </span>
-                                                                            <span className="flex-1 text-sm text-slate-300 leading-tight truncate" title={c.title}>
+                                                                            <span className="flex-1 text-sm text-muted-foreground leading-tight truncate" title={c.title}>
                                                                                 {c.title}
                                                                             </span>
-                                                                            <span className="hidden md:inline-flex items-center gap-1 text-xs text-slate-500 tabular-nums">
+                                                                            <span className="hidden md:inline-flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
                                                                                 <FileText className="w-3 h-3" />
                                                                                 {s?.evidenceCount ?? 0}
                                                                             </span>
@@ -351,8 +352,8 @@ export function ControlRequirementsClient({
                                                                                 <StatusIcon className="w-3 h-3" />
                                                                                 {meta.label}
                                                                             </span>
-                                                                            <ChevronRight className="w-3 h-3 text-slate-600" />
-                                                                        </button>
+                                                                            <ChevronRight className="w-3 h-3 text-muted-foreground/70" />
+                                                                        </Button>
                                                                     );
                                                                 })}
                                                             </div>
@@ -369,11 +370,11 @@ export function ControlRequirementsClient({
 
                     {/* Frameworks */}
                     {frameworks.length > 0 && (
-                        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-5">
-                            <p className="text-sm font-semibold text-slate-200 mb-3">Active Frameworks</p>
+                        <div className="bg-card/60 border border-border rounded-xl p-5">
+                            <p className="text-sm font-semibold text-foreground mb-3">Active Frameworks</p>
                             <div className="flex flex-wrap gap-2">
                                 {frameworks.map(fw => (
-                                    <span key={fw.id} className="px-3 py-1.5 bg-slate-800/60 border border-slate-700 rounded-lg text-xs text-slate-300 font-medium">
+                                    <span key={fw.id} className="px-3 py-1.5 bg-secondary/60 border border-border rounded-lg text-xs text-muted-foreground font-medium">
                                         {fw.name} {fw.version && `v${fw.version}`}
                                     </span>
                                 ))}
@@ -422,7 +423,7 @@ interface AllControlsTabProps {
 const STATUS_META: Record<StatusKey, { label: string; cls: string; icon: React.ComponentType<{ className?: string }> }> = {
     verified:        { label: "Verified",       cls: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30", icon: CheckCircle2 },
     in_progress:     { label: "In Progress",    cls: "bg-amber-500/10 text-amber-300 border-amber-500/30",       icon: AlertTriangle },
-    not_started:     { label: "Not Started",    cls: "bg-slate-700/40 text-slate-300 border-slate-600/40",        icon: XCircle },
+    not_started:     { label: "Not Started",    cls: "bg-secondary/40 text-muted-foreground border-slate-600/40",        icon: XCircle },
     not_applicable:  { label: "Not Applicable", cls: "bg-blue-500/10 text-blue-300 border-blue-500/30",           icon: MinusCircle },
 };
 
@@ -484,12 +485,12 @@ function AllControlsTab({
 
     if (scoped.length === 0) {
         return (
-            <div className="flex flex-col items-center justify-center py-24 text-center bg-slate-900/40 border border-slate-800 rounded-xl">
-                <Layers className="w-12 h-12 text-slate-700 mb-4" />
-                <p className="text-slate-300 font-medium">
+            <div className="flex flex-col items-center justify-center py-24 text-center bg-card/40 border border-border rounded-xl">
+                <Layers className="w-12 h-12 text-muted-foreground/50 mb-4" />
+                <p className="text-muted-foreground font-medium">
                     No controls found{activeFrameworkName ? ` for ${activeFrameworkName}` : ""}
                 </p>
-                <p className="text-slate-500 text-sm mt-1">Ask your admin to seed controls for this framework.</p>
+                <p className="text-muted-foreground text-sm mt-1">Ask your admin to seed controls for this framework.</p>
             </div>
         );
     }
@@ -498,77 +499,77 @@ function AllControlsTab({
         <div className="space-y-4">
             <div className="flex flex-wrap items-center gap-3">
                 <div className="relative flex-1 min-w-[240px] max-w-md">
-                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                    <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
                     <input
                         value={search}
                         onChange={e => onSearchChange(e.target.value)}
                         placeholder="Search by code, name, domain…"
-                        className="w-full bg-slate-950/50 border border-slate-700 rounded-lg pl-9 pr-4 py-2 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:ring-2 focus:ring-orange-500/40"
+                        className="w-full bg-background/50 border border-border rounded-lg pl-9 pr-4 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-orange-500/40"
                     />
                 </div>
-                <div className="flex items-center gap-1 bg-slate-900/50 border border-slate-800 rounded-lg p-1">
+                <div className="flex items-center gap-1 bg-card/50 border border-border rounded-lg p-1">
                     {STATUS_FILTERS.map(f => (
-                        <button
+                        <Button variant="plain"
                             key={f.value}
                             type="button"
                             onClick={() => onStatusFilterChange(f.value)}
-                            className={cn(
+                            className={cn("h-auto", 
                                 "px-3 py-1 rounded-md text-xs font-medium transition-colors",
                                 statusFilter === f.value
                                     ? "bg-orange-600 text-white"
-                                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/60"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/60"
                             )}
                         >
                             {f.label}
-                        </button>
+                        </Button>
                     ))}
                 </div>
-                <span className="ml-auto text-xs text-slate-500 tabular-nums">
+                <span className="ml-auto text-xs text-muted-foreground tabular-nums">
                     {filtered.length} of {scoped.length} controls
                 </span>
             </div>
 
             {filtered.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-16 text-center bg-slate-900/40 border border-slate-800 rounded-xl">
-                    <Search className="w-10 h-10 text-slate-700 mb-3" />
-                    <p className="text-slate-400 text-sm">No controls match your filters.</p>
+                <div className="flex flex-col items-center justify-center py-16 text-center bg-card/40 border border-border rounded-xl">
+                    <Search className="w-10 h-10 text-muted-foreground/50 mb-3" />
+                    <p className="text-muted-foreground text-sm">No controls match your filters.</p>
                 </div>
             ) : (
                 <div className="space-y-4">
                     {grouped.map(g => (
-                        <div key={g.domain} className="bg-slate-900/40 border border-slate-800 rounded-xl overflow-hidden">
-                            <div className="flex items-center justify-between px-5 py-3 border-b border-slate-800/60 bg-slate-900/60">
+                        <div key={g.domain} className="bg-card/40 border border-border rounded-xl overflow-hidden">
+                            <div className="flex items-center justify-between px-5 py-3 border-b border-border/60 bg-card/60">
                                 <div className="flex items-center gap-2">
-                                    <Layers className="w-4 h-4 text-slate-500" />
-                                    <span className="text-sm font-semibold text-slate-200">{g.domain}</span>
+                                    <Layers className="w-4 h-4 text-muted-foreground" />
+                                    <span className="text-sm font-semibold text-foreground">{g.domain}</span>
                                 </div>
-                                <span className="text-xs text-slate-500 tabular-nums">{g.items.length}</span>
+                                <span className="text-xs text-muted-foreground tabular-nums">{g.items.length}</span>
                             </div>
-                            <div className="divide-y divide-slate-800/40">
+                            <div className="divide-y divide-border/40">
                                 {g.items.map(c => {
                                     const s = statusMap.get(c.id);
                                     const statusKey: StatusKey = (s?.status ?? "not_started") as StatusKey;
                                     const meta = STATUS_META[statusKey];
                                     const StatusIcon = meta.icon;
                                     return (
-                                        <button
+                                        <Button variant="plain"
                                             key={c.id}
                                             type="button"
                                             onClick={() => onView(c.id)}
-                                            className="w-full flex items-center gap-4 px-5 py-3 hover:bg-slate-800/30 transition-colors text-left group"
+                                            className="w-full flex items-center gap-4 px-5 py-3 hover:bg-secondary/30 transition-colors text-left group h-auto"
                                         >
-                                            <span className="inline-block min-w-[64px] px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 font-mono text-xs text-slate-200 text-center">
+                                            <span className="inline-block min-w-[64px] px-2 py-0.5 rounded-md bg-secondary/80 border border-border/60 font-mono text-xs text-foreground text-center">
                                                 {c.code}
                                             </span>
                                             <div className="flex-1 min-w-0">
-                                                <p className="text-sm text-slate-200 leading-tight truncate" title={c.title}>
+                                                <p className="text-sm text-foreground leading-tight truncate" title={c.title}>
                                                     {c.title}
                                                 </p>
                                                 {c.description && (
-                                                    <p className="text-xs text-slate-500 mt-0.5 line-clamp-1">{c.description}</p>
+                                                    <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">{c.description}</p>
                                                 )}
                                             </div>
-                                            <span className="hidden md:inline-flex items-center gap-1 text-xs text-slate-500 tabular-nums">
+                                            <span className="hidden md:inline-flex items-center gap-1 text-xs text-muted-foreground tabular-nums">
                                                 <FileText className="w-3 h-3" />
                                                 {s?.evidenceCount ?? 0}
                                             </span>
@@ -579,8 +580,8 @@ function AllControlsTab({
                                                 <StatusIcon className="w-3 h-3" />
                                                 {meta.label}
                                             </span>
-                                            <ChevronRight className="w-3 h-3 text-slate-600 group-hover:text-slate-400 transition-colors" />
-                                        </button>
+                                            <ChevronRight className="w-3 h-3 text-muted-foreground/70 group-hover:text-muted-foreground transition-colors" />
+                                        </Button>
                                     );
                                 })}
                             </div>
@@ -619,12 +620,12 @@ function ControlDetailDialog({ control, status, framework, onClose }: ControlDet
                         initial={{ opacity: 0, scale: 0.95, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="relative w-full max-w-2xl bg-slate-900 border border-slate-700/60 rounded-2xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto"
+                        className="relative w-full max-w-2xl bg-card border border-border/60 rounded-2xl shadow-2xl z-10 max-h-[90vh] overflow-y-auto"
                     >
-                        <div className="px-6 pt-6 pb-4 border-b border-slate-800/60 flex items-start justify-between gap-4">
+                        <div className="px-6 pt-6 pb-4 border-b border-border/60 flex items-start justify-between gap-4">
                             <div className="min-w-0 flex-1">
                                 <div className="flex items-center gap-2 mb-2">
-                                    <span className="inline-block px-2 py-0.5 rounded-md bg-slate-800/80 border border-slate-700/60 font-mono text-xs text-slate-200">
+                                    <span className="inline-block px-2 py-0.5 rounded-md bg-secondary/80 border border-border/60 font-mono text-xs text-foreground">
                                         {control.code}
                                     </span>
                                     {meta && (
@@ -637,32 +638,34 @@ function ControlDetailDialog({ control, status, framework, onClose }: ControlDet
                                         </span>
                                     )}
                                 </div>
-                                <h2 className="text-lg font-bold text-slate-100 leading-tight">{control.title}</h2>
+                                <h2 className="text-lg font-bold text-foreground leading-tight">{control.title}</h2>
                                 {framework && (
-                                    <p className="text-xs text-slate-500 mt-1">
+                                    <p className="text-xs text-muted-foreground mt-1">
                                         {framework.name}{framework.version ? ` v${framework.version}` : ""}
                                     </p>
                                 )}
                             </div>
-                            <button
+                            <Button
                                 type="button"
+                                variant="plain"
+                                size="icon-sm"
                                 onClick={onClose}
-                                className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400 transition-colors flex-shrink-0"
+                                className="text-muted-foreground flex-shrink-0"
                             >
                                 <X className="w-4 h-4" />
-                            </button>
+                            </Button>
                         </div>
 
                         <div className="px-6 py-5 space-y-5">
                             {control.description ? (
                                 <section>
-                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Requirement</h3>
-                                    <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line">{control.description}</p>
+                                    <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Requirement</h3>
+                                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line">{control.description}</p>
                                 </section>
                             ) : (
                                 <section>
-                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Requirement</h3>
-                                    <p className="text-sm text-slate-500 italic">No description provided.</p>
+                                    <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Requirement</h3>
+                                    <p className="text-sm text-muted-foreground italic">No description provided.</p>
                                 </section>
                             )}
 
@@ -684,28 +687,29 @@ function ControlDetailDialog({ control, status, framework, onClose }: ControlDet
 
                             {status?.notes && (
                                 <section>
-                                    <h3 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1.5">Notes</h3>
-                                    <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-line bg-slate-950/40 border border-slate-800 rounded-lg px-3 py-2">
+                                    <h3 className="text-[11px] font-bold text-muted-foreground uppercase tracking-wider mb-1.5">Notes</h3>
+                                    <p className="text-sm text-muted-foreground leading-relaxed whitespace-pre-line bg-background/40 border border-border rounded-lg px-3 py-2">
                                         {status.notes}
                                     </p>
                                 </section>
                             )}
 
                             {control.category && (
-                                <section className="text-xs text-slate-500">
-                                    Category: <span className="text-slate-400">{control.category}</span>
+                                <section className="text-xs text-muted-foreground">
+                                    Category: <span className="text-muted-foreground">{control.category}</span>
                                 </section>
                             )}
                         </div>
 
                         <div className="px-6 pb-6 pt-2 flex justify-end">
-                            <button
+                            <Button
                                 type="button"
+                                variant="outline"
                                 onClick={onClose}
-                                className="px-4 py-2 rounded-lg border border-slate-700 hover:bg-slate-800 text-sm text-slate-300 transition-colors"
+                                className="h-auto px-4 py-2 rounded-lg text-sm text-muted-foreground"
                             >
                                 Close
-                            </button>
+                            </Button>
                         </div>
                     </motion.div>
                 </div>
@@ -726,12 +730,12 @@ function DetailCell({
     mono?: boolean;
 }) {
     return (
-        <div className="rounded-xl border border-slate-800 bg-slate-950/40 px-3 py-2.5">
-            <div className="flex items-center gap-1.5 text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+        <div className="rounded-xl border border-border bg-background/40 px-3 py-2.5">
+            <div className="flex items-center gap-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-1">
                 <Icon className="w-3 h-3" />
                 {label}
             </div>
-            <p className={cn("text-sm text-slate-200", mono && "font-mono tabular-nums")}>{value}</p>
+            <p className={cn("text-sm text-foreground", mono && "font-mono tabular-nums")}>{value}</p>
         </div>
     );
 }

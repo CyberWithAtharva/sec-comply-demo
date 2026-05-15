@@ -71,8 +71,8 @@ export function EvidenceCategoryHeatmap({ evidenceId }: EvidenceCategoryHeatmapP
             <div className="pt-4 pb-2">
                 {/* Legend */}
                 <div className="flex items-center justify-between mb-4">
-                    <span className="text-xs font-semibold text-slate-400 uppercase tracking-widest">Coverage Heatmap</span>
-                    <div className="flex items-center space-x-1.5 text-[10px] text-slate-400">
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">Coverage Heatmap</span>
+                    <div className="flex items-center space-x-1.5 text-[10px] text-muted-foreground">
                         <span>Gap</span>
                         <div className="flex space-x-0.5">
                             <div className="w-3 h-3 rounded-sm bg-red-500/40" />
@@ -92,7 +92,7 @@ export function EvidenceCategoryHeatmap({ evidenceId }: EvidenceCategoryHeatmapP
                     {SUBCATEGORIES.map((sub) => (
                         <div
                             key={sub}
-                            className="text-[10px] font-medium text-slate-500 text-center px-1 truncate"
+                            className="text-[10px] font-medium text-muted-foreground text-center px-1 truncate"
                             title={sub}
                         >
                             {sub}
@@ -102,7 +102,7 @@ export function EvidenceCategoryHeatmap({ evidenceId }: EvidenceCategoryHeatmapP
                     {/* Data Rows */}
                     {CATEGORIES.map((cat, catIdx) => (
                         <React.Fragment key={cat}>
-                            <div className="text-xs font-semibold text-slate-300 flex items-center pr-2 truncate" title={cat}>
+                            <div className="text-xs font-semibold text-muted-foreground flex items-center pr-2 truncate" title={cat}>
                                 {cat}
                             </div>
                             {heatmapData[catIdx].map((value, subIdx) => (

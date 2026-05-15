@@ -13,11 +13,11 @@ const data = [
 
 export function VendorRiskDistributionWidget() {
     return (
-        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-slate-800/50">
+        <div className="glass-panel p-6 rounded-2xl flex flex-col h-full border border-border/50">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center space-x-2">
                     <Building2 className="w-5 h-5 text-indigo-400" />
-                    <h3 className="text-lg font-semibold text-slate-100 tracking-tight">Risk Distribution</h3>
+                    <h3 className="text-lg font-semibold text-foreground tracking-tight">Risk Distribution</h3>
                 </div>
             </div>
 
@@ -37,23 +37,23 @@ export function VendorRiskDistributionWidget() {
                             ))}
                         </Pie>
                         <RechartsTooltip
-                            contentStyle={{ backgroundColor: "#0f172a", borderColor: "#1e293b", borderRadius: "8px", fontSize: "12px" }}
+                            contentStyle={{ backgroundColor: "var(--card)", borderColor: "var(--border)", borderRadius: "8px", fontSize: "12px" }}
                             itemStyle={{ color: "#e2e8f0" }}
                         />
                     </PieChart>
                 </ResponsiveContainer>
 
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                    <span className="text-2xl font-bold text-slate-100 pb-0.5">142</span>
-                    <span className="text-[10px] uppercase tracking-widest text-slate-500 font-medium">Vendors</span>
+                    <span className="text-2xl font-bold text-foreground pb-0.5">142</span>
+                    <span className="text-[10px] uppercase tracking-widest text-muted-foreground font-medium">Vendors</span>
                 </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-1.5 mt-2 pt-3 shrink-0 border-t border-slate-800/50">
+            <div className="grid grid-cols-2 gap-1.5 mt-2 pt-3 shrink-0 border-t border-border/50">
                 {data.map((item, i) => (
                     <div key={i} className="flex items-center space-x-1.5">
                         <div className="w-2 h-2 rounded-full shrink-0" style={{ backgroundColor: item.color }} />
-                        <span className="text-[10px] text-slate-400 truncate">{item.name}</span>
+                        <span className="text-[10px] text-muted-foreground truncate">{item.name}</span>
                     </div>
                 ))}
             </div>

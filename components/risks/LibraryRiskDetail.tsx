@@ -4,6 +4,7 @@ import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Plus, Tag, CheckCircle2, AlertTriangle } from "lucide-react";
 import { severityFromScore } from "@/lib/risk-styles";
+import { Button } from "@/components/ui/button";
 import { FRAMEWORK_BADGE_COLORS, FRAMEWORK_LABELS, type LibraryRisk } from "@/lib/risk-library";
 
 interface Props {
@@ -27,18 +28,18 @@ export function LibraryRiskDetail({ libraryRisk, alreadyInRegister, onClose, onA
             <motion.aside
                 initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
                 transition={{ type: "tween", duration: 0.25 }}
-                className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[560px] bg-slate-950 border-l border-slate-800 overflow-y-auto"
+                className="fixed right-0 top-0 bottom-0 z-50 w-full sm:w-[560px] bg-background border-l border-border overflow-y-auto"
             >
-                <div className="sticky top-0 bg-slate-950/95 backdrop-blur z-10 border-b border-slate-800 px-6 py-4 flex items-center justify-between">
+                <div className="sticky top-0 bg-background/95 backdrop-blur z-10 border-b border-border px-6 py-4 flex items-center justify-between">
                     <div className="min-w-0">
-                        <p className="text-[10px] font-mono uppercase tracking-wider text-slate-500">
+                        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">
                             {libraryRisk.id} · {libraryRisk.category}
                         </p>
-                        <h2 className="text-base font-semibold text-slate-100 truncate">{libraryRisk.title}</h2>
+                        <h2 className="text-base font-semibold text-foreground truncate">{libraryRisk.title}</h2>
                     </div>
-                    <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-slate-800 text-slate-400">
+                    <Button variant="plain" size="icon-sm" onClick={onClose} className="text-muted-foreground">
                         <X className="w-4 h-4" />
-                    </button>
+                    </Button>
                 </div>
 
                 <div className="p-6 space-y-5">
@@ -48,26 +49,26 @@ export function LibraryRiskDetail({ libraryRisk, alreadyInRegister, onClose, onA
                         <span className={`text-sm font-bold ${sev.color}`}>
                             Default Score: {score} — {sev.label}
                         </span>
-                        <span className="text-xs text-slate-500 ml-auto">
+                        <span className="text-xs text-muted-foreground ml-auto">
                             L {libraryRisk.defaultLikelihood} × I {libraryRisk.defaultImpact}
                         </span>
                     </div>
 
                     {/* Description */}
                     <section>
-                        <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2">Risk Description</h3>
-                        <p className="text-sm text-slate-300 whitespace-pre-wrap">{libraryRisk.description}</p>
+                        <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Risk Description</h3>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{libraryRisk.description}</p>
                     </section>
 
                     {/* Recommendation */}
                     <section>
-                        <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2">Recommendation</h3>
-                        <p className="text-sm text-slate-300 whitespace-pre-wrap">{libraryRisk.recommendation}</p>
+                        <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Recommendation</h3>
+                        <p className="text-sm text-muted-foreground whitespace-pre-wrap">{libraryRisk.recommendation}</p>
                     </section>
 
                     {/* Framework mappings */}
                     <section>
-                        <h3 className="text-xs uppercase tracking-wider text-slate-500 mb-2 flex items-center gap-2">
+                        <h3 className="text-xs uppercase tracking-wider text-muted-foreground mb-2 flex items-center gap-2">
                             <Tag className="w-3 h-3" /> Framework Mapping
                         </h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -76,27 +77,27 @@ export function LibraryRiskDetail({ libraryRisk, alreadyInRegister, onClose, onA
                                     <p className="font-mono font-bold">
                                         {FRAMEWORK_LABELS[m.framework]} · {m.clause}
                                     </p>
-                                    <p className="text-slate-400 mt-0.5">{m.name}</p>
+                                    <p className="text-muted-foreground mt-0.5">{m.name}</p>
                                 </div>
                             ))}
                         </div>
                     </section>
 
                     {/* Action */}
-                    <div className="pt-3 border-t border-slate-800">
+                    <div className="pt-3 border-t border-border">
                         {alreadyInRegister ? (
                             <div className="flex items-center justify-center gap-2 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-sm font-semibold">
                                 <CheckCircle2 className="w-4 h-4" />
                                 Already in your register
                             </div>
                         ) : (
-                            <button
+                            <Button
                                 onClick={onAddToRegister}
-                                className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold transition-colors"
+                                className="w-full h-auto gap-2 px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-sm font-semibold"
                             >
                                 <Plus className="w-4 h-4" />
                                 Add to Register
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </div>

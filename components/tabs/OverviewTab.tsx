@@ -79,7 +79,7 @@ const SEV_BADGE: Record<string, string> = {
     critical: "text-red-400 bg-red-500/10 border-red-500/20",
     high: "text-orange-400 bg-orange-500/10 border-orange-500/20",
     medium: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-    low: "text-slate-400 bg-slate-500/10 border-slate-500/20",
+    low: "text-muted-foreground bg-slate-500/10 border-slate-500/20",
 };
 
 const SOURCE_LABEL: Record<string, string> = {
@@ -94,7 +94,7 @@ const SOURCE_COLOR: Record<string, string> = {
     aws: "text-orange-300 bg-orange-500/10 border-orange-500/20",
     github: "text-purple-300 bg-purple-500/10 border-purple-500/20",
     vapt: "text-blue-300 bg-blue-500/10 border-blue-500/20",
-    manual: "text-slate-300 bg-slate-500/10 border-slate-500/20",
+    manual: "text-muted-foreground bg-slate-500/10 border-slate-500/20",
     gap: "text-amber-300 bg-amber-500/10 border-amber-500/20",
 };
 
@@ -208,10 +208,10 @@ export function OverviewTab({
                 <div className="glass-panel p-5 rounded-2xl relative overflow-hidden">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-emerald-500/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
                     <div className="relative z-10">
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Compliance Score</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Compliance Score</p>
                         <div className="flex items-baseline gap-1.5">
-                            <span className="text-4xl font-bold text-slate-100 tracking-tighter">{score}</span>
-                            <span className="text-lg text-slate-500 font-medium">/ 100</span>
+                            <span className="text-4xl font-bold text-foreground tracking-tighter">{score}</span>
+                            <span className="text-lg text-muted-foreground font-medium">/ 100</span>
                         </div>
                         <div className="mt-3 flex items-center gap-1.5">
                             <TrendingUp className="w-4 h-4 text-emerald-400" />
@@ -222,10 +222,10 @@ export function OverviewTab({
 
                 {/* Verified Controls */}
                 <div className="glass-panel p-5 rounded-2xl">
-                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide mb-2">Verified Controls</p>
+                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Verified Controls</p>
                     <div className="flex items-baseline gap-1.5">
-                        <span className="text-4xl font-bold text-slate-100 tracking-tighter">{verifiedControls}</span>
-                        <span className="text-lg text-slate-500 font-medium">/ {totalControls}</span>
+                        <span className="text-4xl font-bold text-foreground tracking-tighter">{verifiedControls}</span>
+                        <span className="text-lg text-muted-foreground font-medium">/ {totalControls}</span>
                     </div>
                     <div className="mt-3 flex items-center gap-1.5">
                         <CheckCircle2 className="w-4 h-4 text-blue-400" />
@@ -236,12 +236,12 @@ export function OverviewTab({
                 {/* Open Risks */}
                 <div className="glass-panel p-5 rounded-2xl">
                     <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Open Risks</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Open Risks</p>
                         <ShieldAlert className="w-4 h-4 text-red-400" />
                     </div>
-                    <span className="text-4xl font-bold text-slate-100 tracking-tighter">{openRisks.length}</span>
+                    <span className="text-4xl font-bold text-foreground tracking-tighter">{openRisks.length}</span>
                     <div className="mt-3">
-                        <Link href="/risks" className="text-xs text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1">
+                        <Link href="/risks" className="text-xs text-muted-foreground hover:text-blue-400 transition-colors flex items-center gap-1">
                             View in Risk Register <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
@@ -250,15 +250,15 @@ export function OverviewTab({
                 {/* Policies Approved */}
                 <div className="glass-panel p-5 rounded-2xl">
                     <div className="flex items-center justify-between mb-2">
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wide">Policies Approved</p>
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Policies Approved</p>
                         <FileCheck className="w-4 h-4 text-emerald-400" />
                     </div>
                     <div className="flex items-baseline gap-1.5">
-                        <span className="text-4xl font-bold text-slate-100 tracking-tighter">{approvedPolicyCount}</span>
-                        <span className="text-lg text-slate-500 font-medium">/ {allPolicies.length}</span>
+                        <span className="text-4xl font-bold text-foreground tracking-tighter">{approvedPolicyCount}</span>
+                        <span className="text-lg text-muted-foreground font-medium">/ {allPolicies.length}</span>
                     </div>
                     <div className="mt-3">
-                        <Link href="/policies" className="text-xs text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1">
+                        <Link href="/policies" className="text-xs text-muted-foreground hover:text-blue-400 transition-colors flex items-center gap-1">
                             Manage policies <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
@@ -269,10 +269,10 @@ export function OverviewTab({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Active Vulnerabilities */}
                 <div className="lg:col-span-2 glass-panel rounded-2xl overflow-hidden">
-                    <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800/50">
+                    <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
                         <div className="flex items-center gap-2">
                             <Shield className="w-4 h-4 text-red-400" />
-                            <h3 className="text-sm font-semibold text-slate-100">Active Vulnerabilities</h3>
+                            <h3 className="text-sm font-semibold text-foreground">Active Vulnerabilities</h3>
                         </div>
                         <span className={cn(
                             "text-xs font-mono px-2.5 py-1 rounded border",
@@ -287,13 +287,13 @@ export function OverviewTab({
                     {sortedVulns.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-center px-6">
                             <ShieldCheck className="w-10 h-10 text-emerald-500/50 mb-3" />
-                            <p className="text-sm font-medium text-slate-300 mb-1">No active vulnerabilities</p>
-                            <p className="text-xs text-slate-500">Connect AWS, GitHub, or upload a VAPT report to see findings here.</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">No active vulnerabilities</p>
+                            <p className="text-xs text-muted-foreground">Connect AWS, GitHub, or upload a VAPT report to see findings here.</p>
                         </div>
                     ) : (
-                        <div className="divide-y divide-slate-800/40 overflow-y-auto max-h-72">
+                        <div className="divide-y divide-border/40 overflow-y-auto max-h-72">
                             {sortedVulns.map(v => (
-                                <div key={v.id} className="flex items-start gap-4 px-6 py-3.5 hover:bg-slate-800/20 transition-colors">
+                                <div key={v.id} className="flex items-start gap-4 px-6 py-3.5 hover:bg-secondary/20 transition-colors">
                                     <div className="flex gap-2 pt-0.5 shrink-0">
                                         <span className={cn("text-[10px] font-bold px-1.5 py-0.5 rounded border uppercase", SOURCE_COLOR[v.source] ?? SOURCE_COLOR.manual)}>
                                             {SOURCE_LABEL[v.source] ?? v.source}
@@ -303,9 +303,9 @@ export function OverviewTab({
                                         </span>
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className="text-sm text-slate-200 truncate">{v.title}</p>
+                                        <p className="text-sm text-foreground truncate">{v.title}</p>
                                         {v.category && (
-                                            <p className="text-xs text-slate-500 mt-0.5 capitalize">{v.category}</p>
+                                            <p className="text-xs text-muted-foreground mt-0.5 capitalize">{v.category}</p>
                                         )}
                                     </div>
                                 </div>
@@ -313,8 +313,8 @@ export function OverviewTab({
                         </div>
                     )}
 
-                    <div className="px-6 py-3 border-t border-slate-800/50">
-                        <Link href="/risks" className="text-xs text-slate-400 hover:text-blue-400 transition-colors flex items-center gap-1">
+                    <div className="px-6 py-3 border-t border-border/50">
+                        <Link href="/risks" className="text-xs text-muted-foreground hover:text-blue-400 transition-colors flex items-center gap-1">
                             View all in Risk Register <ArrowRight className="w-3 h-3" />
                         </Link>
                     </div>
@@ -324,25 +324,25 @@ export function OverviewTab({
                 <div className="glass-panel p-6 rounded-2xl flex flex-col">
                     <div className="flex items-center gap-2 mb-5">
                         <Target className="w-4 h-4 text-blue-400" />
-                        <h3 className="text-sm font-semibold text-slate-100">Controls Breakdown</h3>
+                        <h3 className="text-sm font-semibold text-foreground">Controls Breakdown</h3>
                     </div>
 
                     <div className="flex flex-col gap-5 flex-1 justify-center">
                         {[
                             { label: "Verified", count: verifiedControls, total: totalControls, color: "bg-emerald-500", textColor: "text-emerald-400" },
                             { label: "In Progress", count: inProgressControls, total: totalControls, color: "bg-blue-500", textColor: "text-blue-400" },
-                            { label: "Not Started", count: notStartedControls, total: totalControls, color: "bg-slate-600", textColor: "text-slate-400" },
+                            { label: "Not Started", count: notStartedControls, total: totalControls, color: "bg-slate-600", textColor: "text-muted-foreground" },
                         ].map(item => {
                             const pct = totalControls > 0 ? Math.round((item.count / totalControls) * 100) : 0;
                             return (
                                 <div key={item.label}>
                                     <div className="flex items-center justify-between mb-1.5">
-                                        <span className="text-xs font-medium text-slate-300">{item.label}</span>
+                                        <span className="text-xs font-medium text-muted-foreground">{item.label}</span>
                                         <span className={cn("text-xs font-semibold tabular-nums", item.textColor)}>
-                                            {item.count} <span className="text-slate-500 font-normal">/ {item.total}</span>
+                                            {item.count} <span className="text-muted-foreground font-normal">/ {item.total}</span>
                                         </span>
                                     </div>
-                                    <div className="h-2 rounded-full bg-slate-800 overflow-hidden">
+                                    <div className="h-2 rounded-full bg-secondary overflow-hidden">
                                         <motion.div
                                             className={cn("h-full rounded-full", item.color)}
                                             initial={{ width: 0 }}
@@ -355,8 +355,8 @@ export function OverviewTab({
                         })}
                     </div>
 
-                    <div className="mt-6 pt-4 border-t border-slate-800/50">
-                        <p className="text-xs text-slate-500">
+                    <div className="mt-6 pt-4 border-t border-border/50">
+                        <p className="text-xs text-muted-foreground">
                             {notStartedControls > 0
                                 ? `${notStartedControls} control${notStartedControls !== 1 ? "s" : ""} need attention`
                                 : "All controls tracked"}
@@ -369,8 +369,8 @@ export function OverviewTab({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 {/* Next Action Items — data-driven */}
                 <div className="glass-panel p-6 rounded-2xl flex flex-col">
-                    <div className="flex items-center justify-between border-b border-slate-800/50 pb-4 mb-4">
-                        <h3 className="text-sm font-semibold text-slate-100">Next Action Items</h3>
+                    <div className="flex items-center justify-between border-b border-border/50 pb-4 mb-4">
+                        <h3 className="text-sm font-semibold text-foreground">Next Action Items</h3>
                         {actionItems.length > 0 && (
                             <span className="text-xs font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20 px-2.5 py-1 rounded">
                                 {actionItems.length} pending
@@ -381,8 +381,8 @@ export function OverviewTab({
                     {actionItems.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-8 text-center flex-1">
                             <CheckCircle2 className="w-9 h-9 text-emerald-500/50 mb-3" />
-                            <p className="text-sm font-medium text-slate-300 mb-1">All caught up!</p>
-                            <p className="text-xs text-slate-500">No pending controls, policy reviews, or open risks.</p>
+                            <p className="text-sm font-medium text-muted-foreground mb-1">All caught up!</p>
+                            <p className="text-xs text-muted-foreground">No pending controls, policy reviews, or open risks.</p>
                         </div>
                     ) : (
                         <div className="flex flex-col gap-2.5">
@@ -394,7 +394,7 @@ export function OverviewTab({
                                 return (
                                     <div
                                         key={i}
-                                        className="flex items-start gap-3 p-3.5 rounded-xl bg-slate-900/40 border border-slate-800/50 hover:bg-slate-800/40 transition-colors"
+                                        className="flex items-start gap-3 p-3.5 rounded-xl bg-card/40 border border-border/50 hover:bg-secondary/40 transition-colors"
                                     >
                                         <div className={cn(
                                             "p-2 rounded-lg border shrink-0 mt-0.5",
@@ -403,9 +403,9 @@ export function OverviewTab({
                                             <Icon className={cn("w-4 h-4", isHigh ? "text-red-400" : "text-blue-400")} />
                                         </div>
                                         <div className="min-w-0">
-                                            <p className="text-sm font-medium text-slate-200 leading-snug line-clamp-2">{item.title}</p>
+                                            <p className="text-sm font-medium text-foreground leading-snug line-clamp-2">{item.title}</p>
                                             {item.subtitle && (
-                                                <p className="text-xs text-slate-500 mt-0.5">{item.subtitle}</p>
+                                                <p className="text-xs text-muted-foreground mt-0.5">{item.subtitle}</p>
                                             )}
                                         </div>
                                     </div>
