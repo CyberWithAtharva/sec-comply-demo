@@ -59,13 +59,63 @@ export type Database = {
         ];
       };
       policies: {
-        Row: { id: string; org_id: string; title: string; version: string; status: 'draft' | 'under_review' | 'approved' | 'archived'; content: string | null; file_url: string | null; owner_id: string | null; next_review: string | null; framework_id: string | null; is_generated: boolean; created_at: string; updated_at: string };
-        Insert: { id?: string; org_id: string; title: string; version?: string; status?: 'draft' | 'under_review' | 'approved' | 'archived'; content?: string | null; file_url?: string | null; owner_id?: string | null; next_review?: string | null; framework_id?: string | null; is_generated?: boolean };
-        Update: { title?: string; version?: string; status?: 'draft' | 'under_review' | 'approved' | 'archived'; content?: string | null; file_url?: string | null; owner_id?: string | null; next_review?: string | null; framework_id?: string | null };
+        Row: { id: string; org_id: string; title: string; version: string; status: 'draft' | 'under_review' | 'approved' | 'archived' | 'in_review' | 'awaiting_approval' | 'active' | 'superseded'; content: string | null; file_url: string | null; owner_id: string | null; next_review: string | null; framework_id: string | null; is_generated: boolean; code: string | null; category: string | null; policy_type: string | null; description: string | null; frameworks_list: string[]; author_id: string | null; reviewer_id: string | null; approver_id: string | null; created_at: string; updated_at: string };
+        Insert: { id?: string; org_id: string; title: string; version?: string; status?: 'draft' | 'under_review' | 'approved' | 'archived' | 'in_review' | 'awaiting_approval' | 'active' | 'superseded'; content?: string | null; file_url?: string | null; owner_id?: string | null; next_review?: string | null; framework_id?: string | null; is_generated?: boolean; code?: string | null; category?: string | null; policy_type?: string | null; description?: string | null; frameworks_list?: string[]; author_id?: string | null; reviewer_id?: string | null; approver_id?: string | null };
+        Update: { title?: string; version?: string; status?: 'draft' | 'under_review' | 'approved' | 'archived' | 'in_review' | 'awaiting_approval' | 'active' | 'superseded'; content?: string | null; file_url?: string | null; owner_id?: string | null; next_review?: string | null; framework_id?: string | null; code?: string | null; category?: string | null; policy_type?: string | null; description?: string | null; frameworks_list?: string[]; author_id?: string | null; reviewer_id?: string | null; approver_id?: string | null; updated_at?: string };
         Relationships: [
           { foreignKeyName: "policies_org_id_fkey"; columns: ["org_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] },
           { foreignKeyName: "policies_owner_id_fkey"; columns: ["owner_id"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
           { foreignKeyName: "policies_framework_id_fkey"; columns: ["framework_id"]; isOneToOne: false; referencedRelation: "frameworks"; referencedColumns: ["id"] }
+        ];
+      };
+      policy_versions: {
+        Row: { id: string; policy_id: string; version: string; status: 'draft' | 'in_review' | 'awaiting_approval' | 'active' | 'superseded'; content: string | null; classification: 'auto' | 'minor' | 'major' | null; summary: string | null; created_by: string | null; created_at: string; approved_by: string | null; approved_at: string | null; reviewer_id: string | null; reviewed_at: string | null; reviewer_decision: 'approved' | 'changes_requested' | null; reviewer_comment: string | null };
+        Insert: { id?: string; policy_id: string; version: string; status?: 'draft' | 'in_review' | 'awaiting_approval' | 'active' | 'superseded'; content?: string | null; classification?: 'auto' | 'minor' | 'major' | null; summary?: string | null; created_by?: string | null; approved_by?: string | null; approved_at?: string | null; reviewer_id?: string | null; reviewed_at?: string | null; reviewer_decision?: 'approved' | 'changes_requested' | null; reviewer_comment?: string | null };
+        Update: { version?: string; status?: 'draft' | 'in_review' | 'awaiting_approval' | 'active' | 'superseded'; content?: string | null; classification?: 'auto' | 'minor' | 'major' | null; summary?: string | null; approved_by?: string | null; approved_at?: string | null; reviewer_id?: string | null; reviewed_at?: string | null; reviewer_decision?: 'approved' | 'changes_requested' | null; reviewer_comment?: string | null };
+        Relationships: [
+          { foreignKeyName: "policy_versions_policy_id_fkey"; columns: ["policy_id"]; isOneToOne: false; referencedRelation: "policies"; referencedColumns: ["id"] },
+          { foreignKeyName: "policy_versions_created_by_fkey"; columns: ["created_by"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] },
+          { foreignKeyName: "policy_versions_approved_by_fkey"; columns: ["approved_by"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }
+        ];
+      };
+      policy_framework_controls: {
+        Row: { id: string; policy_id: string; framework: string; control_code: string; description: string | null; created_at: string };
+        Insert: { id?: string; policy_id: string; framework: string; control_code: string; description?: string | null };
+        Update: { framework?: string; control_code?: string; description?: string | null };
+        Relationships: [
+          { foreignKeyName: "pfc_policy_id_fkey"; columns: ["policy_id"]; isOneToOne: false; referencedRelation: "policies"; referencedColumns: ["id"] }
+        ];
+      };
+      policy_variable_definitions: {
+        Row: { id: string; group_id: 'org' | 'people' | 'tools' | 'thresholds' | 'recovery'; group_label: string; group_icon: string | null; question: string; input_type: 'text' | 'number' | 'dropdown' | 'date'; default_value: string | null; required: boolean; sort_order: number; created_at: string };
+        Insert: { id: string; group_id: 'org' | 'people' | 'tools' | 'thresholds' | 'recovery'; group_label: string; group_icon?: string | null; question: string; input_type?: 'text' | 'number' | 'dropdown' | 'date'; default_value?: string | null; required?: boolean; sort_order?: number };
+        Update: { group_id?: 'org' | 'people' | 'tools' | 'thresholds' | 'recovery'; group_label?: string; group_icon?: string | null; question?: string; input_type?: 'text' | 'number' | 'dropdown' | 'date'; default_value?: string | null; required?: boolean; sort_order?: number };
+        Relationships: [];
+      };
+      org_policy_variables: {
+        Row: { id: string; org_id: string; var_key: string; value: string | null; updated_by: string | null; updated_at: string };
+        Insert: { id?: string; org_id: string; var_key: string; value?: string | null; updated_by?: string | null };
+        Update: { value?: string | null; updated_by?: string | null; updated_at?: string };
+        Relationships: [
+          { foreignKeyName: "opv_org_id_fkey"; columns: ["org_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] },
+          { foreignKeyName: "opv_var_key_fkey"; columns: ["var_key"]; isOneToOne: false; referencedRelation: "policy_variable_definitions"; referencedColumns: ["id"] }
+        ];
+      };
+      org_branding: {
+        Row: { org_id: string; display_name: string | null; logo_url: string | null; accent_color: string | null; updated_by: string | null; updated_at: string };
+        Insert: { org_id: string; display_name?: string | null; logo_url?: string | null; accent_color?: string | null; updated_by?: string | null };
+        Update: { display_name?: string | null; logo_url?: string | null; accent_color?: string | null; updated_by?: string | null };
+        Relationships: [
+          { foreignKeyName: "org_branding_org_id_fkey"; columns: ["org_id"]; isOneToOne: true; referencedRelation: "organizations"; referencedColumns: ["id"] }
+        ];
+      };
+      policy_ack_recipients: {
+        Row: { id: string; policy_id: string; version_id: string | null; policy_version_label: string | null; email: string; name: string | null; token: string; status: 'pending' | 'acknowledged' | 'expired'; submitted_name: string | null; match_status: 'matched' | 'unverified' | null; ip_address: string | null; user_agent: string | null; sent_by: string | null; expires_at: string; acknowledged_at: string | null; created_at: string };
+        Insert: { id?: string; policy_id: string; version_id?: string | null; policy_version_label?: string | null; email: string; name?: string | null; token: string; status?: 'pending' | 'acknowledged' | 'expired'; submitted_name?: string | null; match_status?: 'matched' | 'unverified' | null; ip_address?: string | null; user_agent?: string | null; sent_by?: string | null; expires_at?: string };
+        Update: { status?: 'pending' | 'acknowledged' | 'expired'; submitted_name?: string | null; match_status?: 'matched' | 'unverified' | null; ip_address?: string | null; user_agent?: string | null; acknowledged_at?: string | null };
+        Relationships: [
+          { foreignKeyName: "par_policy_id_fkey"; columns: ["policy_id"]; isOneToOne: false; referencedRelation: "policies"; referencedColumns: ["id"] },
+          { foreignKeyName: "par_version_id_fkey"; columns: ["version_id"]; isOneToOne: false; referencedRelation: "policy_versions"; referencedColumns: ["id"] }
         ];
       };
       policy_controls: {

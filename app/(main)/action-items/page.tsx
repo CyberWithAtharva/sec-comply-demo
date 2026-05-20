@@ -54,7 +54,7 @@ export default async function ActionItemsPage() {
     // Fetch all controls for org's frameworks
     const { data: controlsRaw } = await supabase
         .from("controls")
-        .select("id, control_id, domain, category, title, framework_id")
+        .select("id, control_id, domain, category, title, framework_id, type")
         .in("framework_id", frameworkIds);
 
     const controls = (controlsRaw ?? []).map(c => ({
@@ -64,6 +64,7 @@ export default async function ActionItemsPage() {
         domain: c.domain ?? "",
         category: c.category ?? "",
         framework_id: c.framework_id,
+        type: (c.type === "automated" ? "automated" : "manual") as "automated" | "manual",
     }));
 
     if (controls.length === 0) {

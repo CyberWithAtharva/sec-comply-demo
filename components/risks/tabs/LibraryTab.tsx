@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useMemo, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Search, Filter, BookOpen, CheckCircle2, ChevronRight } from "lucide-react";
+import { Search, Filter, BookOpen, CheckCircle2 } from "lucide-react";
 import {
     RISK_LIBRARY,
     CATEGORIES,
@@ -60,12 +59,6 @@ export function LibraryTab({ risks, orgId, onRiskAdded }: Props) {
             return true;
         });
     }, [search, categoryFilter, frameworkFilter, levelFilter, hideAdded, inRegister]);
-
-    const grouped = useMemo(() => {
-        const out: Record<string, LibraryRisk[]> = {};
-        for (const r of filtered) (out[r.category] ??= []).push(r);
-        return out;
-    }, [filtered]);
 
     const selectedRisk = selectedId ? RISK_LIBRARY.find(r => r.id === selectedId) ?? null : null;
 
@@ -127,72 +120,84 @@ export function LibraryTab({ risks, orgId, onRiskAdded }: Props) {
                 Hide risks already in my register
             </label>
 
-            {/* Grouped grid */}
-            {filtered.length === 0 ? (
-                <div className="rounded-2xl border border-border/60 bg-card/30 py-20 text-center">
-                    <BookOpen className="w-12 h-12 text-muted-foreground/50 mb-4 mx-auto" />
-                    <p className="text-muted-foreground text-sm">No library risks match your filters.</p>
-                </div>
-            ) : (
-                <div className="space-y-6">
-                    {CATEGORIES.map(({ name }) => {
-                        const items = grouped[name];
-                        if (!items?.length) return null;
-                        return (
-                            <section key={name}>
-                                <div className="flex items-center justify-between mb-2">
-                                    <h3 className="text-sm font-semibold text-muted-foreground">{name}</h3>
-                                    <span className="text-[11px] text-muted-foreground/70 font-mono">{items.length}</span>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                                    {items.map(risk => {
-                                        const score = risk.defaultLikelihood * risk.defaultImpact;
-                                        const sev = severityFromScore(score);
-                                        const added = inRegister.has(risk.id);
-                                        return (
-                                            <Button variant="plain"
-                                                key={risk.id}
-                                                onClick={() => setSelectedId(risk.id)}
-                                                className="text-left rounded-2xl border border-border hover:border-border bg-card/40 hover:bg-card/70 p-4 transition-colors group h-auto"
-                                            >
-                                                <div className="flex items-center justify-between mb-1.5">
-                                                    <span className="text-[10px] font-mono text-muted-foreground/70">{risk.id}</span>
-                                                    {added && (
-                                                        <span className="flex items-center gap-1 text-[10px] text-emerald-400">
-                                                            <CheckCircle2 className="w-3 h-3" /> in register
+            {/* Table */}
+            <div className="rounded-2xl border border-border/60 bg-card/30 overflow-hidden">
+                {filtered.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center">
+                        <BookOpen className="w-12 h-12 text-muted-foreground/50 mb-4" />
+                        <p className="text-muted-foreground text-sm">No library risks match your filters.</p>
+                    </div>
+                ) : (
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm">
+                            <thead className="text-xs text-muted-foreground font-mono uppercase bg-card/50 border-b border-border/60">
+                                <tr>
+                                    <th className="px-5 py-3 text-left">Risk</th>
+                                    <th className="px-5 py-3 text-left">Category</th>
+                                    <th className="px-5 py-3 text-center">Score</th>
+                                    <th className="px-5 py-3 text-left">Frameworks</th>
+                                    <th className="px-5 py-3 text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-border/40">
+                                {filtered.map(risk => {
+                                    const score = risk.defaultLikelihood * risk.defaultImpact;
+                                    const sev = severityFromScore(score);
+                                    const added = inRegister.has(risk.id);
+                                    return (
+                                        <tr
+                                            key={risk.id}
+                                            onClick={() => setSelectedId(risk.id)}
+                                            className="hover:bg-secondary/20 transition-colors cursor-pointer"
+                                        >
+                                            <td className="px-5 py-3.5">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${sev.dot}`} />
+                                                    <span className="font-medium text-foreground truncate max-w-[320px]" title={risk.title}>
+                                                        {risk.title}
+                                                    </span>
+                                                </div>
+                                                <p className="text-[10px] font-mono text-muted-foreground/70 mt-0.5 ml-4">
+                                                    {risk.id}
+                                                </p>
+                                            </td>
+                                            <td className="px-5 py-3.5 text-muted-foreground text-xs">{risk.category}</td>
+                                            <td className="px-5 py-3.5 text-center">
+                                                <span className={`inline-flex items-center px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded border ${sev.bg} ${sev.color} ${sev.border}`}>
+                                                    {score} · {sev.label}
+                                                </span>
+                                            </td>
+                                            <td className="px-5 py-3.5">
+                                                <div className="flex flex-wrap gap-1">
+                                                    {risk.frameworkMappings.slice(0, 3).map((m, i) => (
+                                                        <span key={`${risk.id}-${m.framework}-${m.clause}-${i}`} className={`px-1.5 py-0.5 text-[9px] uppercase font-bold rounded border ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
+                                                            {FRAMEWORK_LABELS[m.framework]}
                                                         </span>
+                                                    ))}
+                                                    {risk.frameworkMappings.length > 3 && (
+                                                        <span className="text-[9px] text-muted-foreground">+{risk.frameworkMappings.length - 3}</span>
                                                     )}
                                                 </div>
-                                                <p className="text-sm font-medium text-foreground mb-2 line-clamp-2">{risk.title}</p>
-                                                <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{risk.description}</p>
-                                                <div className="flex items-center justify-between">
-                                                    <span className={`px-2 py-0.5 text-[10px] uppercase font-bold tracking-wider rounded border ${sev.bg} ${sev.color} ${sev.border}`}>
-                                                        {sev.label} · {score}
+                                            </td>
+                                            <td className="px-5 py-3.5 text-center">
+                                                {added ? (
+                                                    <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400">
+                                                        <CheckCircle2 className="w-3 h-3" /> in register
                                                     </span>
-                                                    <div className="flex items-center gap-1">
-                                                        {risk.frameworkMappings.slice(0, 3).map((m, i) => (
-                                                            <span key={`${risk.id}-${m.framework}-${m.clause}-${i}`} className={`px-1.5 py-0.5 text-[9px] uppercase font-bold rounded border ${FRAMEWORK_BADGE_COLORS[m.framework]}`}>
-                                                                {FRAMEWORK_LABELS[m.framework].replace(" ", "")}
-                                                            </span>
-                                                        ))}
-                                                        {risk.frameworkMappings.length > 3 && (
-                                                            <span className="text-[9px] text-muted-foreground">+{risk.frameworkMappings.length - 3}</span>
-                                                        )}
-                                                        <ChevronRight className="w-3 h-3 text-muted-foreground/70 group-hover:text-muted-foreground ml-1" />
-                                                    </div>
-                                                </div>
-                                            </Button>
-                                        );
-                                    })}
-                                </div>
-                            </section>
-                        );
-                    })}
+                                                ) : (
+                                                    <span className="text-[10px] text-muted-foreground/70">—</span>
+                                                )}
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+                )}
+                <div className="flex items-center justify-end gap-2 px-5 py-2 border-t border-border/40 text-[11px] text-muted-foreground">
+                    <Filter className="w-3 h-3" /> {filtered.length} of {RISK_LIBRARY.length}
                 </div>
-            )}
-
-            <div className="flex items-center justify-end gap-2 text-[11px] text-muted-foreground">
-                <Filter className="w-3 h-3" /> {filtered.length} of {RISK_LIBRARY.length}
             </div>
 
             {/* Detail panel */}

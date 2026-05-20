@@ -36,6 +36,8 @@ export async function middleware(request: NextRequest) {
         pathname === "/login" ||
         pathname.startsWith("/auth/") ||       // email confirm, set-password
         pathname.startsWith("/q/") ||          // vendor questionnaire public token URLs
+        pathname.startsWith("/policies/ack/") ||// policy acknowledgement magic-link portal
+        pathname.startsWith("/api/policies/ack/") ||
         pathname.startsWith("/_next/") ||
         pathname.startsWith("/api/integrations/github/callback") ||
         pathname === "/favicon.ico";

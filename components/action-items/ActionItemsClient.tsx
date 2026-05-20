@@ -22,6 +22,7 @@ export interface Control {
     domain: string;
     category: string;
     framework_id: string;
+    type: "automated" | "manual";
 }
 
 export interface ControlStatus {
@@ -45,36 +46,18 @@ export interface ActionItemsClientProps {
 type Priority = "critical" | "evidence" | "quickwin" | "other";
 type Tab = "all" | "critical" | "quickwin" | "evidence" | "questionnaire";
 
+const CRITICAL_HINTS = /access control|identity|cryptograph|encryption|technolog|protect|detect|respond/i;
+const QUICKWIN_HINTS = /documentation|awareness|training|policy|govern|logging/i;
+
 function isCritical(control: Control): boolean {
-    const d = control.domain.toLowerCase();
-    const c = control.category.toLowerCase();
-    return (
-        d.includes("access control") ||
-        d.includes("identity") ||
-        d.includes("cryptograph") ||
-        d.includes("encryption") ||
-        c.includes("access control") ||
-        c.includes("identity") ||
-        c.includes("cryptograph") ||
-        c.includes("encryption")
-    );
+    return CRITICAL_HINTS.test(control.domain) || CRITICAL_HINTS.test(control.category);
 }
 
 function isQuickWin(control: Control): boolean {
-    const d = control.domain.toLowerCase();
-    const c = control.category.toLowerCase();
-    return (
-        d.includes("logging") ||
-        d.includes("documentation") ||
-        d.includes("awareness") ||
-        c.includes("logging") ||
-        c.includes("documentation") ||
-        c.includes("awareness") ||
-        control.title.length < 30
-    );
+    return QUICKWIN_HINTS.test(control.domain) || QUICKWIN_HINTS.test(control.category);
 }
 
-function isEvidencePending(control: Control, status: ControlStatus | undefined): boolean {
+function isEvidencePending(_control: Control, status: ControlStatus | undefined): boolean {
     if (!status) return false;
     return (
         status.status === "in_progress" ||
@@ -83,14 +66,7 @@ function isEvidencePending(control: Control, status: ControlStatus | undefined):
 }
 
 function isAuto(control: Control): boolean {
-    const d = control.domain.toLowerCase();
-    const c = control.category.toLowerCase();
-    return (
-        d.includes("access") ||
-        d.includes("cloud") ||
-        d.includes("network") ||
-        c.includes("technical")
-    );
+    return control.type === "automated";
 }
 
 function getPriority(control: Control, status: ControlStatus | undefined): Priority {
@@ -184,12 +160,18 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
     const quickwins = filtered.filter(i => i.priority === "quickwin");
     const others = filtered.filter(i => i.priority === "other");
 
+    const criticalCount = pendingControls.filter(i => i.priority === "critical").length;
+    const quickwinCount = pendingControls.filter(i => i.priority === "quickwin").length;
+    const evidenceCount = pendingControls.filter(i => i.priority === "evidence").length;
+    const manualCount = pendingControls.filter(i => !i.auto).length;
+    const autoCount = pendingControls.length - manualCount;
+
     const tabs: { id: Tab; label: string; count?: number }[] = [
         { id: "all", label: "All", count: pendingControls.length },
-        { id: "critical", label: "Critical", count: pendingControls.filter(i => i.priority === "critical").length },
-        { id: "quickwin", label: "Quick Wins", count: pendingControls.filter(i => i.priority === "quickwin").length },
-        { id: "evidence", label: "Evidence", count: pendingControls.filter(i => i.priority === "evidence").length },
-        { id: "questionnaire", label: "Questionnaire", count: pendingControls.filter(i => !i.auto).length },
+        { id: "critical", label: "Critical", count: criticalCount },
+        { id: "quickwin", label: "Quick Wins", count: quickwinCount },
+        { id: "evidence", label: "Evidence", count: evidenceCount },
+        { id: "questionnaire", label: "Questionnaire", count: manualCount },
     ];
 
     return (
@@ -208,9 +190,19 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
                     </div>
                 </div>
 
-                <div className="flex items-center gap-2 bg-card/60 border border-border rounded-lg px-3 py-1.5">
-                    <span className="text-sm text-muted-foreground">Pending</span>
-                    <span className="text-sm font-bold text-orange-400">{pendingControls.length}</span>
+                <div className="flex items-center divide-x divide-border bg-card/60 border border-border rounded-lg overflow-hidden">
+                    <div className="flex items-center gap-1.5 px-3 py-1.5">
+                        <span className="text-xs text-muted-foreground">Critical</span>
+                        <span className="text-sm font-bold text-red-400">{criticalCount}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5">
+                        <span className="text-xs text-muted-foreground">Manual</span>
+                        <span className="text-sm font-bold text-foreground">{manualCount}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 px-3 py-1.5">
+                        <span className="text-xs text-muted-foreground">Auto</span>
+                        <span className="text-sm font-bold text-blue-400">{autoCount}</span>
+                    </div>
                 </div>
             </div>
 
@@ -234,7 +226,7 @@ export function ActionItemsClient({ controls, statuses, frameworks, orgId }: Act
                                 <span className={cn(
                                     "text-[10px] font-bold px-1.5 py-0.5 rounded-full",
                                     activeTab === tab.id
-                                        ? "bg-white/20 text-white"
+                                        ? "bg-white text-orange-700"
                                         : "bg-secondary text-muted-foreground"
                                 )}>
                                     {tab.count}
@@ -392,16 +384,16 @@ function ControlRow({
             {auto && (
                 <span className="flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 flex-shrink-0">
                     <Cpu className="w-2.5 h-2.5" />
-                    AUTO
+                    AUTOMATED
                 </span>
             )}
 
             {/* View button */}
             <Link
-                href="/gap-assessment"
+                href={auto ? `/gap-assessment?control=${control.id}` : `/questionnaire?control=${control.id}`}
                 className="flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-orange-400 transition-colors flex-shrink-0 group-hover:text-orange-400"
             >
-                View
+                {auto ? "Review" : "Answer"}
                 <ChevronRight className="w-3.5 h-3.5" />
             </Link>
         </div>

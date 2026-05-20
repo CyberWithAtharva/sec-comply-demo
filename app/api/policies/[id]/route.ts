@@ -31,6 +31,14 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
         if (version !== undefined) updatePayload.version = version;
         updatePayload.updated_at = new Date().toISOString();
 
+        // Editing the content of an Active (or legacy "approved") policy must spawn
+        // a new Draft. The Active version row stays locked until the new draft is
+        // approved — keep policies.version unchanged, just flip status → draft.
+        const isContentEdit = content !== undefined && existing.status !== "draft" && existing.status !== "in_review" && existing.status !== "under_review";
+        if (isContentEdit && status === undefined) {
+            updatePayload.status = "draft";
+        }
+
         const { data, error } = await supabase
             .from("policies")
             .update(updatePayload)
@@ -39,6 +47,39 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
             .single();
 
         if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+        // Mirror the edit into a draft policy_versions row so the version history
+        // and the future approval step both have a row to act on.
+        if (isContentEdit && content !== undefined) {
+            const { data: existingVer } = await supabase
+                .from("policies")
+                .select("version")
+                .eq("id", id)
+                .single();
+            const ver = existingVer?.version ?? "v1.0";
+
+            const { data: draftRow } = await supabase
+                .from("policy_versions")
+                .select("id")
+                .eq("policy_id", id)
+                .eq("status", "draft")
+                .maybeSingle();
+            if (draftRow) {
+                await supabase.from("policy_versions").update({
+                    content,
+                    summary: "Edited from Active version.",
+                }).eq("id", draftRow.id);
+            } else {
+                await supabase.from("policy_versions").insert({
+                    policy_id: id,
+                    version: ver,
+                    status: "draft",
+                    content,
+                    created_by: user.id,
+                    summary: "Edited from Active version.",
+                });
+            }
+        }
 
         // If policy was just approved, bump linked controls from not_started → in_progress
         if (status === "approved" && existing.status !== "approved") {

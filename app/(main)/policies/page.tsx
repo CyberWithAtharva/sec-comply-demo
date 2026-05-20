@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { PoliciesClient } from "@/components/policies/PoliciesClient";
+import { PolicyLibraryClient } from "@/components/policies/PolicyLibraryClient";
+import { normaliseStatus, type PolicyListItem } from "@/components/policies/policy-shared";
 
 export default async function PoliciesPage() {
     const supabase = await createClient();
@@ -9,7 +10,7 @@ export default async function PoliciesPage() {
 
     const { data: membership } = await supabase
         .from("organization_members")
-        .select("org_id")
+        .select("org_id, organizations(id, name)")
         .eq("user_id", user.id)
         .limit(1)
         .single();
@@ -17,65 +18,50 @@ export default async function PoliciesPage() {
     if (!membership) redirect("/");
 
     const orgId = membership.org_id;
+    const orgName = (membership.organizations as unknown as { name: string } | null)?.name ?? "Your organisation";
 
-    // Fetch policies and org members in parallel (both only need orgId)
-    const [{ data: policies }, { data: members }] = await Promise.all([
-        supabase
-            .from("policies")
-            .select("*, profiles(id, full_name)")
-            .eq("org_id", orgId)
-            .order("updated_at", { ascending: false }),
-        supabase
-            .from("organization_members")
-            .select("user_id, profiles(id, full_name)")
-            .eq("org_id", orgId),
-    ]);
+    // Pull policies + the latest updater for each (single round-trip via profiles join)
+    const { data: policies } = await supabase
+        .from("policies")
+        .select("id, code, title, category, frameworks_list, status, version, updated_at, description, profiles:owner_id(full_name)")
+        .eq("org_id", orgId)
+        .order("category", { ascending: true })
+        .order("code", { ascending: true });
 
-    // Fetch acknowledgements and exceptions in parallel (both need policyIds)
-    const policyIds = (policies ?? []).map(p => p.id);
-    const [{ data: acknowledgements }, { data: exceptions }] = await Promise.all([
-        policyIds.length > 0
-            ? supabase
-                .from("policy_acknowledgements")
-                .select("id, policy_id, user_id, acknowledged_at")
-                .in("policy_id", policyIds)
-            : Promise.resolve({ data: [] as { id: string; policy_id: string; user_id: string; acknowledged_at: string }[] }),
-        policyIds.length > 0
-            ? supabase
-                .from("policy_exceptions")
-                .select("*")
-                .in("policy_id", policyIds)
-                .order("created_at", { ascending: false })
-            : Promise.resolve({ data: [] as import("@/types/database").Database["public"]["Tables"]["policy_exceptions"]["Row"][] }),
-    ]);
-
-    const owners = (members ?? [])
-        .map(m => {
-            const p = m.profiles as { id: string; full_name: string | null } | null;
-            return p ? { id: p.id, name: p.full_name ?? "Unknown" } : null;
-        })
-        .filter(Boolean) as { id: string; name: string }[];
-
-    // Count acknowledgements per policy
-    const ackCountMap = new Map<string, number>();
-    for (const ack of (acknowledgements ?? [])) {
-        ackCountMap.set(ack.policy_id, (ackCountMap.get(ack.policy_id) ?? 0) + 1);
+    // Ack roll-up from policy_ack_recipients
+    const ids = (policies ?? []).map(p => p.id);
+    const ackMap = new Map<string, { done: number; total: number }>();
+    if (ids.length > 0) {
+        const { data: acks } = await supabase
+            .from("policy_ack_recipients")
+            .select("policy_id, status")
+            .in("policy_id", ids);
+        for (const a of acks ?? []) {
+            const m = ackMap.get(a.policy_id) ?? { done: 0, total: 0 };
+            m.total++;
+            if (a.status === "acknowledged") m.done++;
+            ackMap.set(a.policy_id, m);
+        }
     }
 
-    const policiesWithAck = (policies ?? []).map(p => ({
-        ...p,
-        owner: (p.profiles as unknown as { id: string; full_name: string | null } | null),
-        ackCount: ackCountMap.get(p.id) ?? 0,
-        totalMembers: owners.length,
-    }));
+    const items: PolicyListItem[] = (policies ?? []).map(p => {
+        const owner = p.profiles as unknown as { full_name: string | null } | null;
+        const ack = ackMap.get(p.id) ?? { done: 0, total: 0 };
+        return {
+            id: p.id,
+            code: p.code,
+            title: p.title,
+            category: p.category,
+            frameworks_list: p.frameworks_list ?? [],
+            status: normaliseStatus(p.status),
+            version: p.version,
+            updated_at: p.updated_at,
+            description: p.description,
+            updatedBy: owner?.full_name ?? null,
+            ackDone: ack.done,
+            ackTotal: ack.total,
+        };
+    });
 
-    return (
-        <PoliciesClient
-            initialPolicies={policiesWithAck}
-            initialExceptions={exceptions ?? []}
-            orgId={orgId}
-            currentUserId={user.id}
-            owners={owners}
-        />
-    );
+    return <PolicyLibraryClient policies={items} orgName={orgName} />;
 }
