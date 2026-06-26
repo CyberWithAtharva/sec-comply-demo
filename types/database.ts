@@ -220,9 +220,9 @@ export type Database = {
         ];
       };
       evidence_artifacts: {
-        Row: { id: string; org_id: string; control_id: string | null; name: string; description: string | null; file_url: string | null; file_type: string | null; file_size: number | null; uploaded_by: string | null; status: string; expires_at: string | null; created_at: string };
-        Insert: { id?: string; org_id: string; control_id?: string | null; name: string; description?: string | null; file_url?: string | null; file_type?: string | null; file_size?: number | null; uploaded_by?: string | null; status?: string; expires_at?: string | null };
-        Update: { control_id?: string | null; name?: string; description?: string | null; status?: string; expires_at?: string | null };
+        Row: { id: string; org_id: string; control_id: string | null; name: string; description: string | null; file_url: string | null; file_type: string | null; file_size: number | null; uploaded_by: string | null; status: string; source: 'manual' | 'workflow_log' | 'integration'; expires_at: string | null; created_at: string };
+        Insert: { id?: string; org_id: string; control_id?: string | null; name: string; description?: string | null; file_url?: string | null; file_type?: string | null; file_size?: number | null; uploaded_by?: string | null; status?: string; source?: 'manual' | 'workflow_log' | 'integration'; expires_at?: string | null };
+        Update: { control_id?: string | null; name?: string; description?: string | null; status?: string; source?: 'manual' | 'workflow_log' | 'integration'; expires_at?: string | null };
         Relationships: [
           { foreignKeyName: "evidence_artifacts_org_id_fkey"; columns: ["org_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] },
           { foreignKeyName: "evidence_artifacts_uploaded_by_fkey"; columns: ["uploaded_by"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }
@@ -273,6 +273,24 @@ export type Database = {
         Insert: { id?: string; org_id?: string | null; user_id?: string | null; action: string; resource_type?: string | null; resource_id?: string | null; metadata?: Json; ip_address?: string | null };
         Update: { org_id?: string | null };
         Relationships: [];
+      };
+      qms_processes: {
+        Row: { id: string; key: string; name: string; description: string | null; owner_role: string | null; clause: string | null; control_id: string | null; schema: Json; sort_order: number; created_at: string };
+        Insert: { id?: string; key: string; name: string; description?: string | null; owner_role?: string | null; clause?: string | null; control_id?: string | null; schema?: Json; sort_order?: number };
+        Update: { name?: string; description?: string | null; owner_role?: string | null; clause?: string | null; control_id?: string | null; schema?: Json; sort_order?: number };
+        Relationships: [
+          { foreignKeyName: "qms_processes_control_id_fkey"; columns: ["control_id"]; isOneToOne: false; referencedRelation: "controls"; referencedColumns: ["id"] }
+        ];
+      };
+      qms_log_entries: {
+        Row: { id: string; org_id: string; process_id: string; logged_by: string | null; payload: Json; result: string | null; occurred_at: string; created_at: string };
+        Insert: { id?: string; org_id: string; process_id: string; logged_by?: string | null; payload?: Json; result?: string | null; occurred_at?: string };
+        Update: { payload?: Json; result?: string | null; occurred_at?: string };
+        Relationships: [
+          { foreignKeyName: "qms_log_entries_org_id_fkey"; columns: ["org_id"]; isOneToOne: false; referencedRelation: "organizations"; referencedColumns: ["id"] },
+          { foreignKeyName: "qms_log_entries_process_id_fkey"; columns: ["process_id"]; isOneToOne: false; referencedRelation: "qms_processes"; referencedColumns: ["id"] },
+          { foreignKeyName: "qms_log_entries_logged_by_fkey"; columns: ["logged_by"]; isOneToOne: false; referencedRelation: "profiles"; referencedColumns: ["id"] }
+        ];
       };
     };
     Views: Record<string, never>;
