@@ -462,7 +462,10 @@ export function ControlRequirementsClient({
                                   const s = statusMap.get(c.id);
                                   const statusKey: StatusKey = (s?.status ??
                                     "not_started") as StatusKey;
-                                  const meta = STATUS_META[statusKey];
+                                  const meta = metaFor(
+                                    statusKey,
+                                    activeFramework?.name,
+                                  );
                                   const StatusIcon = meta.icon;
                                   return (
                                     <Button
@@ -597,13 +600,61 @@ const STATUS_META: Record<
   },
 };
 
-const STATUS_FILTERS: Array<{ value: "all" | StatusKey; label: string }> = [
-  { value: "all", label: "All" },
-  { value: "verified", label: "Verified" },
-  { value: "in_progress", label: "In Progress" },
-  { value: "not_started", label: "Not Started" },
-  { value: "not_applicable", label: "Not Applicable" },
-];
+// ISO 9001 auditors think in conformance vocabulary, not security-control
+// status. For the quality framework we relabel the same underlying statuses
+// (the stored enum and scoring are unchanged) to Conformant / Minor NC /
+// Major NC / Excluded. See Overwatch ISO 9001 plan §3.1.
+const QMS_STATUS_META: Record<StatusKey, (typeof STATUS_META)[StatusKey]> = {
+  verified: {
+    label: "Conformant",
+    cls: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30",
+    icon: CheckCircle2,
+  },
+  in_progress: {
+    label: "Minor NC",
+    cls: "bg-amber-500/10 text-amber-300 border-amber-500/30",
+    icon: AlertTriangle,
+  },
+  not_started: {
+    label: "Major NC",
+    cls: "bg-red-500/10 text-red-300 border-red-500/30",
+    icon: XCircle,
+  },
+  not_applicable: {
+    label: "Excluded (N/A)",
+    cls: "bg-blue-500/10 text-blue-300 border-blue-500/30",
+    icon: MinusCircle,
+  },
+};
+
+function isQmsFramework(name?: string | null): boolean {
+  return (name ?? "").toLowerCase().startsWith("iso 9001");
+}
+
+function metaFor(
+  statusKey: StatusKey,
+  frameworkName?: string | null,
+): (typeof STATUS_META)[StatusKey] {
+  return isQmsFramework(frameworkName)
+    ? QMS_STATUS_META[statusKey]
+    : STATUS_META[statusKey];
+}
+
+function statusFiltersFor(
+  frameworkName?: string | null,
+): Array<{ value: "all" | StatusKey; label: string }> {
+  const qms = isQmsFramework(frameworkName);
+  return [
+    { value: "all", label: "All" },
+    { value: "verified", label: qms ? "Conformant" : "Verified" },
+    { value: "in_progress", label: qms ? "Minor NC" : "In Progress" },
+    { value: "not_started", label: qms ? "Major NC" : "Not Started" },
+    {
+      value: "not_applicable",
+      label: qms ? "Excluded (N/A)" : "Not Applicable",
+    },
+  ];
+}
 
 function AllControlsTab({
   activeFrameworkId,
@@ -683,7 +734,7 @@ function AllControlsTab({
           />
         </div>
         <div className="flex items-center gap-1 bg-card/50 border border-border rounded-lg p-1">
-          {STATUS_FILTERS.map((f) => (
+          {statusFiltersFor(activeFrameworkName).map((f) => (
             <Button
               variant="plain"
               key={f.value}
@@ -736,7 +787,7 @@ function AllControlsTab({
                   const s = statusMap.get(c.id);
                   const statusKey: StatusKey = (s?.status ??
                     "not_started") as StatusKey;
-                  const meta = STATUS_META[statusKey];
+                  const meta = metaFor(statusKey, activeFrameworkName);
                   const StatusIcon = meta.icon;
                   return (
                     <Button
@@ -803,7 +854,7 @@ function ControlDetailDialog({
 }: ControlDetailDialogProps) {
   const open = !!control;
   const meta = control
-    ? STATUS_META[(status?.status ?? "not_started") as StatusKey]
+    ? metaFor((status?.status ?? "not_started") as StatusKey, framework?.name)
     : null;
   const StatusIcon = meta?.icon ?? Info;
 

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -31,9 +31,12 @@ import {
   Fingerprint,
   FolderGit2,
   Library,
+  Workflow,
+  Gauge,
 } from "lucide-react";
 import { cn } from "@/components/ui/Card";
 import { useAuth } from "@/context/AuthContext";
+import { createClient } from "@/lib/supabase/client";
 import { signOut } from "@/lib/auth/actions";
 
 interface NavItem {
@@ -184,6 +187,25 @@ const navSections: NavSection[] = [
   },
 ];
 
+// Shown only to clients with ISO 9001 assigned (the QMS process + KPI modules).
+const QUALITY_SECTION: NavSection = {
+  label: "QUALITY (QMS)",
+  items: [
+    {
+      name: "Workflow",
+      href: "/workflow",
+      icon: Workflow,
+      caption: "Log structured QMS process records",
+    },
+    {
+      name: "Monitoring",
+      href: "/monitoring",
+      icon: Gauge,
+      caption: "Quality KPIs derived from Clause 9.1",
+    },
+  ],
+};
+
 const comingSoonItems: NavItem[] = [
   {
     name: "AI Identity",
@@ -221,7 +243,67 @@ export function Sidebar() {
     item: NavItem;
     top: number;
   } | null>(null);
-  const { profile } = useAuth();
+  const { profile, user } = useAuth();
+  const [qms, setQms] = useState<{ enabled: boolean; only: boolean }>({
+    enabled: false,
+    only: false,
+  });
+
+  // Derive QMS module visibility from the org's assigned frameworks. A QMS
+  // client (ISO 9001 assigned) gets the QUALITY section; a QMS-only client
+  // (ISO 9001 is the *only* framework) additionally hides the security-posture
+  // modules. This is the lightweight analogue of framework-driven nav.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      const supabase = createClient();
+      const { data: member } = await supabase
+        .from("organization_members")
+        .select("org_id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .single();
+      if (!member) return;
+      const { data: ofs } = await supabase
+        .from("org_frameworks")
+        .select("frameworks(name)")
+        .eq("org_id", member.org_id);
+      const names = (ofs ?? []).map(
+        (o) => (o.frameworks as { name: string } | null)?.name ?? "",
+      );
+      const isQms = (n: string) => n.toLowerCase().startsWith("iso 9001");
+      if (!cancelled) {
+        setQms({
+          enabled: names.some(isQms),
+          only: names.length > 0 && names.every(isQms),
+        });
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [user]);
+
+  const visibleSections = useMemo(() => {
+    let sections = navSections;
+    if (qms.only) {
+      sections = sections
+        .filter((s) => s.label !== "SECURITY POSTURE")
+        .map((s) =>
+          s.label === "OPERATIONS"
+            ? { ...s, items: s.items.filter((i) => i.href !== "/incident-management") }
+            : s,
+        );
+    }
+    if (qms.enabled) {
+      const idx = sections.findIndex((s) => s.label === "AUDIT");
+      const next = [...sections];
+      next.splice(idx >= 0 ? idx : next.length, 0, QUALITY_SECTION);
+      sections = next;
+    }
+    return sections;
+  }, [qms]);
 
   if (pathname === "/questionnaire") return null;
 
@@ -297,7 +379,7 @@ export function Sidebar() {
 
         {/* Navigation Body */}
         <div className="flex-1 overflow-y-auto no-scrollbar py-4 flex flex-col">
-          {navSections.map((section, sectionIdx) => (
+          {visibleSections.map((section, sectionIdx) => (
             <div key={sectionIdx} className="mb-1">
               {/* Section label */}
               {section.label && !isCollapsed && (

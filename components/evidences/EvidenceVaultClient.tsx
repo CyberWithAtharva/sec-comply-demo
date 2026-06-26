@@ -33,6 +33,7 @@ export interface EvidenceArtifact {
     file_size: number | null;
     uploaded_by: string | null;
     status: string;
+    source?: "manual" | "workflow_log" | "integration";
     expires_at: string | null;
     created_at: string;
     uploader: { id: string; full_name: string | null } | null;
@@ -79,6 +80,7 @@ type Evidence = {
     uploadedAt: string;
     fileUrl?: string;
     uploaderName: string;
+    source: "manual" | "workflow_log" | "integration";
 };
 
 type AuditEvent = {
@@ -109,6 +111,22 @@ interface EvidenceVaultClientProps {
 const FILTERS = ["all", "evidenced", "missing"] as const;
 type Filter = typeof FILTERS[number];
 
+// AUTO = generated in-platform (workflow logs / integrations); MANUAL = file
+// uploads. The more a client uses the Workflow module, the more evidence shifts
+// from MANUAL to AUTO. See Overwatch ISO 9001 plan §5.4.
+const SOURCE_TABS = [
+    { value: "all", label: "All" },
+    { value: "auto", label: "Auto" },
+    { value: "manual", label: "Manual" },
+] as const;
+type SourceTab = typeof SOURCE_TABS[number]["value"];
+
+function matchesSource(source: EvidenceArtifact["source"], tab: SourceTab): boolean {
+    if (tab === "all") return true;
+    if (tab === "manual") return (source ?? "manual") === "manual";
+    return (source ?? "manual") !== "manual"; // auto = workflow_log | integration
+}
+
 function formatDate(value?: string) {
     if (!value) return "—";
     return new Date(value).toLocaleDateString(undefined, {
@@ -136,6 +154,7 @@ function evidenceFromArtifact(artifact: EvidenceArtifact): Evidence {
         uploadedAt: artifact.created_at,
         fileUrl: artifact.file_url ?? undefined,
         uploaderName: artifact.uploader?.full_name ?? "Unknown user",
+        source: artifact.source ?? "manual",
     };
 }
 
@@ -216,6 +235,23 @@ function ControlStatusPill({ control }: { control: VaultControl }) {
     return (
         <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded border text-muted-foreground bg-secondary/70 border-border/60">
             Missing
+        </span>
+    );
+}
+
+function SourceBadge({ source }: { source: Evidence["source"] }) {
+    const isAuto = source !== "manual";
+    return (
+        <span
+            className={cn(
+                "text-[10px] uppercase font-bold px-2 py-0.5 rounded border",
+                isAuto
+                    ? "text-sky-400 bg-sky-500/10 border-sky-500/30"
+                    : "text-muted-foreground bg-secondary/70 border-border/60",
+            )}
+            title={isAuto ? "Auto-collected (workflow log / integration)" : "Manually uploaded file"}
+        >
+            {isAuto ? "Auto" : "Manual"}
         </span>
     );
 }
@@ -315,12 +351,28 @@ export function EvidenceVaultClient({
 }: EvidenceVaultClientProps) {
     const supabase = createClient();
 
-    const [vaultByFramework, setVaultByFramework] = useState<Record<string, VaultControl[]>>(() =>
-        frameworks.reduce<Record<string, VaultControl[]>>((acc, fw) => {
-            const fwControls = controls.filter((c) => c.framework_id === fw.id);
-            acc[fw.id] = buildVaultControls(fw, fwControls, initialArtifacts, policies, policyLinks, statuses);
-            return acc;
-        }, {}),
+    // Optimistically-added artifacts (manual uploads / link adds) are kept
+    // separately and merged with the server-provided list; the vault is then
+    // derived so the AUTO/MANUAL source filter stays reactive.
+    const [extraArtifacts, setExtraArtifacts] = useState<EvidenceArtifact[]>([]);
+    const [sourceTab, setSourceTab] = useState<SourceTab>("all");
+
+    const sourceFilteredArtifacts = useMemo(
+        () =>
+            [...extraArtifacts, ...initialArtifacts].filter((a) =>
+                matchesSource(a.source, sourceTab),
+            ),
+        [extraArtifacts, initialArtifacts, sourceTab],
+    );
+
+    const vaultByFramework = useMemo<Record<string, VaultControl[]>>(
+        () =>
+            frameworks.reduce<Record<string, VaultControl[]>>((acc, fw) => {
+                const fwControls = controls.filter((c) => c.framework_id === fw.id);
+                acc[fw.id] = buildVaultControls(fw, fwControls, sourceFilteredArtifacts, policies, policyLinks, statuses);
+                return acc;
+            }, {}),
+        [frameworks, controls, sourceFilteredArtifacts, policies, policyLinks, statuses],
     );
 
     const [selectedFrameworkId, setSelectedFrameworkId] = useState(frameworks[0]?.id ?? "");
@@ -390,43 +442,10 @@ export function EvidenceVaultClient({
         return { total, evidenced, policyOnly, missing };
     }, [currentControls]);
 
-    function applyArtifactToControl(
-        frameworkId: string,
-        controlId: string,
-        artifact: EvidenceArtifact,
-        mode: "upload" | "replace",
-    ) {
-        setVaultByFramework((previous) => {
-            const next = { ...previous };
-            next[frameworkId] = (previous[frameworkId] ?? []).map((c) => {
-                if (c.id !== controlId) return c;
-                const newEvidence = evidenceFromArtifact(artifact);
-                const previousEvidence = c.evidence;
-                const newEvent: AuditEvent = {
-                    id: `${mode}-${artifact.id}`,
-                    kind: mode === "replace" ? "replaced" : "uploaded",
-                    message: mode === "replace"
-                        ? `${artifact.name} replaced the previous evidence`
-                        : `${artifact.name} uploaded by ${artifact.uploader?.full_name ?? "Unknown user"}`,
-                    at: artifact.created_at,
-                };
-                const archiveEvent: AuditEvent | null = mode === "replace" && previousEvidence
-                    ? {
-                        id: `archived-${previousEvidence.id}`,
-                        kind: "archived",
-                        message: `${previousEvidence.name} archived after replacement`,
-                        at: artifact.created_at,
-                    }
-                    : null;
-
-                return {
-                    ...c,
-                    evidence: newEvidence,
-                    auditTrail: [newEvent, ...(archiveEvent ? [archiveEvent] : []), ...c.auditTrail],
-                };
-            });
-            return next;
-        });
+    // Optimistically surface a newly-persisted artifact by prepending it to the
+    // live list; the vault (and its audit trail) re-derives via useMemo.
+    function applyArtifactToControl(artifact: EvidenceArtifact) {
+        setExtraArtifacts((previous) => [artifact, ...previous]);
     }
 
     async function persistArtifact({
@@ -502,7 +521,7 @@ export function EvidenceVaultClient({
                 controlId: control.id,
                 label: control.title,
             });
-            applyArtifactToControl(context.frameworkId, context.controlId, artifact, context.mode);
+            applyArtifactToControl(artifact);
             toast.success(context.mode === "replace" ? "Evidence replaced" : "Evidence uploaded");
         } catch (error) {
             toast.error(error instanceof Error ? error.message : "Failed to upload evidence");
@@ -524,7 +543,7 @@ export function EvidenceVaultClient({
                 controlId: control.id,
                 label: control.title,
             });
-            applyArtifactToControl(selectedFrameworkId, control.id, artifact, "upload");
+            applyArtifactToControl(artifact);
             setLinkDraft("");
             toast.success("Evidence link added");
         } catch (error) {
@@ -592,6 +611,29 @@ export function EvidenceVaultClient({
                         {framework.name} {framework.version ? `v${framework.version}` : ""}
                     </Button>
                 ))}
+            </div>
+
+            <div className="flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Source</span>
+                <div className="flex items-center gap-1 bg-secondary/50 border border-border/50 rounded-lg p-1 w-fit">
+                    {SOURCE_TABS.map((tab) => (
+                        <Button variant="plain"
+                            key={tab.value}
+                            onClick={() => setSourceTab(tab.value)}
+                            className={cn("h-auto",
+                                "px-3 py-1 rounded-md text-xs font-medium transition-all",
+                                sourceTab === tab.value
+                                    ? "bg-orange-600 text-white shadow-sm"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-secondary/40",
+                            )}
+                        >
+                            {tab.label}
+                        </Button>
+                    ))}
+                </div>
+                <span className="text-[11px] text-muted-foreground">
+                    Auto = workflow logs &amp; integrations · Manual = file uploads
+                </span>
             </div>
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -734,7 +776,12 @@ export function EvidenceVaultClient({
                             <div>
                                 <div className="flex items-center justify-between mb-3">
                                     <h3 className="text-sm font-semibold text-foreground">Uploaded Evidence</h3>
-                                    <ControlStatusPill control={selectedControl} />
+                                    <div className="flex items-center gap-2">
+                                        {selectedControl.evidence && (
+                                            <SourceBadge source={selectedControl.evidence.source} />
+                                        )}
+                                        <ControlStatusPill control={selectedControl} />
+                                    </div>
                                 </div>
 
                                 {selectedControl.evidence ? (
