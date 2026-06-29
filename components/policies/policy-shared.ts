@@ -32,6 +32,7 @@ export const STATUS_CLASSES: Record<PolicyStatusV2, string> = {
 
 export const FRAMEWORKS = [
     { id: "iso", label: "ISO 27001", short: "ISO" },
+    { id: "iso9001", label: "ISO 9001", short: "ISO9001" },
     { id: "soc2", label: "SOC 2", short: "SOC2" },
     { id: "hipaa", label: "HIPAA", short: "HIPAA" },
     { id: "gdpr", label: "GDPR", short: "GDPR" },
@@ -40,6 +41,7 @@ export const FRAMEWORKS = [
 
 export const FRAMEWORK_CLASSES: Record<string, string> = {
     iso: "bg-blue-500/10 text-blue-400 border-blue-500/30",
+    iso9001: "bg-teal-500/10 text-teal-400 border-teal-500/30",
     soc2: "bg-violet-500/10 text-violet-400 border-violet-500/30",
     hipaa: "bg-emerald-500/10 text-emerald-400 border-emerald-500/30",
     gdpr: "bg-amber-500/10 text-amber-400 border-amber-500/30",
